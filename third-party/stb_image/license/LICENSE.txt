@@ -1,0 +1,22 @@
+stbi-1.33 - public domain JPEG/PNG reader - http://nothings.org/stb_image.c
+   when you control the images you're loading
+                                     no warranty implied; use at your own risk
+
+
+ ============================    Contributors    =========================
+              
+ Image formats                                Optimizations & bugfixes
+    Sean Barrett (jpeg, png, bmp)                Fabian "ryg" Giesen
+    Nicolas Schulz (hdr, psd)                                                 
+    Jonathan Dummer (tga)                     Bug fixes & warning fixes           
+    Jean-Marc Lienher (gif)                      Marc LeBlanc               
+    Tom Seddon (pic)                             Christpher Lloyd           
+    Thatcher Ulrich (psd)                        Dave Moore                 
+                                                 Won Chun                   
+                                                 the Horde3D community      
+ Extensions, features                            Janez Zemva                
+    Jetro Lauha (stbi_info)                      Jonathan Blow              
+    James "moose2000" Brown (iPhone PNG)         Laurent Gomila                             
+    Ben "Disch" Wenger (io callbacks)            Aruelien Pocheville
+    Martin "SpartanJ" Golini                     Ryamond Barbiero
+                                                 David Woo
