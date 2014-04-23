@@ -1,9 +1,12 @@
+# Modified for use in the Locus game engine
+
 # CMakeLists.txt
 #
 # Copyright 2013, 2014 by
 # David Turner, Robert Wilhelm, and Werner Lemberg.
 #
 # Written by John Cary <cary@txcorp.com>
+#
 #
 # This file is part of the FreeType project, and may only be used, modified,
 # and distributed under the terms of the FreeType project license,
@@ -43,6 +46,42 @@ set(VERSION_MAJOR "2")
 set(VERSION_MINOR "5")
 set(VERSION_PATCH "3")
 set(PROJECT_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
+
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+
+if (MSVC)
+    option(USE_MSVC_RUNTIME_LIBRARY_DLL "Use MSVC runtime library DLL" OFF)
+endif()
+
+if(BUILD_SHARED_LIBS)
+	add_definitions(-DFREETYPE_BUILD_SHARED)
+endif()
+
+#--------------------------------------------------------------------
+# Set compiler specific flags
+#--------------------------------------------------------------------
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/UnixOptions.cmake)
+
+SetUnixOptions(OFF ON)
+
+if (MSVC)
+    if (NOT USE_MSVC_RUNTIME_LIBRARY_DLL)
+        foreach (flag CMAKE_C_FLAGS
+                      CMAKE_C_FLAGS_DEBUG
+                      CMAKE_C_FLAGS_RELEASE
+                      CMAKE_C_FLAGS_MINSIZEREL
+                      CMAKE_C_FLAGS_RELWITHDEBINFO)
+
+            if (${flag} MATCHES "/MD")
+                string(REGEX REPLACE "/MD" "/MT" ${flag} "${${flag}}")
+            endif()
+            if (${flag} MATCHES "/MDd")
+                string(REGEX REPLACE "/MDd" "/MTd" ${flag} "${${flag}}")
+            endif()
+
+        endforeach()
+    endif()
+endif()
 
 # Compiler definitions for building the library
 add_definitions(-DFT2_BUILD_LIBRARY)
@@ -129,37 +168,37 @@ add_library(freetype ${BASE_SRCS})
 
 # Installations
 # Note the trailing slash in the argument to the `DIRECTORY' directive
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
-  DESTINATION include/freetype2
-  PATTERN "internal" EXCLUDE
-)
-install(TARGETS freetype
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
+#install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
+#  DESTINATION include/freetype2
+#  PATTERN "internal" EXCLUDE
+#)
+#install(TARGETS freetype
+#  RUNTIME DESTINATION bin
+#  LIBRARY DESTINATION lib
+#  ARCHIVE DESTINATION lib
+#)
 
 # Packaging
 # CPack version numbers for release tarball name.
-set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
-set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH}})
-if (NOT DEFINED CPACK_PACKAGE_DESCRIPTION_SUMMARY)
-  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${CMAKE_PROJECT_NAME}")
-endif ()
-if (NOT DEFINED CPACK_SOURCE_PACKAGE_FILE_NAME)
-  set(CPACK_SOURCE_PACKAGE_FILE_NAME
-    "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}-r${PROJECT_REV}"
-    CACHE INTERNAL "tarball basename"
-  )
-endif ()
-set(CPACK_SOURCE_GENERATOR TGZ)
-set(CPACK_SOURCE_IGNORE_FILES
-  "/CVS/;/.svn/;.swp$;.#;/#;/build/;/serial/;/ser/;/parallel/;/par/;~;/preconfig.out;/autom4te.cache/;/.config")
-set(CPACK_GENERATOR TGZ)
-include(CPack)
+# set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
+# set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
+# set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH}})
+# if (NOT DEFINED CPACK_PACKAGE_DESCRIPTION_SUMMARY)
+#   set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${CMAKE_PROJECT_NAME}")
+# endif ()
+# if (NOT DEFINED CPACK_SOURCE_PACKAGE_FILE_NAME)
+#   set(CPACK_SOURCE_PACKAGE_FILE_NAME
+#     "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}-r${PROJECT_REV}"
+#     CACHE INTERNAL "tarball basename"
+#   )
+# endif ()
+# set(CPACK_SOURCE_GENERATOR TGZ)
+# set(CPACK_SOURCE_IGNORE_FILES
+#   "/CVS/;/.svn/;.swp$;.#;/#;/build/;/serial/;/ser/;/parallel/;/par/;~;/preconfig.out;/autom4te.cache/;/.config")
+# set(CPACK_GENERATOR TGZ)
+# include(CPack)
 
 # add make dist target
-add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
+# add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
 
 # eof

@@ -4,6 +4,8 @@
  * Main header file for PhysicsFS.
  */
 
+ // This file has been altered for use with the Locus Game Engine
+ 
 /**
  * \mainpage PhysicsFS
  *
@@ -221,12 +223,22 @@ extern "C" {
 #endif
 
 #ifndef DOXYGEN_SHOULD_IGNORE_THIS
-#if (defined _MSC_VER)
-#define __EXPORT__ __declspec(dllexport)
-#elif (__GNUC__ >= 3)
-#define __EXPORT__ __attribute__((visibility("default")))
+#if (defined PHYSFS_BUILD_SHARED)
+	#if (defined _MSC_VER)
+	#define __EXPORT__ __declspec(dllexport)
+	#elif (__GNUC__ >= 3)
+	#define __EXPORT__ __attribute__((visibility("default")))
+   #else
+   #define __EXPORT__
+	#endif
+#elif (defined PHYSFS_SHARED)
+	#if (defined _MSC_VER)
+		#define __EXPORT__ __declspec(dllimport)
+   #else
+   #define __EXPORT__
+	#endif
 #else
-#define __EXPORT__
+   #define __EXPORT__
 #endif
 #endif  /* DOXYGEN_SHOULD_IGNORE_THIS */
 

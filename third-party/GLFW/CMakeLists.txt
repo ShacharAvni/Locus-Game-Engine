@@ -1,3 +1,5 @@
+# Modified for use in the Locus game engine
+
 project(GLFW C)
 
 cmake_minimum_required(VERSION 2.8)
@@ -11,10 +13,10 @@ set(GLFW_VERSION_FULL "${GLFW_VERSION}.${GLFW_VERSION_PATCH}${GLFW_VERSION_EXTRA
 set(LIB_SUFFIX "" CACHE STRING "Takes an empty string or 64. Directory where lib will be installed: lib or lib64")
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-option(GLFW_BUILD_EXAMPLES "Build the GLFW example programs" ON)
-option(GLFW_BUILD_TESTS "Build the GLFW test programs" ON)
-option(GLFW_INSTALL "Generate installation target" ON)
-option(GLFW_DOCUMENT_INTERNALS "Include internals in documentation" OFF)
+#option(GLFW_BUILD_EXAMPLES "Build the GLFW example programs" ON)
+#option(GLFW_BUILD_TESTS "Build the GLFW test programs" ON)
+#option(GLFW_INSTALL "Generate installation target" ON)
+#option(GLFW_DOCUMENT_INTERNALS "Include internals in documentation" OFF)
 
 if (WIN32)
     option(GLFW_USE_DWM_SWAP_INTERVAL "Set swap interval even when DWM compositing is enabled" OFF)
@@ -30,7 +32,7 @@ else()
 endif()
 
 if (MSVC)
-    option(USE_MSVC_RUNTIME_LIBRARY_DLL "Use MSVC runtime library DLL" ON)
+    option(USE_MSVC_RUNTIME_LIBRARY_DLL "Use MSVC runtime library DLL" OFF)
 endif()
 
 if (BUILD_SHARED_LIBS)
@@ -54,11 +56,11 @@ if (GLFW_USE_EGL)
     set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake/modules)
     find_package(EGL REQUIRED)
 
-    if (NOT _GLFW_USE_OPENGL)
-        set(GLFW_BUILD_EXAMPLES OFF)
-        set(GLFW_BUILD_TESTS OFF)
-        message(STATUS "NOTE: Examples and tests require OpenGL")
-    endif()
+	#if (NOT _GLFW_USE_OPENGL)
+        #set(GLFW_BUILD_EXAMPLES OFF)
+        #set(GLFW_BUILD_TESTS OFF)
+        #message(STATUS "NOTE: Examples and tests require OpenGL")
+    #endif()
 else()
     set(_GLFW_USE_OPENGL 1)
 endif()
@@ -73,23 +75,19 @@ endif()
 
 find_package(Threads REQUIRED)
 
-set(DOXYGEN_SKIP_DOT TRUE)
-find_package(Doxygen)
+#set(DOXYGEN_SKIP_DOT TRUE)
+#find_package(Doxygen)
 
-if (GLFW_DOCUMENT_INTERNALS)
-    set(GLFW_INTERNAL_DOCS "${GLFW_SOURCE_DIR}/src/internal.h ${GLFW_SOURCE_DIR}/docs/internal.dox")
-endif()
+#if (GLFW_DOCUMENT_INTERNALS)
+#    set(GLFW_INTERNAL_DOCS "${GLFW_SOURCE_DIR}/src/internal.h ${GLFW_SOURCE_DIR}/docs/internal.dox")
+#endif()
 
 #--------------------------------------------------------------------
 # Set compiler specific flags
 #--------------------------------------------------------------------
-if (UNIX)
-    add_definitions(-Wall)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/UnixOptions.cmake)
 
-    if (BUILD_SHARED_LIBS)
-        add_definitions(-fvisibility=hidden)
-    endif()
-endif()
+SetUnixOptions(OFF ON)
 
 if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
@@ -383,8 +381,8 @@ endif()
 #--------------------------------------------------------------------
 # Create generated files
 #--------------------------------------------------------------------
-configure_file(${GLFW_SOURCE_DIR}/docs/Doxyfile.in
-               ${GLFW_BINARY_DIR}/docs/Doxyfile @ONLY)
+#configure_file(${GLFW_SOURCE_DIR}/docs/Doxyfile.in
+#               ${GLFW_BINARY_DIR}/docs/Doxyfile @ONLY)
 
 configure_file(${GLFW_SOURCE_DIR}/src/config.h.in 
                ${GLFW_BINARY_DIR}/src/config.h @ONLY)
@@ -405,44 +403,44 @@ endif()
 #--------------------------------------------------------------------
 add_subdirectory(src)
 
-if (GLFW_BUILD_EXAMPLES)
-    add_subdirectory(examples)
-endif()
+#if (GLFW_BUILD_EXAMPLES)
+#    add_subdirectory(examples)
+#endif()
 
-if (GLFW_BUILD_TESTS)
-    add_subdirectory(tests)
-endif()
+#if (GLFW_BUILD_TESTS)
+#    add_subdirectory(tests)
+#endif()
 
-if (DOXYGEN_FOUND)
-    add_subdirectory(docs)
-endif()
+#if (DOXYGEN_FOUND)
+#    add_subdirectory(docs)
+#endif()
 
 #--------------------------------------------------------------------
 # Install files other than the library
 # The library is installed by src/CMakeLists.txt
 #--------------------------------------------------------------------
-if (GLFW_INSTALL)
-    install(DIRECTORY include/GLFW DESTINATION include 
-            FILES_MATCHING PATTERN glfw3.h PATTERN glfw3native.h)
+#if (GLFW_INSTALL)
+#    install(DIRECTORY include/GLFW DESTINATION include 
+#            FILES_MATCHING PATTERN glfw3.h PATTERN glfw3native.h)#
 
-    install(FILES ${GLFW_BINARY_DIR}/src/glfwConfig.cmake
-                  ${GLFW_BINARY_DIR}/src/glfwConfigVersion.cmake
-            DESTINATION lib${LIB_SUFFIX}/cmake/glfw)
+#    install(FILES ${GLFW_BINARY_DIR}/src/glfwConfig.cmake
+#                  ${GLFW_BINARY_DIR}/src/glfwConfigVersion.cmake
+#            DESTINATION lib${LIB_SUFFIX}/cmake/glfw)
 
-    if (UNIX)
-        install(EXPORT glfwTargets DESTINATION lib${LIB_SUFFIX}/cmake/glfw)
-        install(FILES ${GLFW_BINARY_DIR}/src/glfw3.pc
-                DESTINATION lib${LIB_SUFFIX}/pkgconfig)
-    endif()
+#    if (UNIX)
+#        install(EXPORT glfwTargets DESTINATION lib${LIB_SUFFIX}/cmake/glfw)
+#        install(FILES ${GLFW_BINARY_DIR}/src/glfw3.pc
+#                DESTINATION lib${LIB_SUFFIX}/pkgconfig)
+#    endif()
 
     # Only generate this target if no higher-level project already has
-    if (NOT TARGET uninstall)
-        configure_file(${GLFW_SOURCE_DIR}/cmake_uninstall.cmake.in
-                       ${GLFW_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
+#    if (NOT TARGET uninstall)
+#        configure_file(${GLFW_SOURCE_DIR}/cmake_uninstall.cmake.in
+#                       ${GLFW_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
 
-        add_custom_target(uninstall
-                          ${CMAKE_COMMAND} -P
-                          ${GLFW_BINARY_DIR}/cmake_uninstall.cmake)
-    endif()
-endif()
+#        add_custom_target(uninstall
+#                          ${CMAKE_COMMAND} -P
+#                          ${GLFW_BINARY_DIR}/cmake_uninstall.cmake)
+#    endif()
+#endif()
 
