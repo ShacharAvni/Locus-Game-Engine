@@ -54,10 +54,10 @@ static const char* const Low = "lowp";
 
 static const std::string FragColorVar130 = "mygl_FragColor";
 
-static std::string Vert_1_30(bool textured, unsigned int numLights);
-static std::string Frag_1_30(bool textured, unsigned int numLights);
-static std::string Vert_Pre_1_30(GLInfo::GLSLVersion version, bool textured, unsigned int numLights);
-static std::string Frag_Pre_1_30(GLInfo::GLSLVersion version, bool textured, unsigned int numLights);
+static std::string Vert_1_30(bool textured, unsigned int numLights, std::vector<std::string>& attributes, std::vector<std::string>& uniforms);
+static std::string Frag_1_30(bool textured, unsigned int numLights, std::vector<std::string>& uniforms);
+static std::string Vert_Pre_1_30(GLInfo::GLSLVersion version, bool textured, unsigned int numLights, std::vector<std::string>& uniforms);
+static std::string Frag_Pre_1_30(GLInfo::GLSLVersion version, bool textured, unsigned int numLights, std::vector<std::string>& uniforms);
 
 static void AddVersion(std::string& source, GLInfo::GLSLVersion version);
 static void AddPrecision(std::string& source, const char* precisionQualifier, const char* varType);
@@ -133,33 +133,33 @@ static void AddInOutVar(std::string& source, const char* varType, const std::str
    }
 }
 
-std::string Vert(GLInfo::GLSLVersion version, bool textured, unsigned int numLights)
+std::string Vert(GLInfo::GLSLVersion version, bool textured, unsigned int numLights, std::vector<std::string>& attributes, std::vector<std::string>& uniforms)
 {
    if (version == GLInfo::GLSLVersion::V_130)
    {
-      return Vert_1_30(textured, numLights);
+      return Vert_1_30(textured, numLights, attributes, uniforms);
    }
    else
    {
-      return Vert_Pre_1_30(version, textured, numLights);
+      return Vert_Pre_1_30(version, textured, numLights, uniforms);
    }
 }
 
-std::string Frag(GLInfo::GLSLVersion version, bool textured, unsigned int numLights)
+std::string Frag(GLInfo::GLSLVersion version, bool textured, unsigned int numLights, std::vector<std::string>& uniforms)
 {
    if (version == GLInfo::GLSLVersion::V_130)
    {
-      return Frag_1_30(textured, numLights);
+      return Frag_1_30(textured, numLights, uniforms);
    }
    else
    {
-      return Frag_Pre_1_30(version, textured, numLights);
+      return Frag_Pre_1_30(version, textured, numLights, uniforms);
    }
 }
 
 ///////////////////////////// 1.30 Shaders ////////////////////////////////////
 
-static std::string Vert_1_30(bool textured, unsigned int numLights)
+static std::string Vert_1_30(bool textured, unsigned int numLights, std::vector<std::string>& attributes, std::vector<std::string>& uniforms)
 {
    GLInfo::GLSLVersion version = GLInfo::GLSLVersion::V_130;
 
@@ -171,32 +171,49 @@ static std::string Vert_1_30(bool textured, unsigned int numLights)
    AddPrecision(source, PrecisionQualifiers::Medium, VariableTypes::Float);
 
    AddVar(source, VariableSpecifiers::In, VariableTypes::Vec4, Vert_Pos);
+   attributes.push_back(Vert_Pos);
 
    AddInOutVar(source, VariableTypes::Vec4, Color, version);
+   attributes.push_back(Color);
 
    AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Mat4, Mat_MVP);
+   uniforms.push_back(Mat_MVP);
 
    if (textured)
    {
       AddInOutVar(source, VariableTypes::Vec2, Vert_Tex, version);
+      attributes.push_back(Vert_Tex);
    }
 
    if (shouldUseLights)
    {
       AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Mat4, Mat_MV);
+      uniforms.push_back(Mat_MV);
 
       AddInOutVar(source, VariableTypes::Vec3, Vert_Normal, version);
+      attributes.push_back(Vert_Normal);
 
       AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Mat3, Mat_Normal);
+      uniforms.push_back(Mat_Normal);
 
       //AddVar(source, VariableSpecifiers::Out, VariableTypes::Vec3, ToEyeDirection);
 
       for (unsigned int lightNum = 0; lightNum < numLights; ++lightNum)
       {
-         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Vec3, GetMultiVariableName(Light_EyePos, lightNum));
-         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Float, GetMultiVariableName(Light_Attenuation, lightNum));
-         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Float, GetMultiVariableName(Light_LinearAttenuation, lightNum));
-         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Float, GetMultiVariableName(Light_QuadraticAttenuation, lightNum));
+         std::string lightEyePosUniform = GetMultiVariableName(Light_EyePos, lightNum);
+         std::string lightAttenuationUniform = GetMultiVariableName(Light_Attenuation, lightNum);
+         std::string lightLinearAttenuationUniform = GetMultiVariableName(Light_LinearAttenuation, lightNum);
+         std::string lightQuadraticAttenuationUniform = GetMultiVariableName(Light_QuadraticAttenuation, lightNum);
+
+         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Vec3, lightEyePosUniform);
+         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Float, lightAttenuationUniform);
+         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Float, lightLinearAttenuationUniform);
+         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Float, lightQuadraticAttenuationUniform);
+
+         uniforms.push_back(lightEyePosUniform);
+         uniforms.push_back(lightAttenuationUniform);
+         uniforms.push_back(lightLinearAttenuationUniform);
+         uniforms.push_back(lightQuadraticAttenuationUniform);
 
          AddVar(source, VariableSpecifiers::Out, VariableTypes::Vec3, GetMultiVariableName(ToLightDirection, lightNum));
          AddVar(source, VariableSpecifiers::Out, VariableTypes::Float, GetMultiVariableName(CalculatedLightAttenuation, lightNum));
@@ -250,7 +267,7 @@ static std::string Vert_1_30(bool textured, unsigned int numLights)
    return source;
 }
 
-static std::string Frag_1_30(bool textured, unsigned int numLights)
+static std::string Frag_1_30(bool textured, unsigned int numLights, std::vector<std::string>& uniforms)
 {
    GLInfo::GLSLVersion version = GLInfo::GLSLVersion::V_130;
 
@@ -270,7 +287,9 @@ static std::string Frag_1_30(bool textured, unsigned int numLights)
    if (textured)
    {
       AddVar(source, VariableSpecifiers::In, VariableTypes::Vec2, fromVertTexCoordVar);
+
       AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Sampler2D, Map_Diffuse);
+      uniforms.push_back(Map_Diffuse);
    }
 
    if (shouldUseLights)
@@ -284,7 +303,11 @@ static std::string Frag_1_30(bool textured, unsigned int numLights)
          AddVar(source, VariableSpecifiers::In, VariableTypes::Vec3, GetMultiVariableName(ToLightDirection, lightNum));
          AddVar(source, VariableSpecifiers::In, VariableTypes::Float, GetMultiVariableName(CalculatedLightAttenuation, lightNum));
 
-         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Vec4, GetMultiVariableName(Light_Diffuse, lightNum));
+         std::string lightDiffuseUniform = GetMultiVariableName(Light_Diffuse, lightNum);
+
+         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Vec4, lightDiffuseUniform);
+         uniforms.push_back(lightDiffuseUniform);
+
          //AddVar(source, VariableSpecifiers::Uniform, VariableType::Vec4, GetMultiVariableName(Light_Ambient, lightNum));
          //AddVar(source, VariableSpecifiers::Uniform, VariableType::Vec4, GetMultiVariableName(Light_Specular, lightNum));
       }
@@ -338,7 +361,7 @@ static std::string Frag_1_30(bool textured, unsigned int numLights)
    return source;
 }
 
-static std::string Vert_Pre_1_30(GLInfo::GLSLVersion version, bool textured, unsigned int numLights)
+static std::string Vert_Pre_1_30(GLInfo::GLSLVersion version, bool textured, unsigned int numLights, std::vector<std::string>& uniforms)
 {
    bool shouldUseLights = (numLights > 0);
 
@@ -354,10 +377,20 @@ static std::string Vert_Pre_1_30(GLInfo::GLSLVersion version, bool textured, uns
 
       for (unsigned int lightNum = 0; lightNum < numLights; ++lightNum)
       {
-         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Vec3, GetMultiVariableName(Light_EyePos, lightNum));
-         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Float, GetMultiVariableName(Light_Attenuation, lightNum));
-         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Float, GetMultiVariableName(Light_LinearAttenuation, lightNum));
-         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Float, GetMultiVariableName(Light_QuadraticAttenuation, lightNum));
+         std::string lightEyePosUniform = GetMultiVariableName(Light_EyePos, lightNum);
+         std::string lightAttenuationUniform = GetMultiVariableName(Light_Attenuation, lightNum);
+         std::string lightLinearAttenuationUniform = GetMultiVariableName(Light_LinearAttenuation, lightNum);
+         std::string lightQuadraticAttenuationUniform = GetMultiVariableName(Light_QuadraticAttenuation, lightNum);
+
+         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Vec3, lightEyePosUniform);
+         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Float, lightAttenuationUniform);
+         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Float, lightLinearAttenuationUniform);
+         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Float, lightQuadraticAttenuationUniform);
+
+         uniforms.push_back(lightEyePosUniform);
+         uniforms.push_back(lightAttenuationUniform);
+         uniforms.push_back(lightLinearAttenuationUniform);
+         uniforms.push_back(lightQuadraticAttenuationUniform);
 
          AddVar(source, VariableSpecifiers::Varying, VariableTypes::Vec3, GetMultiVariableName(ToLightDirection, lightNum));
          AddVar(source, VariableSpecifiers::Varying, VariableTypes::Float, GetMultiVariableName(CalculatedLightAttenuation, lightNum));
@@ -411,7 +444,7 @@ static std::string Vert_Pre_1_30(GLInfo::GLSLVersion version, bool textured, uns
    return source;
 }
 
-static std::string Frag_Pre_1_30(GLInfo::GLSLVersion version, bool textured, unsigned int numLights)
+static std::string Frag_Pre_1_30(GLInfo::GLSLVersion version, bool textured, unsigned int numLights, std::vector<std::string>& uniforms)
 {
    std::string source;
 
@@ -424,6 +457,7 @@ static std::string Frag_Pre_1_30(GLInfo::GLSLVersion version, bool textured, uns
    if (textured)
    {
       AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Sampler2D, Map_Diffuse);
+      uniforms.push_back(Map_Diffuse);
    }
 
    if (shouldUseLights)
@@ -437,7 +471,11 @@ static std::string Frag_Pre_1_30(GLInfo::GLSLVersion version, bool textured, uns
          AddVar(source, VariableSpecifiers::Varying, VariableTypes::Vec3, GetMultiVariableName(ToLightDirection, lightNum));
          AddVar(source, VariableSpecifiers::Varying, VariableTypes::Float, GetMultiVariableName(CalculatedLightAttenuation, lightNum));
 
-         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Vec4, GetMultiVariableName(Light_Diffuse, lightNum));
+         std::string lightDiffuseUniform = GetMultiVariableName(Light_Diffuse, lightNum);
+
+         AddVar(source, VariableSpecifiers::Uniform, VariableTypes::Vec4, lightDiffuseUniform);
+         uniforms.push_back(lightDiffuseUniform);
+
          //AddVar(source, VariableSpecifiers::Uniform, VariableType::Vec4, GetMultiVariableName(Light_Ambient, lightNum));
          //AddVar(source, VariableSpecifiers::Uniform, VariableType::Vec4, GetMultiVariableName(Light_Specular, lightNum));
       }

@@ -61,6 +61,27 @@ void ShaderController::LoadShaderProgram(unsigned int whichProgram, const Shader
    shaderProgramMap[whichProgram].reset( new ShaderProgram(shader1, shader2, doesTexturing, doesLighting, attributes, uniforms) );
 }
 
+void ShaderController::LoadShaderProgram(unsigned int whichProgram, GLInfo::GLSLVersion activeGLSLVersion, bool doesTexturing, unsigned int numLights)
+{
+   std::vector<std::string> attributes;
+   std::vector<std::string> uniforms;
+
+   std::string vertexShader = Locus::ShaderSource::Vert(activeGLSLVersion, doesTexturing, numLights, attributes, uniforms);
+   std::string fragmentShader = Locus::ShaderSource::Frag(activeGLSLVersion, doesTexturing, numLights, uniforms);
+
+   shaderProgramMap[whichProgram].reset
+   ( new ShaderProgram
+      (
+         Shader(Shader::ShaderType::Vertex, vertexShader),
+         Shader(Shader::ShaderType::Fragment, fragmentShader),
+         doesTexturing,
+         (numLights > 0),
+         attributes,
+         uniforms
+       )
+   );
+}
+
 void ShaderController::SetTextureUniform(const char* whichTex, GLuint textureUnit)
 {
    if (currentProgram != nullptr)

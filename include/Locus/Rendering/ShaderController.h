@@ -39,6 +39,7 @@ public:
    void StopProgams();
 
    void LoadShaderProgram(unsigned int whichProgram, const Shader& shader1, const Shader& shader2, bool doesTexturing, bool doesLighting, const std::vector<std::string>& attributes, const std::vector<std::string>& uniforms);
+   void LoadShaderProgram(unsigned int whichProgram, GLInfo::GLSLVersion activeGLSLVersion, bool doesTexturing, unsigned int numLights);
 
    void SetTextureUniform(const char* whichTex, GLuint textureUnit);
    void SetMatrix4Uniform(const char* whichMatrix, const float* matrixElements);
