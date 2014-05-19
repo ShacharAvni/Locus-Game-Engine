@@ -15,7 +15,6 @@
 #include "GLInfo.h"
 
 #include <string>
-#include <vector>
 
 namespace Locus
 {
@@ -23,8 +22,8 @@ namespace Locus
 namespace ShaderSource
 {
 
-LOCUS_RENDERING_API std::string Vert(GLInfo::GLSLVersion version, bool textured, unsigned int numLights, std::vector<std::string>& attributes, std::vector<std::string>& uniforms);
-LOCUS_RENDERING_API std::string Frag(GLInfo::GLSLVersion version, bool textured, unsigned int numLights, std::vector<std::string>& uniforms);
+LOCUS_RENDERING_API std::string Vert(GLInfo::GLSLVersion version, bool textured, unsigned int numLights);
+LOCUS_RENDERING_API std::string Frag(GLInfo::GLSLVersion version, bool textured, unsigned int numLights);
 
 LOCUS_RENDERING_API std::string GetMultiVariableName(const std::string& variableName, unsigned int index);
 

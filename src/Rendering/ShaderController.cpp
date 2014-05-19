@@ -56,37 +56,29 @@ void ShaderController::StopProgams()
    }
 }
 
-void ShaderController::LoadShaderProgram(unsigned int whichProgram, const Shader& shader1, const Shader& shader2, bool doesTexturing, bool doesLighting, const std::vector<std::string>& attributes, const std::vector<std::string>& uniforms)
+void ShaderController::LoadShaderProgram(unsigned int whichProgram, const Shader& shader1, const Shader& shader2, bool doesTexturing, bool doesLighting)
 {
-   shaderProgramMap[whichProgram].reset( new ShaderProgram(shader1, shader2, doesTexturing, doesLighting, attributes, uniforms) );
+   shaderProgramMap[whichProgram].reset( new ShaderProgram(shader1, shader2, doesTexturing, doesLighting) );
 }
 
 void ShaderController::LoadShaderProgram(unsigned int whichProgram, GLInfo::GLSLVersion activeGLSLVersion, bool doesTexturing, unsigned int numLights)
 {
-   std::vector<std::string> attributes;
-   std::vector<std::string> uniforms;
-
-   std::string vertexShader = Locus::ShaderSource::Vert(activeGLSLVersion, doesTexturing, numLights, attributes, uniforms);
-   std::string fragmentShader = Locus::ShaderSource::Frag(activeGLSLVersion, doesTexturing, numLights, uniforms);
-
    shaderProgramMap[whichProgram].reset
    ( new ShaderProgram
       (
-         Shader(Shader::ShaderType::Vertex, vertexShader),
-         Shader(Shader::ShaderType::Fragment, fragmentShader),
+         Shader(Shader::ShaderType::Vertex, Locus::ShaderSource::Vert(activeGLSLVersion, doesTexturing, numLights)),
+         Shader(Shader::ShaderType::Fragment, Locus::ShaderSource::Frag(activeGLSLVersion, doesTexturing, numLights)),
          doesTexturing,
-         (numLights > 0),
-         attributes,
-         uniforms
+         (numLights > 0)
        )
    );
 }
 
-void ShaderController::SetTextureUniform(const char* whichTex, GLuint textureUnit)
+void ShaderController::SetTextureUniform(const std::string& whichTex, GLuint textureUnit)
 {
    if (currentProgram != nullptr)
    {
-      GLint uniformLocation = currentProgram->GetAttributeOrUniformLocation(whichTex);
+      GLint uniformLocation = currentProgram->GetUniformLocation(whichTex);
 
       if (uniformLocation != -1)
       {
@@ -95,11 +87,11 @@ void ShaderController::SetTextureUniform(const char* whichTex, GLuint textureUni
    }
 }
 
-void ShaderController::SetMatrix4Uniform(const char* whichMatrix, const float* matrixElements)
+void ShaderController::SetMatrix4Uniform(const std::string& whichMatrix, const float* matrixElements)
 {
    if (currentProgram != nullptr)
    {
-      GLint uniformLocation = currentProgram->GetAttributeOrUniformLocation(whichMatrix);
+      GLint uniformLocation = currentProgram->GetUniformLocation(whichMatrix);
 
       if (uniformLocation != -1)
       {
@@ -108,11 +100,11 @@ void ShaderController::SetMatrix4Uniform(const char* whichMatrix, const float* m
    }
 }
 
-void ShaderController::SetMatrix3Uniform(const char* whichMatrix, const float* matrixElements)
+void ShaderController::SetMatrix3Uniform(const std::string& whichMatrix, const float* matrixElements)
 {
    if (currentProgram != nullptr)
    {
-      GLint uniformLocation = currentProgram->GetAttributeOrUniformLocation(whichMatrix);
+      GLint uniformLocation = currentProgram->GetUniformLocation(whichMatrix);
 
       if (uniformLocation != -1)
       {
@@ -125,35 +117,35 @@ void ShaderController::SetLightUniforms(unsigned int whichLight, const Light& li
 {
    if (currentProgram != nullptr)
    {
-      GLint eyePosUniformLocation = currentProgram->GetAttributeOrUniformLocation( ShaderSource::GetMultiVariableName(ShaderSource::Light_EyePos, whichLight).c_str() );
+      GLint eyePosUniformLocation = currentProgram->GetUniformLocation( ShaderSource::GetMultiVariableName(ShaderSource::Light_EyePos, whichLight) );
 
       if (eyePosUniformLocation != -1)
       {
          glUniform3f(eyePosUniformLocation, light.eyePosition.x, light.eyePosition.y, light.eyePosition.z);
       }
 
-      GLint diffuseLightUniformLocation = currentProgram->GetAttributeOrUniformLocation( ShaderSource::GetMultiVariableName(ShaderSource::Light_Diffuse, whichLight).c_str() );
+      GLint diffuseLightUniformLocation = currentProgram->GetUniformLocation( ShaderSource::GetMultiVariableName(ShaderSource::Light_Diffuse, whichLight) );
 
       if (diffuseLightUniformLocation != -1)
       {
          glUniform4f(diffuseLightUniformLocation, light.diffuseColor.r / 255.0f, light.diffuseColor.g / 255.0f, light.diffuseColor.b / 255.0f, light.diffuseColor.a / 255.0f);
       }
 
-      GLint attenuationUniformLocation = currentProgram->GetAttributeOrUniformLocation( ShaderSource::GetMultiVariableName(ShaderSource::Light_Attenuation, whichLight).c_str() );
+      GLint attenuationUniformLocation = currentProgram->GetUniformLocation( ShaderSource::GetMultiVariableName(ShaderSource::Light_Attenuation, whichLight) );
 
       if (attenuationUniformLocation != -1)
       {
          glUniform1f(attenuationUniformLocation, light.attenuation);
       }
 
-      GLint linearAttenuationUniformLocation = currentProgram->GetAttributeOrUniformLocation( ShaderSource::GetMultiVariableName(ShaderSource::Light_LinearAttenuation, whichLight).c_str() );
+      GLint linearAttenuationUniformLocation = currentProgram->GetUniformLocation( ShaderSource::GetMultiVariableName(ShaderSource::Light_LinearAttenuation, whichLight) );
 
       if (linearAttenuationUniformLocation != -1)
       {
          glUniform1f(linearAttenuationUniformLocation, light.linearAttenuation);
       }
 
-      GLint quadraticAttenuationUniformLocation = currentProgram->GetAttributeOrUniformLocation( ShaderSource::GetMultiVariableName(ShaderSource::Light_QuadraticAttenuation, whichLight).c_str() );
+      GLint quadraticAttenuationUniformLocation = currentProgram->GetUniformLocation( ShaderSource::GetMultiVariableName(ShaderSource::Light_QuadraticAttenuation, whichLight) );
 
       if (quadraticAttenuationUniformLocation != -1)
       {
@@ -162,11 +154,23 @@ void ShaderController::SetLightUniforms(unsigned int whichLight, const Light& li
    }
 }
 
-GLint ShaderController::GetAttributeLocation(const char* whichVar)
+GLint ShaderController::GetAttributeLocation(const std::string& attribute)
 {
    if (currentProgram != nullptr)
    {
-      return currentProgram->GetAttributeOrUniformLocation(whichVar);
+      return currentProgram->GetAttributeLocation(attribute);
+   }
+   else
+   {
+      return -1;
+   }
+}
+
+GLint ShaderController::GetUniformLocation(const std::string& uniform)
+{
+   if (currentProgram != nullptr)
+   {
+      return currentProgram->GetUniformLocation(uniform);
    }
    else
    {
@@ -178,19 +182,19 @@ void ShaderController::DisableCurrentProgramAttributes()
 {
    if (currentProgram != nullptr)
    {
-      glDisableVertexAttribArray( currentProgram->GetAttributeOrUniformLocation(ShaderSource::Vert_Pos) );
+      glDisableVertexAttribArray( currentProgram->GetAttributeLocation(ShaderSource::Vert_Pos) );
 
       if (currentProgram->doesLighting)
       {
-         glDisableVertexAttribArray( currentProgram->GetAttributeOrUniformLocation(ShaderSource::Vert_Normal) );
+         glDisableVertexAttribArray( currentProgram->GetAttributeLocation(ShaderSource::Vert_Normal) );
       }
 
       if (currentProgram->doesTexturing)
       {
-         glDisableVertexAttribArray( currentProgram->GetAttributeOrUniformLocation(ShaderSource::Vert_Tex) );
+         glDisableVertexAttribArray( currentProgram->GetAttributeLocation(ShaderSource::Vert_Tex) );
       }
 
-      glDisableVertexAttribArray( currentProgram->GetAttributeOrUniformLocation(ShaderSource::Color) );
+      glDisableVertexAttribArray( currentProgram->GetAttributeLocation(ShaderSource::Color) );
    }
 }
 

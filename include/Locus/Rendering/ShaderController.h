@@ -18,7 +18,6 @@
 
 #include <unordered_map>
 #include <string>
-#include <vector>
 #include <memory>
 
 namespace Locus
@@ -38,15 +37,16 @@ public:
    void UseProgram(unsigned int whichProgram);
    void StopProgams();
 
-   void LoadShaderProgram(unsigned int whichProgram, const Shader& shader1, const Shader& shader2, bool doesTexturing, bool doesLighting, const std::vector<std::string>& attributes, const std::vector<std::string>& uniforms);
+   void LoadShaderProgram(unsigned int whichProgram, const Shader& shader1, const Shader& shader2, bool doesTexturing, bool doesLighting);
    void LoadShaderProgram(unsigned int whichProgram, GLInfo::GLSLVersion activeGLSLVersion, bool doesTexturing, unsigned int numLights);
 
-   void SetTextureUniform(const char* whichTex, GLuint textureUnit);
-   void SetMatrix4Uniform(const char* whichMatrix, const float* matrixElements);
-   void SetMatrix3Uniform(const char* whichMatrix, const float* matrixElements);
+   void SetTextureUniform(const std::string& whichTex, GLuint textureUnit);
+   void SetMatrix4Uniform(const std::string& whichMatrix, const float* matrixElements);
+   void SetMatrix3Uniform(const std::string& whichMatrix, const float* matrixElements);
    void SetLightUniforms(unsigned int whichLight, const Light& light);
 
-   GLint GetAttributeLocation(const char* whichVar);
+   GLint GetAttributeLocation(const std::string& attribute);
+   GLint GetUniformLocation(const std::string& uniform);
 
    bool CurrentProgramDoesLighting() const;
    bool CurrentProgramDoesTexturing() const;

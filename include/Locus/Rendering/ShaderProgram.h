@@ -15,12 +15,8 @@
 #include "Shader.h"
 #include "GLCommonTypes.h"
 
-#include <vector>
 #include <string>
 #include <map>
-#include <functional>
-
-#include <cstring>
 
 namespace Locus
 {
@@ -30,7 +26,7 @@ namespace Locus
 class LOCUS_RENDERING_API ShaderProgram
 {
 public:
-   ShaderProgram(const Shader& shader1, const Shader& shader2, bool doesTexturing, bool doesLighting, const std::vector<std::string>& attributes, const std::vector<std::string>& uniforms);
+   ShaderProgram(const Shader& shader1, const Shader& shader2, bool doesTexturing, bool doesLighting);
    ShaderProgram(const ShaderProgram&) = delete;
    ShaderProgram& operator=(const ShaderProgram&) = delete;
    ~ShaderProgram();
@@ -41,28 +37,14 @@ public:
    const bool doesTexturing;
    const bool doesLighting;
 
-   GLint GetAttributeOrUniformLocation(const char* attribute) const;
+   GLint GetAttributeLocation(const std::string& attribute) const;
+   GLint GetUniformLocation(const std::string& uniform) const;
 
    static void Stop();
 
 private:
-   struct AttributeAndUniformLocationMapEquality
-   {
-      bool operator()(const char* a, const char* b) const
-      {
-         return (std::strcmp(a, b) < 0);
-      }
-   };
-
-   std::map<const char*, GLint, AttributeAndUniformLocationMapEquality> attributeAndUniformLocationMap;
-
-   std::vector<std::string> attributes;
-   std::vector<std::string> uniforms;
-
-   void CacheAttributes();
-   void CacheUniforms();
-
-   void CacheAttributesOrUniforms(const std::vector<std::string>& attributesOrUniforms, const std::function<GLint(GLuint, const GLchar*)>& locationAcquisitionFunction);
+   mutable std::map<std::string, GLint> attributeLocationMap;
+   mutable std::map<std::string, GLint> uniformLocationMap;
 };
 
 #include "Locus/Preprocessor/EndSilenceDLLInterfaceWarnings"

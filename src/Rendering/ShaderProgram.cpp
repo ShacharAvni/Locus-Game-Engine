@@ -19,8 +19,8 @@
 namespace Locus
 {
 
-ShaderProgram::ShaderProgram(const Shader& shader1, const Shader& shader2, bool doesTexturing, bool doesLighting, const std::vector<std::string>& attributes, const std::vector<std::string>& uniforms)
-   : id(glCreateProgram()), doesTexturing(doesTexturing), doesLighting(doesLighting), attributes(attributes), uniforms(uniforms)
+ShaderProgram::ShaderProgram(const Shader& shader1, const Shader& shader2, bool doesTexturing, bool doesLighting)
+   : id(glCreateProgram()), doesTexturing(doesTexturing), doesLighting(doesLighting)
 {
    glAttachShader(id, shader1.id);
    glAttachShader(id, shader2.id);
@@ -52,9 +52,6 @@ ShaderProgram::ShaderProgram(const Shader& shader1, const Shader& shader2, bool 
 
       throw ShaderLinkException(std::string("Shader program failed to link.\n\nLog:\n") + log);
    }
-
-   CacheAttributes();
-   CacheUniforms();
 }
 
 ShaderProgram::~ShaderProgram()
@@ -62,35 +59,39 @@ ShaderProgram::~ShaderProgram()
    glDeleteProgram(id);
 }
 
-GLint ShaderProgram::GetAttributeOrUniformLocation(const char* attribute) const
+GLint ShaderProgram::GetAttributeLocation(const std::string& attribute) const
 {
-   std::map<const char*, GLint>::const_iterator iter = attributeAndUniformLocationMap.find(attribute);
+   std::map<std::string, GLint>::const_iterator iter = attributeLocationMap.find(attribute);
 
-   if (iter != attributeAndUniformLocationMap.end())
+   if (iter != attributeLocationMap.end())
    {
       return iter->second;
    }
    else
    {
-      return -1;
+      GLint attributeLocation = glGetAttribLocation(id, attribute.c_str());
+
+      attributeLocationMap[attribute] = attributeLocation;
+
+      return attributeLocation;
    }
 }
 
-void ShaderProgram::CacheAttributes()
+GLint ShaderProgram::GetUniformLocation(const std::string& uniform) const
 {
-   CacheAttributesOrUniforms(attributes, glGetAttribLocation);
-}
+   std::map<std::string, GLint>::const_iterator iter = uniformLocationMap.find(uniform);
 
-void ShaderProgram::CacheUniforms()
-{
-   CacheAttributesOrUniforms(uniforms, glGetUniformLocation);
-}
-
-void ShaderProgram::CacheAttributesOrUniforms(const std::vector<std::string>& attributesOrUniforms, const std::function<GLint(GLuint, const GLchar*)>& locationAcquisitionFunction)
-{
-   for (const std::string& attributeOrUniform : attributesOrUniforms)
+   if (iter != uniformLocationMap.end())
    {
-      attributeAndUniformLocationMap[attributeOrUniform.c_str()] = locationAcquisitionFunction(id, attributeOrUniform.c_str());
+      return iter->second;
+   }
+   else
+   {
+      GLint uniformLocation = glGetUniformLocation(id, uniform.c_str());
+
+      uniformLocationMap[uniform] = uniformLocation;
+
+      return uniformLocation;
    }
 }
 
