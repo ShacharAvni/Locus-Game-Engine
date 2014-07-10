@@ -14,6 +14,8 @@ cmake_minimum_required(VERSION 2.8)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
+option(LOCUS_BUILD_EXAMPLES "Build Examples" OFF)
+
 if (MSVC)
     option(USE_MSVC_RUNTIME_LIBRARY_DLL "Use MSVC runtime library DLL" OFF)
 endif()
@@ -32,3 +34,7 @@ add_subdirectory(third-party/OGG)
 add_subdirectory(third-party/PHYSFS)
 add_subdirectory(third-party/stb_image/src)
 add_subdirectory(third-party/Vorbis)
+
+if (LOCUS_BUILD_EXAMPLES)
+   add_subdirectory(examples/Collisions)
+endif()
