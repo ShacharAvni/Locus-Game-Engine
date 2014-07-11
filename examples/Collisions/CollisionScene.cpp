@@ -29,17 +29,31 @@ namespace Locus
 namespace Examples
 {
 
-extern const float BOUNDARY_SIZE = 130.0f;
-extern const float VIEWER_BOUNDARY_SIZE = (3 * BOUNDARY_SIZE);
+//Simulation Constants
+const float VIEWER_SPEED = 80.0f;
+
+const std::size_t NUM_MESHES = 100;
+
+const float MIN_MESH_SPEED = 10.0f; //units/second
+const float MAX_MESH_SPEED = 20.0f;
+
+const float MIN_MESH_ROTATION_SPEED = 1.0f; //radians/second
+const float MAX_MESH_ROTATION_SPEED = 3.0f;
+
+const float MIN_MESH_SCALE = 5.0f;
+const float MAX_MESH_SCALE = 15.0f;
+
+//Environment Constants
+const float BOUNDARY_SIZE = 130.0f;
+const float VIEWER_BOUNDARY_SIZE = (3 * BOUNDARY_SIZE);
 
 const float FIELD_OF_VIEW = 30.0f;
 const float Z_NEAR = 0.01f;
 
-//This is the length of the main diagonal of the scene. This is sqrt(8) times viewer boundary size squared. 
+//This is the length of the main diagonal of the scene. The weird number is sqrt(8)
 const float Z_FAR = (2.828427124746f * VIEWER_BOUNDARY_SIZE * VIEWER_BOUNDARY_SIZE);
 
-const float VIEWER_SPEED = 80.0f;
-
+//Input Constants
 const Locus::Key_t KEY_FORWARD = Locus::Key_W;
 const Locus::Key_t KEY_BACKWARD = Locus::Key_S;
 const Locus::Key_t KEY_LEFT = Locus::Key_A;
@@ -146,28 +160,15 @@ void CollisionScene::InitializeCollidableMeshes()
 
    collisionManager.StartAddRemoveBatch();
 
-   const float maxDistance = BOUNDARY_SIZE - 5.0f;
+   float maxDistance = BOUNDARY_SIZE - 5.0f;
 
-   const std::size_t Num_Collidable_Meshes = 100;
-
-   //units/second
-   const float Min_Speed = 10.0f;
-   const float Max_Speed = 20.0f;
-
-   //radians/second
-   const float Min_Rotation_Speed = 1.0f;
-   const float Max_Rotation_Speed = 3.0f;
-
-   const float Min_Scale = 5.0f;
-   const float Max_Scale = 15.0f;
-
-   collidableMeshes.resize(Num_Collidable_Meshes);
+   collidableMeshes.resize(NUM_MESHES);
 
    std::size_t whichMesh = 0;
 
    Locus::Random random;
 
-   for (std::size_t i = 0; i < Num_Collidable_Meshes; ++i)
+   for (std::size_t i = 0; i < NUM_MESHES; ++i)
    {
       collidableMeshes[i].GrabMeshAndCollidable(collidableMeshTemplates[whichMesh]);
 
@@ -182,7 +183,7 @@ void CollisionScene::InitializeCollidableMeshes()
       collidableMeshes[i].motionProperties.direction.normalize();
 
       //randomize speed
-      collidableMeshes[i].motionProperties.speed = static_cast<float>(random.randomDouble(Min_Speed, Max_Speed));
+      collidableMeshes[i].motionProperties.speed = static_cast<float>(random.randomDouble(MIN_MESH_SPEED, MAX_MESH_SPEED));
 
       //randomize rotation direction
       xDirection = static_cast<float>(random.randomDouble(-1, 1));
@@ -192,10 +193,10 @@ void CollisionScene::InitializeCollidableMeshes()
       collidableMeshes[i].motionProperties.rotation.set(xDirection, yDirection, zDirection);
 
       //randomize rotation speed
-      collidableMeshes[i].motionProperties.angularSpeed = static_cast<float>(random.randomDouble(Min_Rotation_Speed, Max_Rotation_Speed));
+      collidableMeshes[i].motionProperties.angularSpeed = static_cast<float>(random.randomDouble(MIN_MESH_ROTATION_SPEED, MAX_MESH_ROTATION_SPEED));
 
       //randomize size
-      float scale = static_cast<float>(random.randomDouble(Min_Scale, Max_Scale));
+      float scale = static_cast<float>(random.randomDouble(MIN_MESH_SCALE, MAX_MESH_SCALE));
 
       collidableMeshes[i].Scale( Locus::Vector3(scale, scale, scale) );
 
@@ -348,6 +349,7 @@ void CollisionScene::KeyReleased(Locus::Key_t key)
 void CollisionScene::MouseMoved(int x, int y)
 {
    Locus::Vector3 difference(static_cast<float>(x), static_cast<float>(y), 0.0f);
+
    Locus::Vector3 rotation((-difference.y/resolutionY) * FIELD_OF_VIEW * Locus::TO_RADIANS, (-difference.x/resolutionX)* FIELD_OF_VIEW * Locus::TO_RADIANS, 0.0f);
 
    viewpoint.RotateBy(rotation);
