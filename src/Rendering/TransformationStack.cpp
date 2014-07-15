@@ -63,7 +63,7 @@ void TransformationStack::Pop()
 
 void TransformationStack::Load(const Transformation& trans)
 {
-   transformationStacks[currentMode].top() = trans;
+   TopTransformation(currentMode) = trans;
 }
 
 void TransformationStack::LoadIdentity()
@@ -73,12 +73,12 @@ void TransformationStack::LoadIdentity()
 
 void TransformationStack::Translate(const Vector3& t)
 {
-   transformationStacks[currentMode].top().TranslateBy(t);
+   TopTransformation(currentMode).TranslateBy(t);
 }
 
 void TransformationStack::Scale(const Vector3& scale)
 {
-   transformationStacks[currentMode].top().ScaleBy(scale);
+   TopTransformation(currentMode).ScaleBy(scale);
 }
 
 void TransformationStack::SetLegacyMatrixMode(TransformationMode mode)
@@ -100,6 +100,16 @@ void TransformationStack::SetLegacyMatrixMode(TransformationMode mode)
       default:
          break;
    }
+}
+
+const Transformation& TransformationStack::TopTransformation(TransformationMode mode) const
+{
+   return transformationStacks[mode].top();
+}
+
+Transformation& TransformationStack::TopTransformation(TransformationMode mode)
+{
+   return transformationStacks[mode].top();
 }
 
 void TransformationStack::UploadLegacyMatrix(const Transformation& transformation)
@@ -128,8 +138,8 @@ void TransformationStack::UploadLegacyMatrices(const Transformation* modelTransf
 
 void TransformationStack::UploadMatricesToShader(ShaderController& shaderController, const Transformation* modelTransformation)
 {
-   Transformation modelViewProjectionMatrix = transformationStacks[Projection].top();
-   modelViewProjectionMatrix.MultMatrix(transformationStacks[ModelView].top());
+   Transformation modelViewProjectionMatrix = TopTransformation(Projection);
+   modelViewProjectionMatrix.MultMatrix(TopTransformation(ModelView));
 
    if (modelTransformation != nullptr)
    {
@@ -140,7 +150,7 @@ void TransformationStack::UploadMatricesToShader(ShaderController& shaderControl
 
    if (shaderController.CurrentProgramDoesLighting())
    {
-      Transformation modelViewMatrix = transformationStacks[ModelView].top();
+      Transformation modelViewMatrix = TopTransformation(ModelView);
 
       if (modelTransformation != nullptr)
       {

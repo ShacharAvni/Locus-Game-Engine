@@ -69,6 +69,8 @@ CollisionScene::CollisionScene(Locus::SceneManager& sceneManager, unsigned int r
      paused(false),
      resolutionX(resolutionX),
      resolutionY(resolutionY),
+     lastMouseX(0),
+     lastMouseY(0),
      moveViewerAhead(false),
      moveViewerBack(false),
      moveViewerRight(false),
@@ -348,13 +350,18 @@ void CollisionScene::KeyReleased(Locus::Key_t key)
 
 void CollisionScene::MouseMoved(int x, int y)
 {
-   Locus::Vector3 difference(static_cast<float>(x), static_cast<float>(y), 0.0f);
+   int diffX = x - lastMouseX;
+   int diffY = y - lastMouseY;
+
+   Locus::Vector3 difference(static_cast<float>(diffX), static_cast<float>(diffY), 0.0f);
 
    Locus::Vector3 rotation((-difference.y/resolutionY) * FIELD_OF_VIEW * Locus::TO_RADIANS, (-difference.x/resolutionX)* FIELD_OF_VIEW * Locus::TO_RADIANS, 0.0f);
 
    viewpoint.RotateBy(rotation);
 
    sceneManager.CenterMouse();
+
+   UpdateLastMousePosition();
 }
 
 void CollisionScene::Resized(int width, int height)
@@ -369,6 +376,13 @@ void CollisionScene::Activate()
 {
    sceneManager.HideMouse();
    sceneManager.CenterMouse();
+
+   UpdateLastMousePosition();
+}
+
+void CollisionScene::UpdateLastMousePosition()
+{
+   sceneManager.GetMousePosition(lastMouseX, lastMouseY);
 }
 
 bool CollisionScene::Update(double DT)

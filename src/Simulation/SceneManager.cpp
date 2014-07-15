@@ -18,7 +18,7 @@ namespace Locus
 {
 
 SceneManager::SceneManager(Window& window)
-   : window(window), lastMouseX(0), lastMouseY(0)
+   : window(window)
 {
    window.RegisterEventListener(this);
 }
@@ -44,9 +44,16 @@ void SceneManager::CenterMouse()
    int midY = windowHeight/2;
 
    window.SetMousePosition(midX, midY);
+}
 
-   lastMouseX = midX;
-   lastMouseY = midY;
+void SceneManager::GetMousePosition(int& x, int &y)
+{
+   window.GetMousePosition(x, y);
+}
+
+void SceneManager::SetMousePosition(int x, int y)
+{
+   window.SetMousePosition(x, y);
 }
 
 void SceneManager::SyncWindowSizeToSceneSize()
@@ -101,23 +108,17 @@ void SceneManager::KeyReleased(int key)
 
 void SceneManager::MousePressed(int button)
 {
-   sceneStack.top()->MousePressed(button, lastMouseX, lastMouseY);
+   sceneStack.top()->MousePressed(button);
 }
 
 void SceneManager::MouseReleased(int button)
 {
-   sceneStack.top()->MouseReleased(button, lastMouseX, lastMouseY);
+   sceneStack.top()->MouseReleased(button);
 }
 
 void SceneManager::MouseMoved(int x, int y)
 {
-   int moveX = x - lastMouseX;
-   int moveY = y - lastMouseY;
-
-   lastMouseX = moveX;
-   lastMouseY = moveY;
-
-   sceneStack.top()->MouseMoved(moveX, moveY);
+   sceneStack.top()->MouseMoved(x, y);
 }
 
 void SceneManager::WindowSized(int width, int height)

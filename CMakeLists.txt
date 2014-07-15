@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 2.8)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
-option(LOCUS_BUILD_EXAMPLES "Build Examples" OFF)
+option(LOCUS_BUILD_EXAMPLES "Build Examples" ON)
 
 if (MSVC)
     option(USE_MSVC_RUNTIME_LIBRARY_DLL "Use MSVC runtime library DLL" OFF)
@@ -37,4 +37,5 @@ add_subdirectory(third-party/Vorbis)
 
 if (LOCUS_BUILD_EXAMPLES)
    add_subdirectory(examples/Collisions)
+   add_subdirectory(examples/Triangulation)
 endif()

@@ -48,11 +48,11 @@ void Scene::KeyReleased(Key_t /*key*/)
 {
 }
 
-void Scene::MousePressed(MouseButton_t /*button*/, int /*x*/, int /*y*/)
+void Scene::MousePressed(MouseButton_t /*button*/)
 {
 }
 
-void Scene::MouseReleased(MouseButton_t /*button*/, int /*x*/, int /*y*/)
+void Scene::MouseReleased(MouseButton_t /*button*/)
 {
 }
 

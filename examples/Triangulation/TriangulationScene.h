@@ -16,8 +16,7 @@
 
 #include "Locus/Rendering/Viewpoint.h"
 #include "Locus/Rendering/LineCollection.h"
-
-#include "CollidableMesh.h"
+#include "Locus/Rendering/DrawablePointCloud.h"
 
 #include <memory>
 
@@ -30,11 +29,11 @@ class RenderingState;
 namespace Examples
 {
 
-class CollisionScene : public Locus::Scene
+class TriangulationScene : public Locus::Scene
 {
 public:
-   CollisionScene(Locus::SceneManager& sceneManager, unsigned int resolutionX, unsigned int resolutionY);
-   ~CollisionScene();
+   TriangulationScene(Locus::SceneManager& sceneManager, unsigned int resolutionX, unsigned int resolutionY);
+   ~TriangulationScene();
 
    virtual void Activate() override;
 
@@ -47,23 +46,16 @@ public:
    virtual void KeyReleased(Locus::Key_t key) override;
 
    virtual void MouseMoved(int x, int y) override;
+   virtual void MousePressed(MouseButton_t button) override;
 
    virtual void Resized(int width, int height) override;
 
 private:
    std::unique_ptr< Locus::RenderingState > renderingState;
 
-   Locus::CollisionManager collisionManager;
-
    Locus::Viewpoint viewpoint;
 
-   std::vector<CollidableMesh> collidableMeshes;
-
-   Locus::LineCollection boundary;
-
-   bool dieOnNextFrame;
-
-   bool paused;
+   Locus::DrawablePointCloud pointCloud;
 
    unsigned int resolutionX;
    unsigned int resolutionY;
@@ -71,21 +63,17 @@ private:
    int lastMouseX;
    int lastMouseY;
 
-   bool moveViewerAhead;
-   bool moveViewerBack;
    bool moveViewerRight;
    bool moveViewerLeft;
    bool moveViewerUp;
    bool moveViewerDown;
 
-   void InitializeCollidableMeshes();
-   void InitializeBoundary();
-
    void DestroyRenderingState();
+
+   bool Unproject(int mouseX, int mouseY, Locus::Vector3& worldCoordinate) const;
 
    void UpdateLastMousePosition();
 
-   void TickCollidableMeshes(double DT);
    void TickViewer(double DT);
 };
 

@@ -39,13 +39,13 @@ public:
 
    void HideMouse();
    void CenterMouse();
+   void GetMousePosition(int& x, int &y);
+   void SetMousePosition(int x, int y);
    void MakeWindowed();
    void MakeFullScreen();
 
 private:
    Window& window;
-   int lastMouseX;
-   int lastMouseY;
 
    std::stack<std::unique_ptr<Scene>> sceneStack;
    std::chrono::time_point<std::chrono::system_clock> lastUpdateTime;

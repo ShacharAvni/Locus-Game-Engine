@@ -50,6 +50,9 @@ public:
    void Translate(const Vector3& t);
    void Scale(const Vector3& scale);
 
+   const Transformation& TopTransformation(TransformationMode mode) const;
+   Transformation& TopTransformation(TransformationMode mode);
+
    void UploadTransformations(ShaderController& shaderController);
    void UploadTransformations(ShaderController& shaderController, const Transformation& modelTransformation);
 

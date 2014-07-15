@@ -37,8 +37,8 @@ public:
    virtual void KeyPressed(Key_t key);
    virtual void KeyReleased(Key_t key);
 
-   virtual void MousePressed(MouseButton_t button, int x, int y);
-   virtual void MouseReleased(MouseButton_t button, int x, int y);
+   virtual void MousePressed(MouseButton_t button);
+   virtual void MouseReleased(MouseButton_t button);
    virtual void MouseMoved(int x, int y);
 
    virtual void Resized(int width, int height);

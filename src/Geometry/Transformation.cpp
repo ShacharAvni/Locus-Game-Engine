@@ -130,15 +130,15 @@ Transformation Transformation::Orthographic(float left, float right, float botto
 Vector3 Transformation::MultVector(const Vector3& v) const
 {
    return Vector3(values[0] * v.x + values[4] * v.y + values[8]  * v.z,
-                   values[1] * v.x + values[5] * v.y + values[9]  * v.z,
-                   values[2] * v.x + values[6] * v.y + values[10] * v.z);
+                  values[1] * v.x + values[5] * v.y + values[9]  * v.z,
+                  values[2] * v.x + values[6] * v.y + values[10] * v.z);
 }
 
 Vector3 Transformation::MultVertex(const Vector3& v) const
 {
    return Vector3(values[0] * v.x + values[4] * v.y + values[8]  * v.z + values[12],
-                   values[1] * v.x + values[5] * v.y + values[9]  * v.z + values[13],
-                   values[2] * v.x + values[6] * v.y + values[10] * v.z + values[14]);
+                  values[1] * v.x + values[5] * v.y + values[9]  * v.z + values[13],
+                  values[2] * v.x + values[6] * v.y + values[10] * v.z + values[14]);
 }
 
 void Transformation::TranslateBy(const Vector3& t)
