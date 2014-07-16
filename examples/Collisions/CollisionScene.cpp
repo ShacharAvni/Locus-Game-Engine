@@ -155,9 +155,9 @@ void CollisionScene::InitializeCollidableMeshes()
 
    const Locus::Color colors[Num_Colors] =
    {
-      Locus::Color(255,  0 ,  0 , 255), //red
-      Locus::Color(255, 255,  0 , 255), //yellow
-      Locus::Color( 0 ,  0 , 255, 255)  //blue
+      Locus::Color::Red(),
+      Locus::Color::Yellow(),
+      Locus::Color::Blue()
    };
 
    collisionManager.StartAddRemoveBatch();
@@ -231,8 +231,6 @@ void CollisionScene::InitializeCollidableMeshes()
 
 void CollisionScene::InitializeBoundary()
 {
-   const Locus::Color green(0, 255, 0, 255);
-
    const Vector3 boundaryPoints[8] =
    {
       {-BOUNDARY_SIZE, -BOUNDARY_SIZE, -BOUNDARY_SIZE},
@@ -266,14 +264,16 @@ void CollisionScene::InitializeBoundary()
       {3, 7}
    };
 
-   Locus::LineCollection::line_t line;
+   Locus::LineSegmentCollection::ColoredLineSegment coloredLineSegment;
 
    for (const std::pair<int, int>& linePointIndexPair : linePointIndices)
    {
-      line.first = boundaryPoints[ linePointIndexPair.first ];
-      line.second = boundaryPoints[ linePointIndexPair.second ];
+      coloredLineSegment.segment.P1 = boundaryPoints[ linePointIndexPair.first ];
+      coloredLineSegment.segment.P2 = boundaryPoints[ linePointIndexPair.second ];
 
-      boundary.AddLine(line, green);
+      coloredLineSegment.color = Locus::Color::Green();
+
+      boundary.AddLineSegment(coloredLineSegment);
    }
 
    boundary.CreateGPUVertexData();

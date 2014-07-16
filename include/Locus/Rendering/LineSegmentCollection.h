@@ -13,39 +13,46 @@
 #include "LocusRenderingAPI.h"
 
 #include "Locus/Geometry/Vector3.h"
+#include "Locus/Geometry/LineSegment.h"
 
 #include "SingleDrawable.h"
 #include "Color.h"
 
 #include <vector>
-#include <utility>
 
 namespace Locus
 {
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
-class LOCUS_RENDERING_API LineCollection : public SingleDrawable
+class LOCUS_RENDERING_API LineSegmentCollection : public SingleDrawable
 {
 public:
-   typedef std::pair<Vector3, Vector3> line_t;
-   typedef std::vector< line_t > lines_t;
+   struct ColoredLineSegment
+   {
+      LineSegment<Vector3> segment;
+      Color color;
+   };
 
-   LineCollection();
-   LineCollection(const lines_t& lines);
-   LineCollection(const lines_t& lines, const std::vector<Color>& colors);
+   LineSegmentCollection();
+   LineSegmentCollection(const std::vector<ColoredLineSegment>& lineSegments);
+   LineSegmentCollection(std::vector<ColoredLineSegment>&& lineSegments);
 
-   void AddLine(const line_t& line, const Color& color = Color::White());
+   std::size_t NumLineSegments() const;
 
    void Clear();
+
+   ColoredLineSegment& operator[](std::size_t index);
+   const ColoredLineSegment& operator[](std::size_t index) const;
+
+   void AddLineSegment(const ColoredLineSegment& lineSegment);
+
+   void InsertLineSegment(std::size_t index, const ColoredLineSegment& lineSegment);
 
    virtual void UpdateGPUVertexData() override;
 
 private:
-   lines_t lines;
-   std::vector<Color> colors;
-
-   void Refit();
+   std::vector<ColoredLineSegment> lineSegments;
 };
 
 #include "Locus/Preprocessor/EndSilenceDLLInterfaceWarnings"

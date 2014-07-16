@@ -50,8 +50,8 @@ set(THIRD_PARTY_DIR ${PROJECT_SOURCE_DIR}/third-party)
 include_directories(${LOCUS_INCLUDE}
                     ${THIRD_PARTY_DIR}/GLEW/include
                     ${THIRD_PARTY_DIR}/stb_image/include
-					${THIRD_PARTY_DIR}/RapidXML/include
-					${THIRD_PARTY_DIR}/FreeType/include)
+                    ${THIRD_PARTY_DIR}/RapidXML/include
+                    ${THIRD_PARTY_DIR}/FreeType/include)
 
 add_library(Locus_Rendering
 			Color.cpp
@@ -61,7 +61,7 @@ add_library(Locus_Rendering
 			GLInfo.cpp
 			GPUVertexData.cpp
 			Image.cpp
-			LineCollection.cpp
+         LineSegmentCollection.cpp
 			Locus_glew.cpp
 			Mesh.cpp
 			MeshUtility.cpp
@@ -91,7 +91,7 @@ add_library(Locus_Rendering
 			${LOCUS_RENDERING_INCLUDE}/GPUVertexDataStorage.h
 			${LOCUS_RENDERING_INCLUDE}/Image.h
 			${LOCUS_RENDERING_INCLUDE}/Light.h
-			${LOCUS_RENDERING_INCLUDE}/LineCollection.h
+         ${LOCUS_RENDERING_INCLUDE}/LineSegmentCollection.h
 			${LOCUS_RENDERING_INCLUDE}/Locus_glew.h
 			${LOCUS_RENDERING_INCLUDE}/Mesh.h
 			${LOCUS_RENDERING_INCLUDE}/MeshUtility.h

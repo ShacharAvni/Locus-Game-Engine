@@ -13,6 +13,7 @@
 #include "Locus/Rendering/MeshUtility.h"
 #include "Locus/Rendering/ShaderSourceStore.h"
 #include "Locus/Rendering/RenderingState.h"
+#include "Locus/Rendering/DrawUtility.h"
 
 #include "Locus/Simulation/UserEvents.h"
 #include "Locus/Simulation/SceneManager.h"
@@ -27,13 +28,13 @@ namespace Locus
 namespace Examples
 {
 
-//Simulation Constants
-const float VIEWER_SPEED = 80.0f;
-
 //Environment Constants
 const float FIELD_OF_VIEW = 30.0f;
 const float Z_NEAR = 0.5f;
 const float Z_FAR = 1.5f;
+const float REAL_Z_VIEWER = 1.0f;
+const float REAL_Z_SCENE = 0.0f;
+const float DEPTH_OF_SCENE = ( (std::fabs(REAL_Z_SCENE - REAL_Z_VIEWER) - Z_NEAR) / (Z_FAR - Z_NEAR) );
 
 //Input Constants
 const Locus::Key_t KEY_LEFT = Locus::Key_A;
@@ -45,6 +46,7 @@ TriangulationScene::TriangulationScene(Locus::SceneManager& sceneManager, unsign
    : Scene(sceneManager),
      resolutionX(resolutionX),
      resolutionY(resolutionY),
+     polygonColors({ Locus::Color::Red(), Locus::Color::Green(), Locus::Color::Blue() }),
      lastMouseX(0),
      lastMouseY(0),
      moveViewerRight(false),
@@ -53,14 +55,10 @@ TriangulationScene::TriangulationScene(Locus::SceneManager& sceneManager, unsign
      moveViewerDown(false)
 {
    InitializeRenderingState();
-
-   //Move the viewer back one unit so they will focus on
-   //Z = 0 (this is where all the objects will be drawn
-   //in this scene)
    
-   viewpoint.TranslateBy( Locus::Vector3(0.0f, 0.0f, 1.0f) );
+   viewpoint.TranslateBy( Locus::Vector3(0.0f, 0.0f, REAL_Z_VIEWER) );
 
-   pointCloud.CreateGPUVertexData();
+   currentPolygon.CreateGPUVertexData();
 }
 
 TriangulationScene::~TriangulationScene()
@@ -96,40 +94,12 @@ void TriangulationScene::DestroyRenderingState()
 {
    renderingState.reset();
 
-   pointCloud.DeleteGPUVertexData();
-}
+   currentPolygon.DeleteGPUVertexData();
 
-bool TriangulationScene::Unproject(int mouseX, int mouseY, Locus::Vector3& worldCoordinate) const
-{
-   const Locus::Transformation& modelView = viewpoint.GetTransformation().GetInverse();
-   const Locus::Transformation& projection = renderingState->transformationStack.TopTransformation(Locus::TransformationStack::Projection);
-
-   Locus::SquareMatrix<float> modelViewProjectionInverted = projection * modelView;
-
-   if (!modelViewProjectionInverted.Invert())
+   for (std::unique_ptr<Locus::LineSegmentCollection>& lineSegmentCollection : completedPolygons)
    {
-      return false;
+      lineSegmentCollection->DeleteGPUVertexData();
    }
-
-   std::vector<float> windowCoordinate{ ( 2.0f * (static_cast<float>(mouseX) / resolutionX) ) - 1.0f,
-                                        ( 2.0f * (static_cast<float>(resolutionY - mouseY) / resolutionY) ) - 1.0f,
-                                        0.0f,
-                                        1.0f };
-
-   std::vector<float> objectCoordinate = modelViewProjectionInverted * windowCoordinate;
-
-   if (objectCoordinate[3] == 0.0f)
-   {
-      return false;
-   }
-
-   objectCoordinate[3] = (1.0f / objectCoordinate[3]);
-
-   worldCoordinate.x = (objectCoordinate[0] * objectCoordinate[3]);
-   worldCoordinate.y = (objectCoordinate[1] * objectCoordinate[3]);
-   worldCoordinate.z = (objectCoordinate[2] * objectCoordinate[3]);
-
-   return true;
 }
 
 void TriangulationScene::KeyPressed(Locus::Key_t key)
@@ -176,23 +146,66 @@ void TriangulationScene::KeyReleased(Locus::Key_t key)
    }
 }
 
-void TriangulationScene::MouseMoved(int /*x*/, int /*y*/)
+void TriangulationScene::MouseMoved(int x, int y)
 {
+   if (currentPolygon.NumLineSegments() > 0)
+   {
+      Locus::Vector3 worldCoordinate;
+
+      if (Unproject(x, y, worldCoordinate))
+      {
+         worldCoordinate.z = REAL_Z_SCENE;
+
+         currentPolygon[currentPolygon.NumLineSegments() - 1].segment.P2 = worldCoordinate;
+         currentPolygon.UpdateGPUVertexData();
+      }
+   }
+
    UpdateLastMousePosition();
 }
 
 void TriangulationScene::MousePressed(MouseButton_t button)
 {
-   if (button == Locus::Mouse_Button_Left)
+   Locus::Vector3 worldCoordinate;
+
+   if (Unproject(lastMouseX, lastMouseY, worldCoordinate))
    {
-      Locus::Vector3 worldCoordinate;
+      worldCoordinate.z = REAL_Z_SCENE;
 
-      if (Unproject(lastMouseX, lastMouseY, worldCoordinate))
+      Locus::LineSegmentCollection::ColoredLineSegment coloredLineSegment;
+
+      coloredLineSegment.color = polygonColors[completedPolygons.size() % polygonColors.size()];
+
+      if (currentPolygon.NumLineSegments() == 0)
       {
-         worldCoordinate.z = 0;
+         coloredLineSegment.segment.P1 = worldCoordinate;
+      }
+      else
+      {
+         coloredLineSegment.segment.P1 = currentPolygon[currentPolygon.NumLineSegments() - 1].segment.P2;
+      }
 
-         pointCloud.AddPosition(worldCoordinate, Locus::Color::White());
-         pointCloud.UpdateGPUVertexData();
+      coloredLineSegment.segment.P2 = worldCoordinate;
+
+      currentPolygon.AddLineSegment(coloredLineSegment);
+      currentPolygon.UpdateGPUVertexData();
+
+      if (button == Locus::Mouse_Button_Right)
+      {
+         if (currentPolygon.NumLineSegments() >= 3)
+         {
+            coloredLineSegment.segment.P1 = coloredLineSegment.segment.P2;
+            coloredLineSegment.segment.P2 = currentPolygon[0].segment.P1;
+
+            currentPolygon.AddLineSegment(coloredLineSegment);
+
+            completedPolygons.push_back( std::unique_ptr<Locus::LineSegmentCollection>(new Locus::LineSegmentCollection(currentPolygon)) );
+            completedPolygons.back()->CreateGPUVertexData();
+            completedPolygons.back()->UpdateGPUVertexData();
+
+            currentPolygon.Clear();
+            currentPolygon.UpdateGPUVertexData();
+         }
       }
    }
 }
@@ -212,53 +225,27 @@ void TriangulationScene::Activate()
    UpdateLastMousePosition();
 }
 
+bool TriangulationScene::Unproject(int x, int y, Locus::Vector3& worldCoordinate) const
+{
+   const Locus::Transformation& modelView = viewpoint.GetTransformation().GetInverse();
+   const Locus::Transformation& projection = renderingState->transformationStack.TopTransformation(Locus::TransformationStack::Projection);
+
+   return Locus::DrawUtility::Unproject
+   (
+      static_cast<float>(x),
+      static_cast<float>(y),
+      DEPTH_OF_SCENE,
+      modelView,
+      projection,
+      resolutionX,
+      resolutionY,
+      worldCoordinate
+   );
+}
+
 void TriangulationScene::UpdateLastMousePosition()
 {
    sceneManager.GetMousePosition(lastMouseX, lastMouseY);
-}
-
-bool TriangulationScene::Update(double DT)
-{
-   TickViewer(DT);
-
-   return true;
-}
-
-void TriangulationScene::TickViewer(double DT)
-{
-   //translate the viewer based on the user's control key input
-
-   Locus::Vector3 translation
-   ( 
-      (moveViewerLeft  ? -VIEWER_SPEED : 0.0f) + (moveViewerRight ?  VIEWER_SPEED : 0.0f),
-      (moveViewerDown  ? -VIEWER_SPEED : 0.0f) + (moveViewerUp    ?  VIEWER_SPEED : 0.0f),
-      0.0f
-   );
-
-   bool move = false;
-
-   Locus::Vector3 originalPosition = viewpoint.GetPosition();
-   Locus::Vector3 newPosition;
-
-   if (!translation.ApproximatelyEqualTo(Locus::Vector3::ZeroVector()))
-   {
-      translation *= static_cast<float>(DT);
-
-      newPosition = originalPosition;
-
-      newPosition += translation.x * viewpoint.GetRight();
-      newPosition += translation.y * viewpoint.GetUp();
-      //newPosition += -translation.z * viewpoint.GetForward();
-
-      //move = ( (std::fabs(newPosition.x) <= VIEWER_BOUNDARY_SIZE) &&
-      //         (std::fabs(newPosition.y) <= VIEWER_BOUNDARY_SIZE) &&
-      //         (std::fabs(newPosition.z) <= VIEWER_BOUNDARY_SIZE) );
-   }
-
-   if (move)
-   {
-      viewpoint.TranslateBy(translation);
-   }
 }
 
 void TriangulationScene::Draw()
@@ -268,7 +255,13 @@ void TriangulationScene::Draw()
    viewpoint.Activate(renderingState->transformationStack);
 
    renderingState->transformationStack.UploadTransformations(renderingState->shaderController, Locus::Transformation::Identity());
-   pointCloud.Draw(*renderingState);
+
+   for (std::unique_ptr<Locus::LineSegmentCollection>& polygon : completedPolygons)
+   {
+      polygon->Draw(*renderingState);
+   }
+
+   currentPolygon.Draw(*renderingState);
 
    viewpoint.Deactivate(renderingState->transformationStack);
 }

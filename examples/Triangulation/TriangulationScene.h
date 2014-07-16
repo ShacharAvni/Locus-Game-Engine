@@ -15,7 +15,7 @@
 #include "Locus/Geometry/CollisionManager.h"
 
 #include "Locus/Rendering/Viewpoint.h"
-#include "Locus/Rendering/LineCollection.h"
+#include "Locus/Rendering/LineSegmentCollection.h"
 #include "Locus/Rendering/DrawablePointCloud.h"
 
 #include <memory>
@@ -37,7 +37,6 @@ public:
 
    virtual void Activate() override;
 
-   virtual bool Update(double DT) override;
    virtual void Draw() override;
 
    virtual void InitializeRenderingState() override;
@@ -55,7 +54,11 @@ private:
 
    Locus::Viewpoint viewpoint;
 
-   Locus::DrawablePointCloud pointCloud;
+   Locus::LineSegmentCollection currentPolygon;
+
+   std::vector< std::unique_ptr<Locus::LineSegmentCollection> > completedPolygons;
+
+   std::vector<Locus::Color> polygonColors;
 
    unsigned int resolutionX;
    unsigned int resolutionY;
@@ -70,11 +73,9 @@ private:
 
    void DestroyRenderingState();
 
-   bool Unproject(int mouseX, int mouseY, Locus::Vector3& worldCoordinate) const;
+   bool Unproject(int x, int y, Locus::Vector3& worldCoordinate) const;
 
    void UpdateLastMousePosition();
-
-   void TickViewer(double DT);
 };
 
 }

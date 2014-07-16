@@ -15,7 +15,7 @@
 #include "Locus/Geometry/CollisionManager.h"
 
 #include "Locus/Rendering/Viewpoint.h"
-#include "Locus/Rendering/LineCollection.h"
+#include "Locus/Rendering/LineSegmentCollection.h"
 
 #include "CollidableMesh.h"
 
@@ -59,7 +59,7 @@ private:
 
    std::vector<CollidableMesh> collidableMeshes;
 
-   Locus::LineCollection boundary;
+   Locus::LineSegmentCollection boundary;
 
    bool dieOnNextFrame;
 

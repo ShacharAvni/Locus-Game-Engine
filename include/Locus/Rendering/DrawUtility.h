@@ -16,12 +16,23 @@ namespace Locus
 {
 
 class RenderingState;
+class Transformation;
+class Vector3;
 
 class LOCUS_RENDERING_API DrawUtility
 {
 public:
    static void BeginDrawing2D(RenderingState& renderingState, int resolutionX, int resolutionY);
    static void EndDrawing2D(RenderingState& renderingState);
+
+   static bool Unproject(float windowCoordX,
+                         float windowCoordY,
+                         float windowCoordZ,
+                         const Transformation& modelView,
+                         const Transformation& projection,
+                         int resolutionX,
+                         int resolutionY,
+                         Vector3& worldCoordinate);
 };
 
 }
