@@ -25,6 +25,7 @@ namespace Locus
 
 class SceneManager;
 class RenderingState;
+class Mesh;
 
 namespace Examples
 {
@@ -60,6 +61,8 @@ private:
 
    std::vector<Locus::Color> polygonColors;
 
+   std::vector< std::unique_ptr<Locus::Mesh> > triangulatedPolygons;
+
    unsigned int resolutionX;
    unsigned int resolutionY;
 
@@ -76,6 +79,10 @@ private:
    bool Unproject(int x, int y, Locus::Vector3& worldCoordinate) const;
 
    void UpdateLastMousePosition();
+
+   Locus::Color CurrentColor() const;
+
+   void TriangulateCompletedPolygons();
 };
 
 }

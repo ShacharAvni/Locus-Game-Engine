@@ -11,9 +11,12 @@
 #include "TriangulationScene.h"
 
 #include "Locus/Rendering/MeshUtility.h"
+#include "Locus/Rendering/Mesh.h"
 #include "Locus/Rendering/ShaderSourceStore.h"
 #include "Locus/Rendering/RenderingState.h"
 #include "Locus/Rendering/DrawUtility.h"
+
+#include "Locus/Geometry/Triangulation.h"
 
 #include "Locus/Simulation/UserEvents.h"
 #include "Locus/Simulation/SceneManager.h"
@@ -41,6 +44,7 @@ const Locus::Key_t KEY_LEFT = Locus::Key_A;
 const Locus::Key_t KEY_RIGHT = Locus::Key_F;
 const Locus::Key_t KEY_UP = Locus::Key_E;
 const Locus::Key_t KEY_DOWN = Locus::Key_D;
+const Locus::Key_t KEY_TRIANGULATE = Locus::Key_T;
 
 TriangulationScene::TriangulationScene(Locus::SceneManager& sceneManager, unsigned int resolutionX, unsigned int resolutionY)
    : Scene(sceneManager),
@@ -100,12 +104,21 @@ void TriangulationScene::DestroyRenderingState()
    {
       lineSegmentCollection->DeleteGPUVertexData();
    }
+
+   for (std::unique_ptr<Locus::Mesh>& triangulatedPolygon : triangulatedPolygons)
+   {
+      triangulatedPolygon->DeleteGPUVertexData();
+   }
 }
 
 void TriangulationScene::KeyPressed(Locus::Key_t key)
 {
    switch (key)
    {
+      case KEY_TRIANGULATE:
+         TriangulateCompletedPolygons();
+         break;
+
       case KEY_LEFT:
          moveViewerLeft = true;
          break;
@@ -174,7 +187,7 @@ void TriangulationScene::MousePressed(MouseButton_t button)
 
       Locus::LineSegmentCollection::ColoredLineSegment coloredLineSegment;
 
-      coloredLineSegment.color = polygonColors[completedPolygons.size() % polygonColors.size()];
+      coloredLineSegment.color = CurrentColor();
 
       if (currentPolygon.NumLineSegments() == 0)
       {
@@ -248,6 +261,91 @@ void TriangulationScene::UpdateLastMousePosition()
    sceneManager.GetMousePosition(lastMouseX, lastMouseY);
 }
 
+Locus::Color TriangulationScene::CurrentColor() const
+{
+   return polygonColors[triangulatedPolygons.size() % polygonColors.size()];;
+}
+
+void TriangulationScene::TriangulateCompletedPolygons()
+{
+   if (completedPolygons.size() > 0)
+   {
+      std::vector<Locus::Polygon2D_t> polygonsToTriangulate;
+
+      Locus::Vector2 point2D;
+
+      for (std::unique_ptr<Locus::LineSegmentCollection>& completedPolygon : completedPolygons)
+      {
+         Locus::Polygon2D_t polygon;
+
+         for (size_t lineSegmentIndex = 0, numLineSegments = completedPolygon->NumLineSegments(); lineSegmentIndex < numLineSegments; ++lineSegmentIndex)
+         {
+            const Locus::Vector3& point3D = (*completedPolygon)[lineSegmentIndex].segment.P2;
+
+            point2D.x = point3D.x;
+            point2D.y = point3D.y;
+
+            polygon.AddPoint(point2D);
+         }
+
+         polygonsToTriangulate.push_back(polygon);
+      }
+
+      std::vector<const Vector2*> triangles;
+
+      Locus::EarClipping::Triangulate(polygonsToTriangulate, Locus::PolygonWinding::CounterClockwise, triangles);
+
+      std::size_t numTriangles = triangles.size() / 3;
+
+      std::vector<std::vector<Locus::MeshVertex>> faceTriangles(numTriangles, std::vector<Locus::MeshVertex>(3));
+
+      const Locus::TextureCoordinate Dont_Care_Tex_Coord(0.0f, 0.0f);
+
+      for (size_t triangleIndex = 0; triangleIndex < numTriangles; ++triangleIndex)
+      {
+         for (std::size_t pointIndex = 0; pointIndex < 3; ++pointIndex)
+         {
+            Locus::MeshVertex& meshVertex = faceTriangles[triangleIndex][pointIndex];
+
+            meshVertex.position.x = triangles[triangleIndex * 3 + pointIndex]->x;
+            meshVertex.position.y = triangles[triangleIndex * 3 + pointIndex]->y;
+            meshVertex.position.z = 0.0f;
+
+            meshVertex.textureCoordinate = Dont_Care_Tex_Coord;
+         }
+      }
+
+      Locus::Color color = CurrentColor();
+
+      triangulatedPolygons.push_back( std::unique_ptr<Locus::Mesh>(new Mesh(faceTriangles)) );
+
+      std::unique_ptr<Locus::Mesh>& polygonJustTriangulated = triangulatedPolygons.back();
+
+      polygonJustTriangulated->gpuVertexDataTransferInfo.sendColors = true;
+      polygonJustTriangulated->gpuVertexDataTransferInfo.sendNormals = false;
+      polygonJustTriangulated->gpuVertexDataTransferInfo.sendPositions = true;
+      polygonJustTriangulated->gpuVertexDataTransferInfo.sendTexCoords = false;
+
+      polygonJustTriangulated->Translate(polygonJustTriangulated->centroid);
+
+      polygonJustTriangulated->SetColor(color);
+
+      polygonJustTriangulated->CreateGPUVertexData();
+      polygonJustTriangulated->UpdateGPUVertexData();
+
+      currentPolygon.Clear();
+      currentPolygon.UpdateGPUVertexData();
+
+      for (std::unique_ptr<Locus::LineSegmentCollection>& lineSegmentCollection : completedPolygons)
+      {
+         lineSegmentCollection->Clear();
+         lineSegmentCollection->UpdateGPUVertexData();
+      }
+
+      completedPolygons.clear();
+   }
+}
+
 void TriangulationScene::Draw()
 {
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -262,6 +360,12 @@ void TriangulationScene::Draw()
    }
 
    currentPolygon.Draw(*renderingState);
+
+   for (std::unique_ptr<Locus::Mesh>& triangulatedPolygon : triangulatedPolygons)
+   {
+      renderingState->transformationStack.UploadTransformations(renderingState->shaderController, triangulatedPolygon->CurrentModelTransformation());
+      triangulatedPolygon->Draw(*renderingState);
+   }
 
    viewpoint.Deactivate(renderingState->transformationStack);
 }
