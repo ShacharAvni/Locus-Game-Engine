@@ -34,9 +34,6 @@ class TriangulationScene : public Locus::Scene
 {
 public:
    TriangulationScene(Locus::SceneManager& sceneManager, unsigned int resolutionX, unsigned int resolutionY);
-   ~TriangulationScene();
-
-   virtual void Activate() override;
 
    virtual void Draw() override;
 
@@ -77,8 +74,6 @@ private:
    void DestroyRenderingState();
 
    bool Unproject(int x, int y, Locus::Vector3& worldCoordinate) const;
-
-   void UpdateLastMousePosition();
 
    Locus::Color CurrentColor() const;
 

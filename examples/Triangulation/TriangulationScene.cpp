@@ -65,11 +65,6 @@ TriangulationScene::TriangulationScene(Locus::SceneManager& sceneManager, unsign
    currentPolygon.CreateGPUVertexData();
 }
 
-TriangulationScene::~TriangulationScene()
-{
-   DestroyRenderingState();
-}
-
 void TriangulationScene::InitializeRenderingState()
 {
    //throws an exception if GLSL can't be loaded, or if the requested GLSL version isn't supported
@@ -174,7 +169,8 @@ void TriangulationScene::MouseMoved(int x, int y)
       }
    }
 
-   UpdateLastMousePosition();
+   lastMouseX = x;
+   lastMouseY = y;
 }
 
 void TriangulationScene::MousePressed(MouseButton_t button)
@@ -231,13 +227,6 @@ void TriangulationScene::Resized(int width, int height)
    resolutionY = height;
 }
 
-void TriangulationScene::Activate()
-{
-   sceneManager.CenterMouse();
-
-   UpdateLastMousePosition();
-}
-
 bool TriangulationScene::Unproject(int x, int y, Locus::Vector3& worldCoordinate) const
 {
    const Locus::Transformation& modelView = viewpoint.GetTransformation().GetInverse();
@@ -256,14 +245,9 @@ bool TriangulationScene::Unproject(int x, int y, Locus::Vector3& worldCoordinate
    );
 }
 
-void TriangulationScene::UpdateLastMousePosition()
-{
-   sceneManager.GetMousePosition(lastMouseX, lastMouseY);
-}
-
 Locus::Color TriangulationScene::CurrentColor() const
 {
-   return polygonColors[triangulatedPolygons.size() % polygonColors.size()];;
+   return polygonColors[triangulatedPolygons.size() % polygonColors.size()];
 }
 
 void TriangulationScene::TriangulateCompletedPolygons()
@@ -291,11 +275,11 @@ void TriangulationScene::TriangulateCompletedPolygons()
          polygonsToTriangulate.push_back(polygon);
       }
 
-      std::vector<const Vector2*> triangles;
+      std::vector<const Vector2*> trianglePoints;
 
-      Locus::EarClipping::Triangulate(polygonsToTriangulate, Locus::PolygonWinding::CounterClockwise, triangles);
+      Locus::EarClipping::Triangulate(polygonsToTriangulate, Locus::PolygonWinding::CounterClockwise, trianglePoints);
 
-      std::size_t numTriangles = triangles.size() / 3;
+      std::size_t numTriangles = trianglePoints.size() / 3;
 
       std::vector<std::vector<Locus::MeshVertex>> faceTriangles(numTriangles, std::vector<Locus::MeshVertex>(3));
 
@@ -307,9 +291,9 @@ void TriangulationScene::TriangulateCompletedPolygons()
          {
             Locus::MeshVertex& meshVertex = faceTriangles[triangleIndex][pointIndex];
 
-            meshVertex.position.x = triangles[triangleIndex * 3 + pointIndex]->x;
-            meshVertex.position.y = triangles[triangleIndex * 3 + pointIndex]->y;
-            meshVertex.position.z = 0.0f;
+            meshVertex.position.x = trianglePoints[triangleIndex * 3 + pointIndex]->x;
+            meshVertex.position.y = trianglePoints[triangleIndex * 3 + pointIndex]->y;
+            meshVertex.position.z = REAL_Z_SCENE;
 
             meshVertex.textureCoordinate = Dont_Care_Tex_Coord;
          }
@@ -335,12 +319,6 @@ void TriangulationScene::TriangulateCompletedPolygons()
 
       currentPolygon.Clear();
       currentPolygon.UpdateGPUVertexData();
-
-      for (std::unique_ptr<Locus::LineSegmentCollection>& lineSegmentCollection : completedPolygons)
-      {
-         lineSegmentCollection->Clear();
-         lineSegmentCollection->UpdateGPUVertexData();
-      }
 
       completedPolygons.clear();
    }
