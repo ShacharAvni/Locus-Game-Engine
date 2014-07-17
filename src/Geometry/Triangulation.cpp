@@ -53,10 +53,11 @@ struct AugmentedVertex
 typedef CircularList<AugmentedVertex> AugmentedVertexList;
 
 static const Polygon2D_t* FindMaxInteriorPointInListAndRemovePolygonFromConsideration(std::forward_list<const Polygon2D_t*>& innerPolygons, std::size_t& maxInteriorPointIndex);
-static const Vector2* RayCastFromMaxInteriorPointToOuterPolygon(const Polygon2D_t& polygon, const Vector2& maxInteriorPoint, Vector2& intersectionPointOnEdge, const Vector2*& pointOnEdgeWithMaximumX);
 static const Vector2* DetermineMutuallyVisibleVertexFromRayCastResult(const EarClipping::AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, const Vector2& intersectionPointOnEdge, const Vector2* pointOnEdgeWithMaximumX, PolygonWinding winding);
 static void StitchOuterAndInnerPolygons(EarClipping::AugmentedVertexList& augmentedVertices, const Polygon2D_t& hole, std::size_t maxInteriorPointIndex, const Vector2* mutuallyVisibleVertex);
-static void MakeSimple(AugmentedVertexList& augmentedVertices, const Polygon2D_t& polygon, const std::vector<const Polygon2D_t*>& innerPolygons, PolygonWinding winding);
+static const Vector2* RayCastFromMaxInteriorPointToOuterPolygon(const EarClipping::AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, Vector2& intersectionPointOnEdge, const Vector2*& pointOnEdgeWithMaximumX);
+static const Vector2* FindMutuallyVisibleVertex(const EarClipping::AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, PolygonWinding winding);
+static void MakeSimple(EarClipping::AugmentedVertexList& augmentedVertices, const std::vector<const Polygon2D_t*>& innerPolygons, PolygonWinding winding);
 
 static void RemoveCollinearVerticesFromConsideration(AugmentedVertexList& augmentedVertices);
 static void AdjustForPossibleResultingCollinearity(AugmentedVertexList& augmentedVertices, std::forward_list< AugmentedVertexList::iterator >& ears, AugmentedVertexList::iterator& beforeEar, AugmentedVertexList::iterator& afterEar);
@@ -122,7 +123,7 @@ void Triangulate(const Polygon2D_t& polygon, const std::vector<const Polygon2D_t
             augmentedVertices.push_back( AugmentedVertex(&polygon[pointIndex]) );
          }
 
-         MakeSimple(augmentedVertices, polygon, innerPolygons, polygonWinding);
+         MakeSimple(augmentedVertices, innerPolygons, polygonWinding);
 
          Triangulate(augmentedVertices, polygonWinding, triangles);
       }
@@ -213,7 +214,7 @@ static const Polygon2D_t* FindMaxInteriorPointInListAndRemovePolygonFromConsider
    return polygonWithMaxX;
 }
 
-static const Vector2* RayCastFromMaxInteriorPointToOuterPolygon(const Polygon2D_t& polygon, const Vector2& maxInteriorPoint, Vector2& intersectionPointOnEdge, const Vector2*& pointOnEdgeWithMaximumX)
+static const Vector2* RayCastFromMaxInteriorPointToOuterPolygon(const EarClipping::AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, Vector2& intersectionPointOnEdge, const Vector2*& pointOnEdgeWithMaximumX)
 {
    //a) Call the vertex on the hole with the maximum x coordinate P. Call the ray { P, (1,0) } R. Intersect R
    //   with the edges of the outer polygon. Find the edge whose intersection is closest to P. Call this edge E.
@@ -229,10 +230,15 @@ static const Vector2* RayCastFromMaxInteriorPointToOuterPolygon(const Polygon2D_
 
    LineSegment2D_t lineSegmentOnOuterPolygon;
    Vector2 intersectionPoint1, intersectionPoint2;
-   for (std::size_t vertexIndex = 0, numVertices = polygon.NumPoints(); vertexIndex < numVertices; ++vertexIndex)
+   const Vector2* pointOnThisEdgeWithMaximumX = nullptr;
+
+   for (AugmentedVertexList::const_iterator augmentedVertexIter = augmentedVertices.begin(), end = augmentedVertices.end(); augmentedVertexIter != end; ++augmentedVertexIter)
    {
-      lineSegmentOnOuterPolygon.P1 = polygon[vertexIndex];
-      lineSegmentOnOuterPolygon.P2 = polygon[(vertexIndex + 1) % numVertices];
+      const Vector2* point1 = augmentedVertexIter->vertex;
+      const Vector2* point2 = augmentedVertexIter.next()->vertex;
+
+      lineSegmentOnOuterPolygon.P1 = *point1;
+      lineSegmentOnOuterPolygon.P2 = *point2;
 
       IntersectionType intersection = rayFromMaxVertex.LineSegmentIntersection(lineSegmentOnOuterPolygon, intersectionPoint1, intersectionPoint2, EXPERIMENTAL_TOLERANCE);
 
@@ -241,45 +247,45 @@ static const Vector2* RayCastFromMaxInteriorPointToOuterPolygon(const Polygon2D_
          const Vector2* vertexCheck = nullptr;
          bool mutuallyVisibleVertexKnownThisPass = true;
 
+         if (lineSegmentOnOuterPolygon.P1.x > lineSegmentOnOuterPolygon.P2.x)
+         {
+            pointOnThisEdgeWithMaximumX = point1;
+         }
+         else
+         {
+            pointOnThisEdgeWithMaximumX = point2;
+         }
+
          if (intersection == IntersectionType::LineSegment)
          {
             if (lineSegmentOnOuterPolygon.P1.x < lineSegmentOnOuterPolygon.P2.x)
             {
-               vertexCheck = &polygon[vertexIndex];
+               vertexCheck = point1;
             }
             else
             {
-               vertexCheck = &polygon[(vertexIndex + 1) % numVertices];
+               vertexCheck = point2;
             }
          }
          else if (intersection == IntersectionType::Point)
          {
-            intersectionPointOnEdge = intersectionPoint1;
-
-            if (intersectionPointOnEdge.PreciselyEqualTo(lineSegmentOnOuterPolygon.P1))
+            if (intersectionPoint1.PreciselyEqualTo(lineSegmentOnOuterPolygon.P1))
             {
-               vertexCheck = &polygon[vertexIndex];
+               vertexCheck = point1;
             }
-            else if (intersectionPointOnEdge.PreciselyEqualTo(lineSegmentOnOuterPolygon.P2))
+            else if (intersectionPoint1.PreciselyEqualTo(lineSegmentOnOuterPolygon.P2))
             {
-               vertexCheck = &polygon[(vertexIndex + 1) % numVertices];
+               vertexCheck = point2;
             }
             else
             {
                mutuallyVisibleVertexKnownThisPass = false;
 
-               if (lineSegmentOnOuterPolygon.P1.x > lineSegmentOnOuterPolygon.P2.x)
-               {
-                  vertexCheck = &polygon[vertexIndex];
-               }
-               else
-               {
-                  vertexCheck = &polygon[(vertexIndex + 1) % numVertices];
-               }
+               vertexCheck = &intersectionPoint1;
             }
          }
 
-         float distance = mutuallyVisibleVertexKnownThisPass ? (vertexCheck->x - maxInteriorPoint.x) : (intersectionPointOnEdge.x - maxInteriorPoint.x);
+         float distance = (vertexCheck->x - maxInteriorPoint.x);
 
          if (distance < minDistance)
          {
@@ -290,7 +296,8 @@ static const Vector2* RayCastFromMaxInteriorPointToOuterPolygon(const Polygon2D_
             else
             {
                mutuallyVisibleVertex = nullptr;
-               pointOnEdgeWithMaximumX = vertexCheck;
+               pointOnEdgeWithMaximumX = pointOnThisEdgeWithMaximumX;
+               intersectionPointOnEdge = intersectionPoint1;
             }
 
             minDistance = distance;
@@ -370,14 +377,14 @@ static const Vector2* DetermineMutuallyVisibleVertexFromRayCastResult(const EarC
    return mutuallyVisibleVertex;
 }
 
-static const Vector2* FindMutuallyVisibleVertex(const EarClipping::AugmentedVertexList& augmentedVertices, const Polygon2D_t& polygon, const Vector2& maxInteriorPoint, PolygonWinding winding)
+static const Vector2* FindMutuallyVisibleVertex(const EarClipping::AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, PolygonWinding winding)
 {
    // Find a vertex on the outer polygon visible to that vertex
 
    Vector2 intersectionPointOnEdge;
    const Vector2* pointOnEdgeWithMaximumX = nullptr;
 
-   const Vector2* mutuallyVisibleVertex = RayCastFromMaxInteriorPointToOuterPolygon(polygon, maxInteriorPoint, intersectionPointOnEdge, pointOnEdgeWithMaximumX);
+   const Vector2* mutuallyVisibleVertex = RayCastFromMaxInteriorPointToOuterPolygon(augmentedVertices, maxInteriorPoint, intersectionPointOnEdge, pointOnEdgeWithMaximumX);
 
    if (mutuallyVisibleVertex == nullptr)
    {
@@ -409,7 +416,7 @@ static void StitchOuterAndInnerPolygons(EarClipping::AugmentedVertexList& augmen
    }
 }
 
-static void MakeSimple(EarClipping::AugmentedVertexList& augmentedVertices, const Polygon2D_t& polygon, const std::vector<const Polygon2D_t*>& innerPolygons, PolygonWinding winding)
+static void MakeSimple(EarClipping::AugmentedVertexList& augmentedVertices, const std::vector<const Polygon2D_t*>& innerPolygons, PolygonWinding winding)
 {
    std::forward_list<const Polygon2D_t*> innerPolygonsRemaining;
    for (const Polygon2D_t* innerPolygon : innerPolygons)
@@ -422,7 +429,7 @@ static void MakeSimple(EarClipping::AugmentedVertexList& augmentedVertices, cons
       std::size_t maxInteriorPointIndex;
       const Polygon2D_t* innerPolygon = FindMaxInteriorPointInListAndRemovePolygonFromConsideration(innerPolygonsRemaining, maxInteriorPointIndex);
 
-      const Vector2* mutuallyVisibleVertex = FindMutuallyVisibleVertex(augmentedVertices, polygon, (*innerPolygon)[maxInteriorPointIndex], winding);
+      const Vector2* mutuallyVisibleVertex = FindMutuallyVisibleVertex(augmentedVertices, (*innerPolygon)[maxInteriorPointIndex], winding);
 
       StitchOuterAndInnerPolygons(augmentedVertices, *innerPolygon, maxInteriorPointIndex, mutuallyVisibleVertex);
    }
