@@ -380,6 +380,104 @@ PolygonWinding Polygon<Vector2>::GetWinding(const Vector3& normalVector) const
    }
 }
 
+template <class PointType>
+bool Polygon<PointType>::IsSelfIntersecting() const
+{
+   if (!IsWellDefined())
+   {
+      return false;
+   }
+
+   //brute force all pairs check
+
+   LineSegment<PointType> lineSegment1, lineSegment2;
+
+   PointType intersectionPoint1, intersectionPoint2;
+
+   for (std::size_t segmentIndex = 0; segmentIndex < (numPoints - 1); ++segmentIndex)
+   {
+      for (std::size_t segmentIndex2 = (segmentIndex + 1); segmentIndex2 < numPoints; ++segmentIndex2)
+      {
+         lineSegment1.P1 = points[segmentIndex];
+         lineSegment1.P2 = points[(segmentIndex + 1) % numPoints];
+
+         if (lineSegment1.P1.PreciselyEqualTo(lineSegment1.P2))
+         {
+            continue;
+         }
+
+         lineSegment2.P1 = points[segmentIndex2];
+         lineSegment2.P2 = points[(segmentIndex2 + 1) % numPoints];
+
+         if (lineSegment2.P1.PreciselyEqualTo(lineSegment2.P2))
+         {
+            continue;
+         }
+
+         IntersectionType intersectionType = lineSegment1.GetLineSegmentIntersection(lineSegment2, intersectionPoint1, intersectionPoint2);
+
+         if (intersectionType != IntersectionType::None)
+         {
+            if (intersectionType == IntersectionType::Point)
+            {
+               bool exactlyOnSegment1EndPoint = (intersectionPoint1.PreciselyEqualTo(lineSegment1.P1) || intersectionPoint1.PreciselyEqualTo(lineSegment1.P2));
+               bool exactlyOnSegment2EndPoint = (intersectionPoint1.PreciselyEqualTo(lineSegment2.P1) || intersectionPoint1.PreciselyEqualTo(lineSegment2.P2));
+
+               if (!exactlyOnSegment1EndPoint || !exactlyOnSegment2EndPoint)
+               {
+                  return true;
+               }
+
+               //here the segments intersect each other at precisely one of their endpoints
+               //this is only valid if the segments are neighbours
+
+               bool segmentsAreNeighbours = ((segmentIndex2 == (segmentIndex + 1) % numPoints) || (segmentIndex == (segmentIndex2 + 1) % numPoints));
+
+               if (!segmentsAreNeighbours)
+               {
+                  return true;
+               }
+            }
+            else // if (intersectionType == IntersectionType::LineSegment)
+            {
+               return true;
+            }
+         }
+      }
+   }
+
+   return false;
+}
+
+template <class PointType>
+bool Polygon<PointType>::Intersects(const Polygon<PointType>& other) const
+{
+   std::size_t numPointsOther = other.NumPoints();
+
+   LineSegment<PointType> lineSegment1, lineSegment2;
+
+   //brute force all pairs check
+
+   for (std::size_t segmentIndex = 0; segmentIndex < numPoints; ++segmentIndex)
+   {
+      lineSegment1.P1 = points[segmentIndex];
+      lineSegment1.P2 = points[(segmentIndex + 1) % numPoints];
+
+      for (std::size_t segmentIndex2 = 0; segmentIndex2 < numPointsOther; ++segmentIndex2)
+      {
+         lineSegment2.P1 = other.points[segmentIndex2];
+         lineSegment2.P2 = other.points[(segmentIndex2 + 1) % numPointsOther];
+
+         if (lineSegment1.GetLineSegmentIntersection(lineSegment2))
+         {
+            return true;
+         }
+      }
+   }
+
+   return false;
+}
+
 template class LOCUS_GEOMETRY_API_AT_DEFINITION Polygon<Vector3>;
 template class LOCUS_GEOMETRY_API_AT_DEFINITION Polygon<Vector2>;
 

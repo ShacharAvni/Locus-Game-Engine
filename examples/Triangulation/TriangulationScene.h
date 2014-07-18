@@ -12,11 +12,10 @@
 
 #include "Locus/Simulation/Scene.h"
 
-#include "Locus/Geometry/CollisionManager.h"
+#include "Locus/Geometry/Polygon.h"
 
 #include "Locus/Rendering/Viewpoint.h"
 #include "Locus/Rendering/LineSegmentCollection.h"
-#include "Locus/Rendering/DrawablePointCloud.h"
 
 #include <memory>
 
@@ -40,7 +39,6 @@ public:
    virtual void InitializeRenderingState() override;
 
    virtual void KeyPressed(Locus::Key_t key) override;
-   virtual void KeyReleased(Locus::Key_t key) override;
 
    virtual void MouseMoved(int x, int y) override;
    virtual void MousePressed(MouseButton_t button) override;
@@ -52,9 +50,9 @@ private:
 
    Locus::Viewpoint viewpoint;
 
-   Locus::LineSegmentCollection currentPolygon;
+   Locus::LineSegmentCollection currentPolygonAsLineSegments;
 
-   std::vector< std::unique_ptr<Locus::LineSegmentCollection> > completedPolygons;
+   std::vector< std::unique_ptr<Locus::LineSegmentCollection> > completedPolygonsAsLineSegments;
 
    std::vector<Locus::Color> polygonColors;
 
@@ -66,16 +64,13 @@ private:
    int lastMouseX;
    int lastMouseY;
 
-   bool moveViewerRight;
-   bool moveViewerLeft;
-   bool moveViewerUp;
-   bool moveViewerDown;
-
-   void DestroyRenderingState();
-
    bool Unproject(int x, int y, Locus::Vector3& worldCoordinate) const;
 
    Locus::Color CurrentColor() const;
+
+   void GetCompletedPolygonLineSegmentsAsPolygons(std::vector<Locus::Polygon2D_t>& polygons) const;
+
+   static bool CompletedPolygonsAreWellFormed(const std::vector<Locus::Polygon2D_t>& polygons);
 
    void TriangulateCompletedPolygons();
 };

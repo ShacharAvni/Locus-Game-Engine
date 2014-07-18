@@ -56,6 +56,9 @@ public:
    void Reverse();
    PolygonWinding GetWinding(const Vector3& normalVector) const;
 
+   bool IsSelfIntersecting() const;
+   bool Intersects(const Polygon<PointType>& other) const;
+
    bool PointIsOnPolygon(const PointType& point, float toleranceFactor = 1) const;
    bool PointIsWithinPolygon(const PointType& point, float toleranceFactor = 1) const;
 

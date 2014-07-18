@@ -10,9 +10,7 @@
 
 #include "TriangulationScene.h"
 
-#include "Locus/Rendering/MeshUtility.h"
 #include "Locus/Rendering/Mesh.h"
-#include "Locus/Rendering/ShaderSourceStore.h"
 #include "Locus/Rendering/RenderingState.h"
 #include "Locus/Rendering/DrawUtility.h"
 
@@ -40,10 +38,6 @@ const float REAL_Z_SCENE = 0.0f;
 const float DEPTH_OF_SCENE = ( (std::fabs(REAL_Z_SCENE - REAL_Z_VIEWER) - Z_NEAR) / (Z_FAR - Z_NEAR) );
 
 //Input Constants
-const Locus::Key_t KEY_LEFT = Locus::Key_A;
-const Locus::Key_t KEY_RIGHT = Locus::Key_F;
-const Locus::Key_t KEY_UP = Locus::Key_E;
-const Locus::Key_t KEY_DOWN = Locus::Key_D;
 const Locus::Key_t KEY_TRIANGULATE = Locus::Key_T;
 
 TriangulationScene::TriangulationScene(Locus::SceneManager& sceneManager, unsigned int resolutionX, unsigned int resolutionY)
@@ -52,17 +46,13 @@ TriangulationScene::TriangulationScene(Locus::SceneManager& sceneManager, unsign
      resolutionY(resolutionY),
      polygonColors({ Locus::Color::Red(), Locus::Color::Green(), Locus::Color::Blue() }),
      lastMouseX(0),
-     lastMouseY(0),
-     moveViewerRight(false),
-     moveViewerLeft(false),
-     moveViewerUp(false),
-     moveViewerDown(false)
+     lastMouseY(0)
 {
    InitializeRenderingState();
-   
+
    viewpoint.TranslateBy( Locus::Vector3(0.0f, 0.0f, REAL_Z_VIEWER) );
 
-   currentPolygon.CreateGPUVertexData();
+   currentPolygonAsLineSegments.CreateGPUVertexData();
 }
 
 void TriangulationScene::InitializeRenderingState()
@@ -89,23 +79,6 @@ void TriangulationScene::InitializeRenderingState()
    renderingState->shaderController.UseProgram(Shader_ID);
 }
 
-void TriangulationScene::DestroyRenderingState()
-{
-   renderingState.reset();
-
-   currentPolygon.DeleteGPUVertexData();
-
-   for (std::unique_ptr<Locus::LineSegmentCollection>& lineSegmentCollection : completedPolygons)
-   {
-      lineSegmentCollection->DeleteGPUVertexData();
-   }
-
-   for (std::unique_ptr<Locus::Mesh>& triangulatedPolygon : triangulatedPolygons)
-   {
-      triangulatedPolygon->DeleteGPUVertexData();
-   }
-}
-
 void TriangulationScene::KeyPressed(Locus::Key_t key)
 {
    switch (key)
@@ -113,50 +86,12 @@ void TriangulationScene::KeyPressed(Locus::Key_t key)
       case KEY_TRIANGULATE:
          TriangulateCompletedPolygons();
          break;
-
-      case KEY_LEFT:
-         moveViewerLeft = true;
-         break;
-
-      case KEY_RIGHT:
-         moveViewerRight = true;
-         break;
-
-      case KEY_UP:
-         moveViewerUp = true;
-         break;
-
-      case KEY_DOWN:
-         moveViewerDown = true;
-         break;
-   }
-}
-
-void TriangulationScene::KeyReleased(Locus::Key_t key)
-{
-   switch (key)
-   {
-      case KEY_LEFT:
-         moveViewerLeft = false;
-         break;
-
-      case KEY_RIGHT:
-         moveViewerRight = false;
-         break;
-
-      case KEY_UP:
-         moveViewerUp = false;
-         break;
-
-      case KEY_DOWN:
-         moveViewerDown = false;
-         break;
    }
 }
 
 void TriangulationScene::MouseMoved(int x, int y)
 {
-   if (currentPolygon.NumLineSegments() > 0)
+   if (currentPolygonAsLineSegments.NumLineSegments() > 0)
    {
       Locus::Vector3 worldCoordinate;
 
@@ -164,8 +99,8 @@ void TriangulationScene::MouseMoved(int x, int y)
       {
          worldCoordinate.z = REAL_Z_SCENE;
 
-         currentPolygon[currentPolygon.NumLineSegments() - 1].segment.P2 = worldCoordinate;
-         currentPolygon.UpdateGPUVertexData();
+         currentPolygonAsLineSegments[currentPolygonAsLineSegments.NumLineSegments() - 1].segment.P2 = worldCoordinate;
+         currentPolygonAsLineSegments.UpdateGPUVertexData();
       }
    }
 
@@ -185,35 +120,39 @@ void TriangulationScene::MousePressed(MouseButton_t button)
 
       coloredLineSegment.color = CurrentColor();
 
-      if (currentPolygon.NumLineSegments() == 0)
+      if (button == Locus::Mouse_Button_Left)
       {
-         coloredLineSegment.segment.P1 = worldCoordinate;
+         if (currentPolygonAsLineSegments.NumLineSegments() == 0)
+         {
+            coloredLineSegment.segment.P1 = worldCoordinate;
+         }
+         else
+         {
+            coloredLineSegment.segment.P1 = currentPolygonAsLineSegments[currentPolygonAsLineSegments.NumLineSegments() - 1].segment.P2;
+         }
+
+         coloredLineSegment.segment.P2 = worldCoordinate;
+
+         currentPolygonAsLineSegments.AddLineSegment(coloredLineSegment);
+         currentPolygonAsLineSegments.UpdateGPUVertexData();
       }
       else
       {
-         coloredLineSegment.segment.P1 = currentPolygon[currentPolygon.NumLineSegments() - 1].segment.P2;
-      }
-
-      coloredLineSegment.segment.P2 = worldCoordinate;
-
-      currentPolygon.AddLineSegment(coloredLineSegment);
-      currentPolygon.UpdateGPUVertexData();
-
-      if (button == Locus::Mouse_Button_Right)
-      {
-         if (currentPolygon.NumLineSegments() >= 3)
+         //a right or middle mouse button click is an attempt
+         //to close the polygon
+         if (currentPolygonAsLineSegments.NumLineSegments() >= 2)
          {
-            coloredLineSegment.segment.P1 = coloredLineSegment.segment.P2;
-            coloredLineSegment.segment.P2 = currentPolygon[0].segment.P1;
+            coloredLineSegment.segment.P1 = worldCoordinate;
+            coloredLineSegment.segment.P2 = currentPolygonAsLineSegments[0].segment.P1;
 
-            currentPolygon.AddLineSegment(coloredLineSegment);
+            currentPolygonAsLineSegments.AddLineSegment(coloredLineSegment);
 
-            completedPolygons.push_back( std::unique_ptr<Locus::LineSegmentCollection>(new Locus::LineSegmentCollection(currentPolygon)) );
-            completedPolygons.back()->CreateGPUVertexData();
-            completedPolygons.back()->UpdateGPUVertexData();
+            completedPolygonsAsLineSegments.push_back( std::unique_ptr<Locus::LineSegmentCollection>(new Locus::LineSegmentCollection(currentPolygonAsLineSegments)) );
+            completedPolygonsAsLineSegments.back()->CreateGPUVertexData();
+            completedPolygonsAsLineSegments.back()->UpdateGPUVertexData();
 
-            currentPolygon.Clear();
-            currentPolygon.UpdateGPUVertexData();
+            currentPolygonAsLineSegments.Clear();
+            currentPolygonAsLineSegments.UpdateGPUVertexData();
          }
       }
    }
@@ -250,77 +189,137 @@ Locus::Color TriangulationScene::CurrentColor() const
    return polygonColors[triangulatedPolygons.size() % polygonColors.size()];
 }
 
+void TriangulationScene::GetCompletedPolygonLineSegmentsAsPolygons(std::vector<Locus::Polygon2D_t>& polygons) const
+{
+   Locus::Vector2 point2D;
+
+   for (const std::unique_ptr<Locus::LineSegmentCollection>& completedPolygon : completedPolygonsAsLineSegments)
+   {
+      Locus::Polygon2D_t polygon;
+
+      for (size_t lineSegmentIndex = 0, numLineSegments = completedPolygon->NumLineSegments(); lineSegmentIndex < numLineSegments; ++lineSegmentIndex)
+      {
+         const Locus::Vector3& point3D = (*completedPolygon)[lineSegmentIndex].segment.P1;
+
+         point2D.x = point3D.x;
+         point2D.y = point3D.y;
+
+         polygon.AddPoint(point2D);
+      }
+
+      polygons.push_back(polygon);
+   }
+}
+
+bool TriangulationScene::CompletedPolygonsAreWellFormed(const std::vector<Locus::Polygon2D_t>& polygons)
+{
+   for (const Locus::Polygon2D_t& polygon : polygons)
+   {
+      if (!polygon.IsWellDefined())
+      {
+         return false;
+      }
+
+      //determine if any line segments are degenerate
+      for (std::size_t pointIndex = 0, numPoints = polygon.NumPoints(); pointIndex < numPoints; ++pointIndex)
+      {
+         const Locus::Vector2& point1 = polygon[pointIndex];
+         const Locus::Vector2& point2 = polygon[(pointIndex + 1) % numPoints];
+
+         if (point1.PreciselyEqualTo(point2))
+         {
+            return false;
+         }
+      }
+
+      if (polygon.IsSelfIntersecting())
+      {
+         return false;
+      }
+   }
+
+   std::size_t numPolygons = polygons.size();
+
+   if (numPolygons > 1)
+   {
+      //determine if any pair of polygons intersect
+      //This is a brute force all pairs check
+
+      for (std::size_t polygonIndex = 0; polygonIndex < (numPolygons - 1); ++polygonIndex)
+      {
+         for (std::size_t polygonIndex2 = (polygonIndex + 1); polygonIndex2 < numPolygons; ++polygonIndex2)
+         {
+            if (polygons[polygonIndex].Intersects(polygons[polygonIndex2]))
+            {
+               return false;
+            }
+         }
+      }
+   }
+
+   return true;
+}
+
 void TriangulationScene::TriangulateCompletedPolygons()
 {
-   if (completedPolygons.size() > 0)
+   if (completedPolygonsAsLineSegments.size() > 0)
    {
       std::vector<Locus::Polygon2D_t> polygonsToTriangulate;
 
-      Locus::Vector2 point2D;
+      GetCompletedPolygonLineSegmentsAsPolygons(polygonsToTriangulate);
 
-      for (std::unique_ptr<Locus::LineSegmentCollection>& completedPolygon : completedPolygons)
+      if (CompletedPolygonsAreWellFormed(polygonsToTriangulate))
       {
-         Locus::Polygon2D_t polygon;
+         std::vector<const Vector2*> trianglePoints;
 
-         for (size_t lineSegmentIndex = 0, numLineSegments = completedPolygon->NumLineSegments(); lineSegmentIndex < numLineSegments; ++lineSegmentIndex)
+         Locus::EarClipping::Triangulate(polygonsToTriangulate, Locus::PolygonWinding::CounterClockwise, trianglePoints);
+
+         std::size_t numTriangles = trianglePoints.size() / 3;
+
+         if (numTriangles > 0)
          {
-            const Locus::Vector3& point3D = (*completedPolygon)[lineSegmentIndex].segment.P2;
+            std::vector<std::vector<Locus::MeshVertex>> faceTriangles(numTriangles, std::vector<Locus::MeshVertex>(3));
 
-            point2D.x = point3D.x;
-            point2D.y = point3D.y;
+            const Locus::TextureCoordinate Dont_Care_Tex_Coord(0.0f, 0.0f);
 
-            polygon.AddPoint(point2D);
+            for (size_t triangleIndex = 0; triangleIndex < numTriangles; ++triangleIndex)
+            {
+               for (std::size_t pointIndex = 0; pointIndex < 3; ++pointIndex)
+               {
+                  Locus::MeshVertex& meshVertex = faceTriangles[triangleIndex][pointIndex];
+
+                  meshVertex.position.x = trianglePoints[triangleIndex * 3 + pointIndex]->x;
+                  meshVertex.position.y = trianglePoints[triangleIndex * 3 + pointIndex]->y;
+                  meshVertex.position.z = REAL_Z_SCENE;
+
+                  meshVertex.textureCoordinate = Dont_Care_Tex_Coord;
+               }
+            }
+
+            Locus::Color color = CurrentColor();
+
+            triangulatedPolygons.push_back( std::unique_ptr<Locus::Mesh>(new Mesh(faceTriangles)) );
+
+            std::unique_ptr<Locus::Mesh>& polygonJustTriangulated = triangulatedPolygons.back();
+
+            polygonJustTriangulated->gpuVertexDataTransferInfo.sendColors = true;
+            polygonJustTriangulated->gpuVertexDataTransferInfo.sendNormals = false;
+            polygonJustTriangulated->gpuVertexDataTransferInfo.sendPositions = true;
+            polygonJustTriangulated->gpuVertexDataTransferInfo.sendTexCoords = false;
+
+            polygonJustTriangulated->Translate(polygonJustTriangulated->centroid);
+
+            polygonJustTriangulated->SetColor(color);
+
+            polygonJustTriangulated->CreateGPUVertexData();
+            polygonJustTriangulated->UpdateGPUVertexData();
          }
-
-         polygonsToTriangulate.push_back(polygon);
       }
 
-      std::vector<const Vector2*> trianglePoints;
+      currentPolygonAsLineSegments.Clear();
+      currentPolygonAsLineSegments.UpdateGPUVertexData();
 
-      Locus::EarClipping::Triangulate(polygonsToTriangulate, Locus::PolygonWinding::CounterClockwise, trianglePoints);
-
-      std::size_t numTriangles = trianglePoints.size() / 3;
-
-      std::vector<std::vector<Locus::MeshVertex>> faceTriangles(numTriangles, std::vector<Locus::MeshVertex>(3));
-
-      const Locus::TextureCoordinate Dont_Care_Tex_Coord(0.0f, 0.0f);
-
-      for (size_t triangleIndex = 0; triangleIndex < numTriangles; ++triangleIndex)
-      {
-         for (std::size_t pointIndex = 0; pointIndex < 3; ++pointIndex)
-         {
-            Locus::MeshVertex& meshVertex = faceTriangles[triangleIndex][pointIndex];
-
-            meshVertex.position.x = trianglePoints[triangleIndex * 3 + pointIndex]->x;
-            meshVertex.position.y = trianglePoints[triangleIndex * 3 + pointIndex]->y;
-            meshVertex.position.z = REAL_Z_SCENE;
-
-            meshVertex.textureCoordinate = Dont_Care_Tex_Coord;
-         }
-      }
-
-      Locus::Color color = CurrentColor();
-
-      triangulatedPolygons.push_back( std::unique_ptr<Locus::Mesh>(new Mesh(faceTriangles)) );
-
-      std::unique_ptr<Locus::Mesh>& polygonJustTriangulated = triangulatedPolygons.back();
-
-      polygonJustTriangulated->gpuVertexDataTransferInfo.sendColors = true;
-      polygonJustTriangulated->gpuVertexDataTransferInfo.sendNormals = false;
-      polygonJustTriangulated->gpuVertexDataTransferInfo.sendPositions = true;
-      polygonJustTriangulated->gpuVertexDataTransferInfo.sendTexCoords = false;
-
-      polygonJustTriangulated->Translate(polygonJustTriangulated->centroid);
-
-      polygonJustTriangulated->SetColor(color);
-
-      polygonJustTriangulated->CreateGPUVertexData();
-      polygonJustTriangulated->UpdateGPUVertexData();
-
-      currentPolygon.Clear();
-      currentPolygon.UpdateGPUVertexData();
-
-      completedPolygons.clear();
+      completedPolygonsAsLineSegments.clear();
    }
 }
 
@@ -332,12 +331,12 @@ void TriangulationScene::Draw()
 
    renderingState->transformationStack.UploadTransformations(renderingState->shaderController, Locus::Transformation::Identity());
 
-   for (std::unique_ptr<Locus::LineSegmentCollection>& polygon : completedPolygons)
+   for (std::unique_ptr<Locus::LineSegmentCollection>& polygon : completedPolygonsAsLineSegments)
    {
       polygon->Draw(*renderingState);
    }
 
-   currentPolygon.Draw(*renderingState);
+   currentPolygonAsLineSegments.Draw(*renderingState);
 
    for (std::unique_ptr<Locus::Mesh>& triangulatedPolygon : triangulatedPolygons)
    {
