@@ -83,25 +83,37 @@ if(WIN32)
       get_target_property(ThisExampleTargetLocation Locus_Example_Triangulation LOCATION)
       get_filename_component(ThisExampleTargetDir ${ThisExampleTargetLocation} PATH)
 
-		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/Locus/third-party/GLEW/$<CONFIGURATION>")
+      list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/third-party/FreeType/$<CONFIGURATION>")
+		list(APPEND DLL_NAMES "freetype")
+
+		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/third-party/GLEW/$<CONFIGURATION>")
 		list(APPEND DLL_NAMES "glew")
 
-		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/Locus/third-party/GLFW/src/$<CONFIGURATION>")
+		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/third-party/GLFW/src/$<CONFIGURATION>")
 		list(APPEND DLL_NAMES "glfw3")
 
-		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/Locus/src/Common/$<CONFIGURATION>")
+		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/third-party/PHYSFS/$<CONFIGURATION>")
+		list(APPEND DLL_NAMES "physfs")
+
+		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/third-party/stb_image/src/$<CONFIGURATION>")
+		list(APPEND DLL_NAMES "stb_image")
+
+		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/src/Common/$<CONFIGURATION>")
 		list(APPEND DLL_NAMES "Locus_Common")
 
-		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/Locus/src/Geometry/$<CONFIGURATION>")
+		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/src/FileSystem/$<CONFIGURATION>")
+		list(APPEND DLL_NAMES "Locus_FileSystem")
+
+		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/src/Geometry/$<CONFIGURATION>")
 		list(APPEND DLL_NAMES "Locus_Geometry")
 
-		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/Locus/src/Math/$<CONFIGURATION>")
+		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/src/Math/$<CONFIGURATION>")
 		list(APPEND DLL_NAMES "Locus_Math")
 
-		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/Locus/src/Rendering/$<CONFIGURATION>")
+		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/src/Rendering/$<CONFIGURATION>")
 		list(APPEND DLL_NAMES "Locus_Rendering")
 
-		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/Locus/src/Simulation/$<CONFIGURATION>")
+		list(APPEND DLL_ORIGIN_PATHS "${PROJECT_BINARY_DIR}/src/Simulation/$<CONFIGURATION>")
 		list(APPEND DLL_NAMES "Locus_Simulation")
 
 		list(LENGTH DLL_ORIGIN_PATHS NUM_DLLS)
