@@ -25,6 +25,19 @@ The above keys may be combined. For instance, pressing w and e at the same time 
 
 * ESC: quit the demo
 
+##Triangulation
+
+The Triangulation example shows triangulation of polygon hierarchies of arbitrary depth using Ear Clipping.
+
+###Controls
+
+* Left Mouse Button: add a point to the current polygon
+* Right or Middle Mouse Button: add a point to the current polygon and close the polygon if possible
+
+* t: triangulate the current set of polygons
+
+If there are any self-intersecting polygons or intersecting pairs of polygons then the input is thrown away at triangulation time.
+
 ##License
 
 Locus Game Engine uses a BSD-style license. See LICENSE.txt for more details.
