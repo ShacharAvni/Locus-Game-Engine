@@ -30,8 +30,8 @@ CollidableMesh::CollidableMesh()
 
 CollidableMesh::CollidableMesh(const CollidableMesh& other)
    :
-   lastCollision(other.lastCollision),
-   boundingVolumeHierarchy( new SphereTree_t(*other.boundingVolumeHierarchy) )
+   boundingVolumeHierarchy( std::make_unique<Locus::SphereTree_t>(*other.boundingVolumeHierarchy) ),
+   lastCollision(other.lastCollision)
 {
 }
 
@@ -39,7 +39,7 @@ CollidableMesh& CollidableMesh::operator=(const CollidableMesh& other)
 {
    if (this != &other)
    {
-      boundingVolumeHierarchy.reset( new Locus::SphereTree_t(*other.boundingVolumeHierarchy) );
+      boundingVolumeHierarchy = std::make_unique<Locus::SphereTree_t>(*other.boundingVolumeHierarchy);
 
       lastCollision = other.lastCollision;
       lastCollisionTime = other.lastCollisionTime;
@@ -63,7 +63,7 @@ void CollidableMesh::GrabMeshAndCollidable(const CollidableMesh& other)
    GrabMesh(other);
    Collidable::operator=(other);
 
-   boundingVolumeHierarchy.reset( new Locus::SphereTree_t(*other.boundingVolumeHierarchy) );
+   boundingVolumeHierarchy = std::make_unique<Locus::SphereTree_t>(*other.boundingVolumeHierarchy);
 }
 
 void CollidableMesh::UpdateBroadCollisionExtent()
@@ -73,7 +73,7 @@ void CollidableMesh::UpdateBroadCollisionExtent()
 
 void CollidableMesh::CreateBoundingVolumeHierarchy()
 {
-   boundingVolumeHierarchy.reset( new Locus::SphereTree_t(*this, 6) );
+   boundingVolumeHierarchy = std::make_unique<Locus::SphereTree_t>(*this, 6);
 }
 
 bool CollidableMesh::GetCollidableMeshIntersection(CollidableMesh& other,  Locus::Triangle3D_t& intersectingTriangle1, Locus::Triangle3D_t& intersectingTriangle2)

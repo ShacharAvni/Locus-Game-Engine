@@ -48,7 +48,7 @@ Octree::Node::Node(const std::unordered_map<std::size_t, Triangle3D_t>& triangle
                }
             }
 
-            children[octantIndex].reset(  new Node(octantTriangles, octants[octantIndex], leafTriangles, currentDepth + 1, maxDepth) );
+            children[octantIndex] = std::make_unique<Node>(octantTriangles, octants[octantIndex], leafTriangles, currentDepth + 1, maxDepth);
          }
       }
       else
@@ -125,7 +125,7 @@ Octree::Octree(const std::vector<Triangle3D_t>& triangles, std::size_t leafTrian
          rootTriangles[triangleIndex] = triangles[triangleIndex];
       }
 
-      root.reset( new Node(rootTriangles, AxisAlignedBox(min, max), leafTriangles, 0, maxDepth) );
+      root = std::make_unique<Node>(rootTriangles, AxisAlignedBox(min, max), leafTriangles, 0, maxDepth);
    }
 }
 

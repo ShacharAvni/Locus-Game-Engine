@@ -58,19 +58,17 @@ void ShaderController::StopProgams()
 
 void ShaderController::LoadShaderProgram(unsigned int whichProgram, const Shader& shader1, const Shader& shader2, bool doesTexturing, bool doesLighting)
 {
-   shaderProgramMap[whichProgram].reset( new ShaderProgram(shader1, shader2, doesTexturing, doesLighting) );
+   shaderProgramMap[whichProgram] = std::make_unique<ShaderProgram>(shader1, shader2, doesTexturing, doesLighting);
 }
 
 void ShaderController::LoadShaderProgram(unsigned int whichProgram, GLInfo::GLSLVersion activeGLSLVersion, bool doesTexturing, unsigned int numLights)
 {
-   shaderProgramMap[whichProgram].reset
-   ( new ShaderProgram
-      (
-         Shader(Shader::ShaderType::Vertex, Locus::ShaderSource::Vert(activeGLSLVersion, doesTexturing, numLights)),
-         Shader(Shader::ShaderType::Fragment, Locus::ShaderSource::Frag(activeGLSLVersion, doesTexturing, numLights)),
-         doesTexturing,
-         (numLights > 0)
-       )
+   shaderProgramMap[whichProgram] = std::make_unique<ShaderProgram>
+   (
+      Shader(Shader::ShaderType::Vertex, Locus::ShaderSource::Vert(activeGLSLVersion, doesTexturing, numLights)),
+      Shader(Shader::ShaderType::Fragment, Locus::ShaderSource::Frag(activeGLSLVersion, doesTexturing, numLights)),
+      doesTexturing,
+      (numLights > 0)
    );
 }
 

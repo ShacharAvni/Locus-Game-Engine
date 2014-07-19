@@ -42,9 +42,9 @@ const Locus::Key_t KEY_TRIANGULATE = Locus::Key_T;
 
 TriangulationScene::TriangulationScene(Locus::SceneManager& sceneManager, unsigned int resolutionX, unsigned int resolutionY)
    : Scene(sceneManager),
+     polygonColors({ Locus::Color::Red(), Locus::Color::Green(), Locus::Color::Blue() }),
      resolutionX(resolutionX),
      resolutionY(resolutionY),
-     polygonColors({ Locus::Color::Red(), Locus::Color::Green(), Locus::Color::Blue() }),
      lastMouseX(0),
      lastMouseY(0)
 {
@@ -58,7 +58,7 @@ TriangulationScene::TriangulationScene(Locus::SceneManager& sceneManager, unsign
 void TriangulationScene::InitializeRenderingState()
 {
    //throws an exception if GLSL can't be loaded, or if the requested GLSL version isn't supported
-   renderingState.reset( new Locus::RenderingState(Locus::GLInfo::GLSLVersion::V_110, true) );
+   renderingState = std::make_unique<Locus::RenderingState>(Locus::GLInfo::GLSLVersion::V_110, true);
 
    Locus::GLInfo::GLSLVersion activeGLSLVersion = renderingState->shaderController.GetActiveGLSLVersion();
 
@@ -147,7 +147,7 @@ void TriangulationScene::MousePressed(MouseButton_t button)
 
             currentPolygonAsLineSegments.AddLineSegment(coloredLineSegment);
 
-            completedPolygonsAsLineSegments.push_back( std::unique_ptr<Locus::LineSegmentCollection>(new Locus::LineSegmentCollection(currentPolygonAsLineSegments)) );
+            completedPolygonsAsLineSegments.emplace_back( std::make_unique<Locus::LineSegmentCollection>(currentPolygonAsLineSegments) );
             completedPolygonsAsLineSegments.back()->CreateGPUVertexData();
             completedPolygonsAsLineSegments.back()->UpdateGPUVertexData();
 
@@ -296,11 +296,7 @@ void TriangulationScene::TriangulateCompletedPolygons()
                }
             }
 
-            Locus::Color color = CurrentColor();
-
-            triangulatedPolygons.push_back( std::unique_ptr<Locus::Mesh>(new Mesh(faceTriangles)) );
-
-            std::unique_ptr<Locus::Mesh>& polygonJustTriangulated = triangulatedPolygons.back();
+            std::unique_ptr<Locus::Mesh> polygonJustTriangulated = std::make_unique<Locus::Mesh>(faceTriangles);
 
             polygonJustTriangulated->gpuVertexDataTransferInfo.sendColors = true;
             polygonJustTriangulated->gpuVertexDataTransferInfo.sendNormals = false;
@@ -309,10 +305,12 @@ void TriangulationScene::TriangulateCompletedPolygons()
 
             polygonJustTriangulated->Translate(polygonJustTriangulated->centroid);
 
-            polygonJustTriangulated->SetColor(color);
+            polygonJustTriangulated->SetColor(CurrentColor());
 
             polygonJustTriangulated->CreateGPUVertexData();
             polygonJustTriangulated->UpdateGPUVertexData();
+
+            triangulatedPolygons.push_back( std::move(polygonJustTriangulated) );
          }
       }
 

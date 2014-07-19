@@ -25,7 +25,7 @@ struct FileOnDisk_Impl
 };
 
 FileOnDisk::FileOnDisk(const std::string& filePath, DataStream::OpenOperation openOperation)
-   : impl(new FileOnDisk_Impl()), filePath(filePath)
+   : impl(std::make_unique<FileOnDisk_Impl>()), filePath(filePath)
 {
    const char* mode = "";
 

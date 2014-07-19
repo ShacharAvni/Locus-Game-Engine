@@ -34,7 +34,7 @@ endif()
 #--------------------------------------------------------------------
 if (UNIX)
     add_definitions(-Wall)
-    add_definitions(-std=c++11)
+    add_definitions(-std=c++1y)
 
     if (BUILD_SHARED_LIBS)
         add_definitions(-fvisibility=hidden)

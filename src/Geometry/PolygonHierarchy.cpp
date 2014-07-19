@@ -18,7 +18,7 @@ namespace Locus
 
 template <class PolygonType>
 PolygonHierarchy<PolygonType>::PolygonHierarchy(std::vector<PolygonType*>& polygons, PolygonWinding winding, const Vector3& normal, float toleranceFactor)
-   : root(new Node)
+   : root(std::make_unique<Node>())
 {
    root->polygon = nullptr;
 
@@ -129,7 +129,7 @@ void PolygonHierarchy<PolygonType>::FormHierarchyAtNode_R(std::unique_ptr<Node>&
             topLevelPolygon->Reverse();
          }
 
-         node->children[topLevelPolygonIndex].reset(new Node);
+         node->children[topLevelPolygonIndex] = std::make_unique<Node>();
          node->children[topLevelPolygonIndex]->polygon = topLevelPolygon;
 
          FormHierarchyAtNode_R(node->children[topLevelPolygonIndex], grandChildren.front(), childrenPolygonWinding, normal, toleranceFactor);

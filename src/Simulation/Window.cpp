@@ -48,12 +48,17 @@ void Window::ExternalSizeCallback(GLFWwindow* glfwWindow, int width, int height)
 }
 
 Window::Window(WindowContext& windowContext, int width, int height, const std::string& name, bool fullScreen, int* targetRefreshRate)
-   : windowContext(windowContext), name(name), glewContext(new GLEWContext()), glfwWindow(nullptr), windowEventListener(nullptr),
-     fullScreen(fullScreen), pollingEvents(false)
+   : windowContext(windowContext),
+     name(name),
+     glewContext(std::make_unique<GLEWContext>()),
+     glfwWindow(nullptr),
+     windowEventListener(nullptr),
+     fullScreen(fullScreen),
+     pollingEvents(false)
 {
    if (targetRefreshRate != nullptr)
    {
-      this->targetRefreshRate.reset(new int(*targetRefreshRate));
+      this->targetRefreshRate = std::make_unique<int>(*targetRefreshRate);
    }
 
    MakeWindow(width, height);

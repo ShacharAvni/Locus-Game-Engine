@@ -48,7 +48,7 @@ public:
    {
       char* numAsBytes = reinterpret_cast<char*>(&num);
 
-      for (int byteIndex = 0; byteIndex < sizeof(T); ++byteIndex)
+      for (std::size_t byteIndex = 0; byteIndex < sizeof(T); ++byteIndex)
       {
          numAsBytes[byteIndex] = buffer[byteIndex];
       }

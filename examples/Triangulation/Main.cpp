@@ -25,6 +25,9 @@
 
 #include "TriangulationScene.h"
 
+#include "Locus/Rendering/RenderingState.h"
+#include "Locus/Rendering/Mesh.h"
+
 #include <string>
 
 #ifndef LOCUS_WINDOWS
@@ -76,7 +79,7 @@ void ShowFatalError(const std::string& error)
 
       Locus::SceneManager sceneManager(window);
 
-      sceneManager.RunSimulation( std::unique_ptr<Locus::Scene>(new Locus::Examples::TriangulationScene(sceneManager, monitorWidth, monitorHeight)) );
+      sceneManager.RunSimulation( std::make_unique<Locus::Examples::TriangulationScene>(sceneManager, monitorWidth, monitorHeight) );
    }
    catch (Locus::Exception& locusException)
    {

@@ -28,7 +28,7 @@ struct File_Impl
 };
 
 File::File(const MountedFilePath& mountedFilePath, DataStream::OpenOperation openOperation)
-   : impl(new File_Impl()), mountedFilePath(mountedFilePath)
+   : impl(std::make_unique<File_Impl>()), mountedFilePath(mountedFilePath)
 {
    const char* path = mountedFilePath.path.c_str();
 

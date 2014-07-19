@@ -99,7 +99,7 @@ struct CollisionManager_Impl
 };
 
 CollisionManager::CollisionManager()
-   : impl(new CollisionManager_Impl())
+   : impl(std::make_unique<CollisionManager_Impl>())
 {
 }
 
@@ -122,9 +122,9 @@ void CollisionManager::Add(Collidable& collidable)
 
    impl->collidableIDSet.insert(collidable.collidableID);
 
-   impl->xIntervals[collidable.collidableID] = std::unique_ptr<CollisionInterval>(new CollisionInterval(collidable.collidableID, collidable.broadCollisionExtentMin.x, collidable.broadCollisionExtentMax.x));
-   impl->yIntervals[collidable.collidableID] = std::unique_ptr<CollisionInterval>(new CollisionInterval(collidable.collidableID, collidable.broadCollisionExtentMin.y, collidable.broadCollisionExtentMax.y));
-   impl->zIntervals[collidable.collidableID] = std::unique_ptr<CollisionInterval>(new CollisionInterval(collidable.collidableID, collidable.broadCollisionExtentMin.z, collidable.broadCollisionExtentMax.z));
+   impl->xIntervals[collidable.collidableID] = std::make_unique<CollisionInterval>(collidable.collidableID, collidable.broadCollisionExtentMin.x, collidable.broadCollisionExtentMax.x);
+   impl->yIntervals[collidable.collidableID] = std::make_unique<CollisionInterval>(collidable.collidableID, collidable.broadCollisionExtentMin.y, collidable.broadCollisionExtentMax.y);
+   impl->zIntervals[collidable.collidableID] = std::make_unique<CollisionInterval>(collidable.collidableID, collidable.broadCollisionExtentMin.z, collidable.broadCollisionExtentMax.z);
 
    if (impl->doUpdateCollisionCollections)
    {

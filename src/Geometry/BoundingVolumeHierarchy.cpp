@@ -187,7 +187,7 @@ BoundingVolumeHierarchy<BoundingVolume>::Node::Node(const TriangleInputMap_t& tr
          {
             if (trianglesInOctants[childIndex].size() > 0)
             {
-               children[childIndex].reset( new Node(trianglesInOctants[childIndex], BoundingVolumeHierarchy::InstantiateBoundingVolumeFromPoints(GetUniquePointsFromTriangles(trianglesInOctants[childIndex])), leafTriangles, currentDepth + 1, maxDepth) );
+               children[childIndex] = std::make_unique<Node>(trianglesInOctants[childIndex], BoundingVolumeHierarchy::InstantiateBoundingVolumeFromPoints(GetUniquePointsFromTriangles(trianglesInOctants[childIndex])), leafTriangles, currentDepth + 1, maxDepth);
             }
          }
       }  
@@ -202,7 +202,7 @@ BoundingVolumeHierarchy<BoundingVolume>::Node::Node(const typename BoundingVolum
    {
       if (boundingVolumeHierarchyNode.children[octantIndex] != nullptr)
       {
-         children[octantIndex].reset( new Node(*boundingVolumeHierarchyNode.children[octantIndex]) );
+         children[octantIndex] = std::make_unique<Node>(*boundingVolumeHierarchyNode.children[octantIndex]);
       }
    }
 }
@@ -213,12 +213,12 @@ BoundingVolumeHierarchy<BoundingVolume>::BoundingVolumeHierarchy(const std::vect
    TriangleInputMap_t triangleInputMap = MakeTriangleInputMap(triangles);
    std::vector<Vector3> rootPoints = GetUniquePointsFromTriangles(triangles);
 
-   root.reset( new Node(triangleInputMap, BoundingVolumeHierarchy::InstantiateBoundingVolumeFromPoints(rootPoints), leafTriangles, 0, maxDepth) );
+   root = std::make_unique<Node>(triangleInputMap, BoundingVolumeHierarchy::InstantiateBoundingVolumeFromPoints(rootPoints), leafTriangles, 0, maxDepth);
 }
 
 template <class BoundingVolume>
 BoundingVolumeHierarchy<BoundingVolume>::BoundingVolumeHierarchy(const BoundingVolumeHierarchy<BoundingVolume>& otherBoundingVolumeHierarchy)
-   : root( new Node(*otherBoundingVolumeHierarchy.root) )
+   : root( std::make_unique<Node>(*otherBoundingVolumeHierarchy.root) )
 {
 }
 
@@ -269,7 +269,7 @@ void BoundingVolumeHierarchy<BoundingVolume>::FinalizeIntersection(const Moveabl
 
          if (intersectsOne)
          {
-            for (int childIndex = 0; childIndex < Num_Tree_Children; ++childIndex)
+            for (std::size_t childIndex = 0; childIndex < Num_Tree_Children; ++childIndex)
             {
                if (checkNode->children[childIndex] != nullptr)
                {
@@ -311,7 +311,7 @@ void BoundingVolumeHierarchy<BoundingVolume>::GetIntersection(const Moveable& th
             }
             else
             {
-               for (int childIndex = 0; childIndex < Num_Tree_Children; ++childIndex)
+               for (std::size_t childIndex = 0; childIndex < Num_Tree_Children; ++childIndex)
                {
                   if (node->children[childIndex] != nullptr)
                   {
@@ -351,7 +351,7 @@ void BoundingVolumeHierarchy<BoundingVolume>::GetIntersection(const Moveable& th
             }
             else
             {
-               for (int childIndex = 0; childIndex < Num_Tree_Children; ++childIndex)
+               for (std::size_t childIndex = 0; childIndex < Num_Tree_Children; ++childIndex)
                {
                   if (node->children[childIndex] != nullptr)
                   {

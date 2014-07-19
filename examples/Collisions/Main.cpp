@@ -76,7 +76,7 @@ void ShowFatalError(const std::string& error)
 
       Locus::SceneManager sceneManager(window);
 
-      sceneManager.RunSimulation( std::unique_ptr<Locus::Scene>(new Locus::Examples::CollisionScene(sceneManager, monitorWidth, monitorHeight)) );
+      sceneManager.RunSimulation( std::make_unique<Locus::Examples::CollisionScene>(sceneManager, monitorWidth, monitorHeight) );
    }
    catch (Locus::Exception& locusException)
    {

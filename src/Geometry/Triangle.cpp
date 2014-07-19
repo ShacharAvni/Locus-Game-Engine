@@ -77,7 +77,7 @@ PointType Triangle<PointType>::ComputeCentroid(const Triangle<PointType>& triang
 {
    PointType centroid;
 
-   for (int triangleVertexIndex = 0; triangleVertexIndex < Triangle<PointType>::NumPointsOnATriangle; ++triangleVertexIndex)
+   for (std::size_t triangleVertexIndex = 0; triangleVertexIndex < Triangle<PointType>::NumPointsOnATriangle; ++triangleVertexIndex)
    {
       centroid += triangle1[triangleVertexIndex];
       centroid += triangle2[triangleVertexIndex];
@@ -161,7 +161,7 @@ IntersectionType Triangle<PointType>::CoplanarTriangleIntersection(const Triangl
 
    PointType intersectionPoint1, intersectionPoint2;
 
-   for (int thisTriangleEdgeIndex = 0; thisTriangleEdgeIndex < NumPointsOnATriangle; ++thisTriangleEdgeIndex)
+   for (std::size_t thisTriangleEdgeIndex = 0; thisTriangleEdgeIndex < NumPointsOnATriangle; ++thisTriangleEdgeIndex)
    {
       LineSegment<PointType> thisLineSegment(this->points[thisTriangleEdgeIndex], this->points[(thisTriangleEdgeIndex + 1) % NumPointsOnATriangle]);
 

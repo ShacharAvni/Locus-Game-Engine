@@ -91,7 +91,7 @@ CollisionScene::~CollisionScene()
 void CollisionScene::InitializeRenderingState()
 {
    //throws an exception if GLSL can't be loaded, or if the requested GLSL version isn't supported
-   renderingState.reset( new Locus::RenderingState(Locus::GLInfo::GLSLVersion::V_110, true) );
+   renderingState = std::make_unique<Locus::RenderingState>(Locus::GLInfo::GLSLVersion::V_110, true);
 
    Locus::GLInfo::GLSLVersion activeGLSLVersion = renderingState->shaderController.GetActiveGLSLVersion();
 

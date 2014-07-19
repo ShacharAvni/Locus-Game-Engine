@@ -95,7 +95,7 @@ public:
       TriangleInputMap_t triangleInputMap = MakeTriangleInputMap(identityFaceTriangles);
       std::vector<Vector3> rootPoints = GetUniquePointsFromTriangles(identityFaceTriangles);
 
-      root.reset( new Node(triangleInputMap, BoundingVolumeHierarchy::InstantiateBoundingVolumeFromPoints(rootPoints), leafTriangles, 0, BoundingVolumeHierarchy::GetMaxTreeDepth(model, maxDepthClamp)) );
+      root = std::make_unique<Node>(triangleInputMap, BoundingVolumeHierarchy::InstantiateBoundingVolumeFromPoints(rootPoints), leafTriangles, 0, BoundingVolumeHierarchy::GetMaxTreeDepth(model, maxDepthClamp));
    }
 
    BoundingVolumeHierarchy(const std::vector<Triangle3D_t>& triangles, std::size_t leafTriangles, std::size_t maxDepth);

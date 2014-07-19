@@ -19,7 +19,7 @@ Locus is split up into the following modules, each compiled as a separate librar
 ##Supported Platforms
 
 * Windows (compiles with Visual Studio 2013)
-* Linux (compiles with GCC 4.8.2)
+* Linux (compiles with GCC 4.9.1)
 * Mac support and support for other compilers is forthcoming
 
 ##License

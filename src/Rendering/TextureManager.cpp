@@ -30,7 +30,7 @@ void TextureManager::Load(const std::string& textureName, const FilePathType& te
 {
    if (textures.find(textureName) == textures.end())
    {
-      std::unique_ptr<Texture> texture(new Texture(textureFilePath, clamp, glInfo));
+      std::unique_ptr<Texture> texture(std::make_unique<Texture>(textureFilePath, clamp, glInfo));
 
       texture->ClearPixelData();
 

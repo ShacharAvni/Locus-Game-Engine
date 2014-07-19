@@ -18,13 +18,15 @@ namespace Locus
 {
 
 SJTPermutations::SJTPermutations(int numElements)
-   : numElements(numElements), elements(numElements), elementsIndexedByValue(numElements)
+   : numElements(numElements),
+     elements(numElements),
+     elementsIndexedByValue(numElements)
 {
    assert(numElements >= 1);
 
    for (int elementIndex = 0; elementIndex < numElements; ++elementIndex)
    {
-      elements[elementIndex].reset(new PermutationElement());
+      elements[elementIndex] = std::make_unique<PermutationElement>();
       elements[elementIndex]->value = elementIndex;
       elements[elementIndex]->position = elementIndex;
       elements[elementIndex]->direction = Direction::Negative;

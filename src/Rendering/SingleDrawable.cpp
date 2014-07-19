@@ -34,7 +34,7 @@ SingleDrawable& SingleDrawable::operator=(const SingleDrawable& /*singleDrawable
 
 void SingleDrawable::CreateGPUVertexData()
 {
-   gpuVertexData.reset(new GPUVertexData());
+   gpuVertexData = std::make_unique<GPUVertexData>();
 }
 
 void SingleDrawable::DeleteGPUVertexData()
