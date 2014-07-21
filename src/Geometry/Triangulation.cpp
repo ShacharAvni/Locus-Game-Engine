@@ -428,7 +428,7 @@ static void MakeSimple(AugmentedVertexList& augmentedVertices, const std::vector
 
       AugmentedVertexList::iterator mutuallyVisibleVertex = FindMutuallyVisibleVertex(augmentedVertices, (*innerPolygon)[maxInteriorPointIndex], winding);
 
-      assert(mutuallyVisibleVertexIter != augmentedVertices.end());
+      assert(mutuallyVisibleVertex != augmentedVertices.end());
 
       StitchOuterAndInnerPolygons(augmentedVertices, *innerPolygon, maxInteriorPointIndex, mutuallyVisibleVertex);
    }
