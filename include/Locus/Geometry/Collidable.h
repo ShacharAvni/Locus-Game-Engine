@@ -17,32 +17,26 @@
 namespace Locus
 {
 
-typedef unsigned int ID_t;
-
 class LOCUS_GEOMETRY_API Collidable
 {
-   friend class CollisionManager;
-
 public:
    Collidable();
    virtual ~Collidable();
 
-   Collidable& operator=(const Collidable& other);
-
    unsigned int GetCollidableType() const;
+
+   const Vector3& GetBroadCollisionExtentMin() const;
+   const Vector3& GetBroadCollisionExtentMax() const;
 
    virtual void UpdateBroadCollisionExtent() = 0;
 
    virtual bool CollidesWith(Collidable& collidable) const;
 
    virtual void ResolveCollision(Collidable& collidable) = 0;
-   virtual void HandleCollision(Collidable& collidable);
 
 private:
    Vector3 broadCollisionExtentMin;
    Vector3 broadCollisionExtentMax;
-
-   ID_t collidableID;
 
 protected:
    unsigned int collidableType;

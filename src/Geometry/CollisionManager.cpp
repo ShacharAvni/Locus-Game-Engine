@@ -13,11 +13,9 @@
 
 #include "Locus/Common/Float.h"
 #include "Locus/Common/Util.h"
-#include "Locus/Common/SequentialIDGenerator.h"
-#include "Locus/Common/Exception.h"
 
 #include <vector>
-#include <set>
+#include <unordered_set>
 #include <unordered_map>
 #include <forward_list>
 #include <algorithm>
@@ -32,12 +30,12 @@ namespace Locus
 struct CollisionInterval
 {
    CollisionInterval()
-   : collidableID(0), min(0.0), max(0.0)
+      : owner(nullptr), min(0.0), max(0.0)
    {
    }
 
-   CollisionInterval(ID_t collidableID, float min, float max)
-      : collidableID(collidableID), min(min), max(max)
+   CollisionInterval(Collidable* owner, float min, float max)
+      : owner(owner), min(min), max(max)
    {
    }
 
@@ -51,7 +49,7 @@ struct CollisionInterval
       return Float::FLess<float>(min, other.min);
    }
 
-   ID_t collidableID;
+   Collidable* owner;
    float min;
    float max;
 };
@@ -71,31 +69,28 @@ struct CollisionManager_Impl
    {
    }
 
-   SequentialIDGenerator idGenerator;
+   std::unordered_set<Collidable*> collidables;
 
-   std::set<ID_t> collidableIDSet;
-   std::unordered_map<ID_t, Collidable*> collidables;
-
-   std::unordered_map<ID_t, std::unique_ptr<CollisionInterval>> xIntervals;
-   std::unordered_map<ID_t, std::unique_ptr<CollisionInterval>> yIntervals;
-   std::unordered_map<ID_t, std::unique_ptr<CollisionInterval>> zIntervals;
+   std::unordered_map<Collidable*, std::unique_ptr<CollisionInterval>> xIntervals;
+   std::unordered_map<Collidable*, std::unique_ptr<CollisionInterval>> yIntervals;
+   std::unordered_map<Collidable*, std::unique_ptr<CollisionInterval>> zIntervals;
 
    std::vector<CollisionInterval*> xSortedIntervals;
    std::vector<CollisionInterval*> ySortedIntervals;
    std::vector<CollisionInterval*> zSortedIntervals;
 
-   std::unordered_map<ID_t, std::size_t> collidableIDToIndex;
+   std::unordered_map<Collidable*, std::size_t> collidableToIndex;
 
    //collisions tables
    std::vector<std::vector<bool>> xCollisions;
    std::vector<std::vector<bool>> yCollisions;
 
-   std::forward_list<std::pair<ID_t, ID_t>> collisionList;
+   std::forward_list<std::pair<Collidable*, Collidable*>> collisionList;
 
    bool doUpdateCollisionCollections;
 
    void UpdateCollisionCollections();
-   void UpdateCollisions(std::vector<CollisionInterval*>& sortedIntervals, const std::function<void(std::size_t, std::size_t, ID_t, ID_t)>& intervalIntersectionFunction);
+   void UpdateCollisions(std::vector<CollisionInterval*>& sortedIntervals, const std::function<void(std::size_t, std::size_t, Collidable*, Collidable*)>& intervalIntersectionFunction);
 };
 
 CollisionManager::CollisionManager()
@@ -107,24 +102,18 @@ CollisionManager::~CollisionManager()
 {
 }
 
-void CollisionManager::Add(Collidable& collidable)
+void CollisionManager::Add(Collidable* collidable)
 {
-   assert(impl->collidables.find(collidable.collidableID) == impl->collidables.end());
+   assert(impl->collidables.find(collidable) == impl->collidables.end());
 
-   collidable.collidableID = impl->idGenerator.NextID();
+   impl->collidables.insert(collidable);
 
-   if (collidable.collidableID == BAD_ID)
-   {
-      throw Exception("Bad ID generated for Collidable");
-   }
+   const Vector3& broadCollisionExtentMin = collidable->GetBroadCollisionExtentMin();
+   const Vector3& broadCollisionExtentMax = collidable->GetBroadCollisionExtentMax();
 
-   impl->collidables.insert(std::make_pair<ID_t, Collidable*>(std::move(collidable.collidableID), &collidable));
-
-   impl->collidableIDSet.insert(collidable.collidableID);
-
-   impl->xIntervals[collidable.collidableID] = std::make_unique<CollisionInterval>(collidable.collidableID, collidable.broadCollisionExtentMin.x, collidable.broadCollisionExtentMax.x);
-   impl->yIntervals[collidable.collidableID] = std::make_unique<CollisionInterval>(collidable.collidableID, collidable.broadCollisionExtentMin.y, collidable.broadCollisionExtentMax.y);
-   impl->zIntervals[collidable.collidableID] = std::make_unique<CollisionInterval>(collidable.collidableID, collidable.broadCollisionExtentMin.z, collidable.broadCollisionExtentMax.z);
+   impl->xIntervals[collidable] = std::make_unique<CollisionInterval>(collidable, broadCollisionExtentMin.x, broadCollisionExtentMax.x);
+   impl->yIntervals[collidable] = std::make_unique<CollisionInterval>(collidable, broadCollisionExtentMin.y, broadCollisionExtentMax.y);
+   impl->zIntervals[collidable] = std::make_unique<CollisionInterval>(collidable, broadCollisionExtentMin.z, broadCollisionExtentMax.z);
 
    if (impl->doUpdateCollisionCollections)
    {
@@ -134,9 +123,9 @@ void CollisionManager::Add(Collidable& collidable)
 
 void CollisionManager_Impl::UpdateCollisionCollections()
 {
-   std::size_t numCollidables = collidableIDSet.size();
+   std::size_t numCollidables = collidables.size();
 
-   collidableIDToIndex.clear();
+   collidableToIndex.clear();
 
    xSortedIntervals.clear();
    xSortedIntervals.reserve(numCollidables);
@@ -148,14 +137,14 @@ void CollisionManager_Impl::UpdateCollisionCollections()
    zSortedIntervals.reserve(numCollidables);
 
    std::size_t index = 0;
-   for (const ID_t& collidableID : collidableIDSet)
+   for (Collidable* collidable : collidables)
    {
       //"index" is an index into the collisions tables
-      collidableIDToIndex[collidableID] = index;
+      collidableToIndex[collidable] = index;
 
-      xSortedIntervals.push_back( xIntervals[collidableID].get() );
-      ySortedIntervals.push_back( yIntervals[collidableID].get() );
-      zSortedIntervals.push_back( zIntervals[collidableID].get() );
+      xSortedIntervals.push_back( xIntervals[collidable].get() );
+      ySortedIntervals.push_back( yIntervals[collidable].get() );
+      zSortedIntervals.push_back( zIntervals[collidable].get() );
 
       ++index;
    }
@@ -163,12 +152,12 @@ void CollisionManager_Impl::UpdateCollisionCollections()
    std::sort(xSortedIntervals.begin(), xSortedIntervals.end(), CollisionIntervalComparator());
    std::sort(ySortedIntervals.begin(), ySortedIntervals.end(), CollisionIntervalComparator());
    std::sort(zSortedIntervals.begin(), zSortedIntervals.end(), CollisionIntervalComparator());
-      
+
    xCollisions = std::vector<std::vector<bool>>(numCollidables, std::vector<bool>(numCollidables));
    yCollisions = std::vector<std::vector<bool>>(numCollidables, std::vector<bool>(numCollidables));
 }
 
-void CollisionManager_Impl::UpdateCollisions(std::vector<CollisionInterval*>& sortedIntervals, const std::function<void(std::size_t, std::size_t, ID_t, ID_t)>& intervalIntersectionFunction)
+void CollisionManager_Impl::UpdateCollisions(std::vector<CollisionInterval*>& sortedIntervals, const std::function<void(std::size_t, std::size_t, Collidable*, Collidable*)>& intervalIntersectionFunction)
 {
    Util::InsertionSort<CollisionInterval*>(sortedIntervals, CollisionIntervalComparator());
 
@@ -182,10 +171,13 @@ void CollisionManager_Impl::UpdateCollisions(std::vector<CollisionInterval*>& so
       {
          if (interval->Intersects(**checkListIter))
          {
-            std::size_t index1 = collidableIDToIndex[interval->collidableID];
-            std::size_t index2 = collidableIDToIndex[(*checkListIter)->collidableID];
+            Collidable* collidable1 = interval->owner;
+            Collidable* collidable2 = (*checkListIter)->owner;
 
-            intervalIntersectionFunction(index1, index2, interval->collidableID, (*checkListIter)->collidableID);
+            std::size_t index1 = collidableToIndex[collidable1];
+            std::size_t index2 = collidableToIndex[collidable2];
+
+            intervalIntersectionFunction(index1, index2, collidable1, collidable2);
 
             ++checkListIter;
          }
@@ -199,32 +191,32 @@ void CollisionManager_Impl::UpdateCollisions(std::vector<CollisionInterval*>& so
    }
 }
 
-void CollisionManager::Update(Collidable& collidable)
+void CollisionManager::Update(Collidable* collidable)
 {
-   assert(impl->collidables.find(collidable.collidableID) != impl->collidables.end());
+   assert(impl->collidables.find(collidable) != impl->collidables.end());
 
-   impl->xIntervals[collidable.collidableID]->min = collidable.broadCollisionExtentMin.x;
-   impl->xIntervals[collidable.collidableID]->max = collidable.broadCollisionExtentMax.x;
+   const Vector3& broadCollisionExtentMin = collidable->GetBroadCollisionExtentMin();
+   const Vector3& broadCollisionExtentMax = collidable->GetBroadCollisionExtentMax();
 
-   impl->yIntervals[collidable.collidableID]->min = collidable.broadCollisionExtentMin.y;
-   impl->yIntervals[collidable.collidableID]->max = collidable.broadCollisionExtentMax.y;
+   impl->xIntervals[collidable]->min = broadCollisionExtentMin.x;
+   impl->xIntervals[collidable]->max = broadCollisionExtentMax.x;
 
-   impl->zIntervals[collidable.collidableID]->min = collidable.broadCollisionExtentMin.z;
-   impl->zIntervals[collidable.collidableID]->max = collidable.broadCollisionExtentMax.z;
+   impl->yIntervals[collidable]->min = broadCollisionExtentMin.y;
+   impl->yIntervals[collidable]->max = broadCollisionExtentMax.y;
+
+   impl->zIntervals[collidable]->min = broadCollisionExtentMin.z;
+   impl->zIntervals[collidable]->max = broadCollisionExtentMax.z;
 }
 
-void CollisionManager::Remove(Collidable& collidable)
+void CollisionManager::Remove(Collidable* collidable)
 {
-   assert(impl->collidables.find(collidable.collidableID) != impl->collidables.end());
+   assert(impl->collidables.find(collidable) != impl->collidables.end());
 
-   impl->collidables.erase(collidable.collidableID);
-   impl->collidableIDSet.erase(collidable.collidableID);
+   impl->collidables.erase(collidable);
 
-   impl->xIntervals.erase(collidable.collidableID);
-   impl->yIntervals.erase(collidable.collidableID);
-   impl->zIntervals.erase(collidable.collidableID);
-
-   collidable.collidableID = BAD_ID;
+   impl->xIntervals.erase(collidable);
+   impl->yIntervals.erase(collidable);
+   impl->zIntervals.erase(collidable);
 
    if (impl->doUpdateCollisionCollections)
    {
@@ -247,13 +239,10 @@ void CollisionManager::FinishAddRemoveBatch()
 void CollisionManager::Clear()
 {
    impl->collidables.clear();
-   impl->collidableIDSet.clear();
 
    impl->xIntervals.clear();
    impl->yIntervals.clear();
    impl->zIntervals.clear();
-
-   impl->idGenerator.Reset();
 }
 
 void CollisionManager::UpdateCollisions()
@@ -270,23 +259,23 @@ void CollisionManager::UpdateCollisions()
          std::fill(impl->yCollisions[i].begin(), impl->yCollisions[i].end(), false);
       }
 
-      impl->UpdateCollisions(impl->xSortedIntervals, [this](std::size_t index1, std::size_t index2, ID_t /*collidableID1*/, ID_t /*collidableID2*/)
+      impl->UpdateCollisions(impl->xSortedIntervals, [this](std::size_t index1, std::size_t index2, Collidable* /*collidable1*/, Collidable* /*collidable2*/)
       {
          impl->xCollisions[index1][index2] = true;
          impl->xCollisions[index2][index1] = true;
       });
 
-      impl->UpdateCollisions(impl->ySortedIntervals, [this](std::size_t index1, std::size_t index2, ID_t /*collidableID1*/, ID_t /*collidableID2*/)
+      impl->UpdateCollisions(impl->ySortedIntervals, [this](std::size_t index1, std::size_t index2, Collidable* /*collidable1*/, Collidable* /*collidable2*/)
       {
          impl->yCollisions[index1][index2] = true;
          impl->yCollisions[index2][index1] = true;
       });
 
-      impl->UpdateCollisions(impl->zSortedIntervals, [this](std::size_t index1, std::size_t index2, ID_t collidableID1, ID_t collidableID2)
+      impl->UpdateCollisions(impl->zSortedIntervals, [this](std::size_t index1, std::size_t index2, Collidable* collidable1, Collidable* collidable2)
       {
          if (impl->xCollisions[index1][index2] && impl->yCollisions[index1][index2])
          {
-            impl->collisionList.emplace_front(std::pair<ID_t, ID_t>(collidableID1, collidableID2));
+            impl->collisionList.emplace_front(std::pair<Collidable*, Collidable*>(collidable1, collidable2));
          }
       });
    }
@@ -294,9 +283,12 @@ void CollisionManager::UpdateCollisions()
 
 void CollisionManager::TransmitCollisions()
 {
-   for (const std::pair<ID_t, ID_t>& collisionPair : impl->collisionList)
+   for (const std::pair<Collidable*, Collidable*>& collisionPair : impl->collisionList)
    {
-      impl->collidables[collisionPair.first]->HandleCollision(*(impl->collidables[collisionPair.second]));
+      if (collisionPair.first->CollidesWith(*(collisionPair.second)))
+      {
+         collisionPair.first->ResolveCollision(*(collisionPair.second));
+      }
    }
 }
 

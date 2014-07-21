@@ -10,13 +10,10 @@
 
 #include "Locus/Geometry/Collidable.h"
 
-#include "Locus/Common/IDGenerator.h"
-
 namespace Locus
 {
 
 Collidable::Collidable()
-   : collidableID(BAD_ID)
 {
 }
 
@@ -29,18 +26,16 @@ unsigned int Collidable::GetCollidableType() const
    return collidableType;
 }
 
-Collidable& Collidable::operator=(const Collidable& other)
+const Vector3& Collidable::GetBroadCollisionExtentMin() const
 {
-   if (this != &other)
-   {
-      collidableType = other.collidableType;
-      broadCollisionExtentMin = other.broadCollisionExtentMin;
-      broadCollisionExtentMax = other.broadCollisionExtentMax;
-   }
-
-   return *this;
+   return broadCollisionExtentMin;
 }
-   
+
+const Vector3& Collidable::GetBroadCollisionExtentMax() const
+{
+   return broadCollisionExtentMax;
+}
+
 void Collidable::UpdateBroadCollisionExtent(const Vector3& centroid, float radius)
 {
    broadCollisionExtentMin.x = centroid.x - radius;
@@ -56,14 +51,6 @@ void Collidable::UpdateBroadCollisionExtent(const Vector3& centroid, float radiu
 bool Collidable::CollidesWith(Collidable& /*collidable*/) const
 {
    return true;
-}
-
-void Collidable::HandleCollision(Collidable& collidable)
-{
-   if (CollidesWith(collidable))
-   {
-      ResolveCollision(collidable);
-   }
 }
 
 }

@@ -31,9 +31,9 @@ public:
    CollisionManager& operator=(const CollisionManager&) = delete;
    ~CollisionManager();
 
-   void Add(Collidable& collidable);
-   void Update(Collidable& collidable);
-   void Remove(Collidable& collidable);
+   void Add(Collidable* collidable);
+   void Update(Collidable* collidable);
+   void Remove(Collidable* collidable);
    void UpdateCollisions();
    void TransmitCollisions();
 

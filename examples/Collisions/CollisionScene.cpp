@@ -223,7 +223,7 @@ void CollisionScene::InitializeCollidableMeshes()
       collidableMeshes[i].UpdateMaxDistanceToCenter();
       collidableMeshes[i].UpdateBroadCollisionExtent();
 
-      collisionManager.Add(collidableMeshes[i]);
+      collisionManager.Add(&collidableMeshes[i]);
    }
 
    collisionManager.FinishAddRemoveBatch();
@@ -432,7 +432,7 @@ void CollisionScene::TickCollidableMeshes(double DT)
       collidableMesh.Tick(DT);
       collidableMesh.UpdateBroadCollisionExtent();
 
-      collisionManager.Update(collidableMesh);
+      collisionManager.Update(&collidableMesh);
    }
 }
 
