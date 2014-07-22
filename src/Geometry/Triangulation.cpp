@@ -56,8 +56,8 @@ static const Polygon2D_t* FindMaxInteriorPointInListAndRemovePolygonFromConsider
 
 static void StitchOuterAndInnerPolygons(AugmentedVertexList& augmentedVertices, const Polygon2D_t& hole, std::size_t maxInteriorPointIndex, AugmentedVertexList::iterator mutuallyVisibleVertexIter);
 static AugmentedVertexList::iterator DetermineMutuallyVisibleVertexFromRayCastResult(AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, const Vector2& intersectionPointOnEdge, AugmentedVertexList::iterator pointOnEdgeWithMaximumXIter, PolygonWinding winding);
-static AugmentedVertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, Vector2& intersectionPointOnEdge, AugmentedVertexList::iterator& pointOnEdgeWithMaximumXIter);
 static AugmentedVertexList::iterator FindMutuallyVisibleVertex(AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, PolygonWinding winding);
+static AugmentedVertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, Vector2& intersectionPointOnEdge, AugmentedVertexList::iterator& pointOnEdgeWithMaximumXIter, PolygonWinding winding);
 
 static void MakeSimple(AugmentedVertexList& augmentedVertices, const std::vector<const Polygon2D_t*>& innerPolygons, PolygonWinding winding);
 
@@ -65,6 +65,7 @@ static void RemoveCollinearVerticesFromConsideration(AugmentedVertexList& augmen
 static void AdjustForPossibleResultingCollinearity(AugmentedVertexList& augmentedVertices, std::forward_list< AugmentedVertexList::iterator >& ears, AugmentedVertexList::iterator& beforeEar, AugmentedVertexList::iterator& afterEar);
 static void MigrateCollinearVertices(AugmentedVertexList::iterator& to, const AugmentedVertexList::iterator& from);
 
+static VertexType GetConvexOrReflexVertexType(const Vector2* firstVertex, const Vector2* secondVertex, const Vector2* thirdVertex, PolygonWinding winding);
 static VertexType GetConvexOrReflexVertexType(AugmentedVertexList::const_iterator augmentedVertexIterator, PolygonWinding winding);
 static void CheckForEarAndUpdateVertexType(AugmentedVertexList& augmentedVertices, AugmentedVertexList::iterator augmentedVertexIterator);
 static void RemoveEar(const Vector2* vertex, std::forward_list< AugmentedVertexList::iterator >& ears);
@@ -216,7 +217,7 @@ static const Polygon2D_t* FindMaxInteriorPointInListAndRemovePolygonFromConsider
    return polygonWithMaxX;
 }
 
-static AugmentedVertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, Vector2& intersectionPointOnEdge, AugmentedVertexList::iterator& pointOnEdgeWithMaximumXIter)
+static AugmentedVertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, Vector2& intersectionPointOnEdge, AugmentedVertexList::iterator& pointOnEdgeWithMaximumXIter, PolygonWinding winding)
 {
    //a) Call the vertex on the hole with the maximum x coordinate P. Call the ray { P, (1,0) } R. Intersect R
    //   with the edges of the outer polygon. Find the edge whose intersection is closest to P. Call this edge E.
@@ -290,20 +291,34 @@ static AugmentedVertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(A
 
          float distance = rayHitEndPointOfEdge ? (possibleMutuallyVisibleVertex->vertex->x - maxInteriorPoint.x) : (intersectionPoint1.x - maxInteriorPoint.x);
 
-         if (distance < minDistance)
+         bool sameishDistance = Float::FEqual(distance, minDistance);
+
+         if ((distance < minDistance) || sameishDistance)
          {
-            if (rayHitEndPointOfEdge)
+            bool takeThisVertex = true;
+
+            if (sameishDistance)
             {
-               mutuallyVisibleVertexIter = possibleMutuallyVisibleVertex;
-            }
-            else
-            {
-               mutuallyVisibleVertexIter = augmentedVerticesEnd;
-               pointOnEdgeWithMaximumXIter = pointOnThisEdgeWithMaximumXIter;
-               intersectionPointOnEdge = intersectionPoint1;
+               const Vector2* beforeMutuallyVisibleVertex = possibleMutuallyVisibleVertex.previous()->vertex;
+
+               takeThisVertex = (GetConvexOrReflexVertexType(beforeMutuallyVisibleVertex, possibleMutuallyVisibleVertex->vertex, &maxInteriorPoint, winding) == VertexType::Convex);
             }
 
-            minDistance = distance;
+            if (takeThisVertex)
+            {
+               if (rayHitEndPointOfEdge)
+               {
+                  mutuallyVisibleVertexIter = possibleMutuallyVisibleVertex;
+               }
+               else
+               {
+                  mutuallyVisibleVertexIter = augmentedVerticesEnd;
+                  pointOnEdgeWithMaximumXIter = pointOnThisEdgeWithMaximumXIter;
+                  intersectionPointOnEdge = intersectionPoint1;
+               }
+
+               minDistance = distance;
+            }
          }
       }
    }
@@ -389,7 +404,7 @@ static AugmentedVertexList::iterator FindMutuallyVisibleVertex(AugmentedVertexLi
    Vector2 intersectionPointOnEdge;
    AugmentedVertexList::iterator pointOnEdgeWithMaximumXIter = augmentedVertices.end();
 
-   AugmentedVertexList::iterator mutuallyVisibleVertex = RayCastFromMaxInteriorPointToOuterPolygon(augmentedVertices, maxInteriorPoint, intersectionPointOnEdge, pointOnEdgeWithMaximumXIter);
+   AugmentedVertexList::iterator mutuallyVisibleVertex = RayCastFromMaxInteriorPointToOuterPolygon(augmentedVertices, maxInteriorPoint, intersectionPointOnEdge, pointOnEdgeWithMaximumXIter, winding);
 
    if (mutuallyVisibleVertex == augmentedVertices.end())
    {
@@ -517,12 +532,8 @@ static void Triangulate(AugmentedVertexList& augmentedVertices, PolygonWinding w
    }
 }
 
-static VertexType GetConvexOrReflexVertexType(AugmentedVertexList::const_iterator augmentedVertexIterator, PolygonWinding winding)
+static VertexType GetConvexOrReflexVertexType(const Vector2* firstVertex, const Vector2* secondVertex, const Vector2* thirdVertex, PolygonWinding winding)
 {
-   const Vector2* firstVertex = (augmentedVertexIterator.previous())->vertex;
-   const Vector2* secondVertex = augmentedVertexIterator->vertex;
-   const Vector2* thirdVertex = (augmentedVertexIterator.next())->vertex;
-
    Vector3 cross = (*secondVertex - *firstVertex).cross(*thirdVertex - *secondVertex);
 
    if (cross.z == 0.0f)
@@ -537,6 +548,15 @@ static VertexType GetConvexOrReflexVertexType(AugmentedVertexList::const_iterato
    {
       return (winding == PolygonWinding::CounterClockwise) ? VertexType::Reflex : VertexType::Convex;
    }
+}
+
+static VertexType GetConvexOrReflexVertexType(AugmentedVertexList::const_iterator augmentedVertexIterator, PolygonWinding winding)
+{
+   const Vector2* firstVertex = (augmentedVertexIterator.previous())->vertex;
+   const Vector2* secondVertex = augmentedVertexIterator->vertex;
+   const Vector2* thirdVertex = (augmentedVertexIterator.next())->vertex;
+
+   return GetConvexOrReflexVertexType(firstVertex, secondVertex, thirdVertex, winding);
 }
 
 static void CheckForEarAndUpdateVertexType(AugmentedVertexList& augmentedVertices, AugmentedVertexList::iterator augmentedVertexIterator)
