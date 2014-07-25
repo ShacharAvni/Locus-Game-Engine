@@ -40,7 +40,10 @@ use the same runtime library.
 
 ##Examples
 
-Sample applications using Locus are planned to be included with the Locus project.
+Sample applications using Locus are in the examples directory.
+
+[Minor Planet Mayhem](https://github.com/ShacharAvni/Minor-Planet-Mayhem/ "Minor Planet Mayhem Source Code")
+is a cross-platform 3D first person space shooter game written in C++ and OpenGL using the Locus Game Engine.
 
 ##Credits
 
@@ -49,7 +52,7 @@ Locus Game Engine Copyright (c) 2014 Shachar Avni. All rights reserved.
 ##Third-Party Software
 
 Locus makes use of the following third-party software whose licenses
-are available in the accompanying THIRD-PARTY-LICENSE.txt:
+are available in the accompanying LICENSE.txt:
 
 * [GLFW](http://www.glfw.org/ "GLFW Homepage") 3.0.3  
   Copyright (c) 2002-2006 Marcus Geelnard  
