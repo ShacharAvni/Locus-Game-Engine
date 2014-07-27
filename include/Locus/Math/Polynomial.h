@@ -22,6 +22,7 @@ namespace Locus
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
+//{CodeReview:NewtonsMethod}
 template <typename ScalarType>
 class LOCUS_MATH_API Polynomial
 {

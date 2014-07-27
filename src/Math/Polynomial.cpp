@@ -394,6 +394,7 @@ bool Polynomial<ScalarType>::SolveForSInQuarticFormula(ScalarType a, ScalarType 
    return Float::NotZero(S);
 }
 
+//{CodeReview:NewtonsMethod}
 template <typename ScalarType>
 bool Polynomial<ScalarType>::SolveWithNewtonsMethod(std::vector<ScalarType>& roots) const
 {

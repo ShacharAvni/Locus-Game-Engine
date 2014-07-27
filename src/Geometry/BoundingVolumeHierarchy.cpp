@@ -135,6 +135,7 @@ static Vector3 GetCenterOfBoundingVolume(const OrientedBox& boundingVolume)
    return boundingVolume.centroid;
 }
 
+//{CodeReview:NarrowPhaseCollisions}
 template <class BoundingVolume>
 BoundingVolumeHierarchy<BoundingVolume>::Node::Node(const TriangleInputMap_t& triangles, const BoundingVolume& boundingVolume, std::size_t leafTriangles, std::size_t currentDepth, std::size_t maxDepth)
    : boundingVolume(boundingVolume)
@@ -281,6 +282,7 @@ void BoundingVolumeHierarchy<BoundingVolume>::FinalizeIntersection(const Moveabl
    } while (remainingNodes.size() > 0);
 }
 
+//{CodeReview:NarrowPhaseCollisions}
 template <class BoundingVolume>
 void BoundingVolumeHierarchy<BoundingVolume>::GetIntersection(const Moveable& thisMoveable, const BoundingVolumeHierarchy<BoundingVolume>& otherBoundingVolumeHierarchy, const Moveable& otherMoveable, std::unordered_set<std::size_t>& thisIntersectionSet, std::unordered_set<std::size_t>& otherIntersectionSet) const
 {
@@ -397,6 +399,7 @@ void BoundingVolumeHierarchy<BoundingVolume>::GetIntersection(const Moveable& th
    }
 }
 
+//{CodeReview:NarrowPhaseCollisions}
 template <class BoundingVolume>
 void BoundingVolumeHierarchy<BoundingVolume>::GetIntersection(const Moveable& thisMoveable, const OrientedBox& orientedBox, std::unordered_set<std::size_t>& thisIntersectionSet) const
 {

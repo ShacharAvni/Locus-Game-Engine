@@ -20,6 +20,7 @@ namespace Locus
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
+//{CodeReview:RowReduction}
 template <typename ScalarType>
 class LOCUS_MATH_API Matrix
 {

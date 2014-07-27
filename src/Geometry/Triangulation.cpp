@@ -97,6 +97,7 @@ void Triangulate(const Polygon2D_t& polygon, std::vector<const Vector2*>& triang
    }
 }
 
+//{CodeReview:Triangulation}
 void Triangulate(const Polygon2D_t& polygon, const std::vector<const Polygon2D_t*>& innerPolygons, std::vector<const Vector2*>& triangles)
 {
    if (innerPolygons.size() == 0)
@@ -133,6 +134,7 @@ void Triangulate(const Polygon2D_t& polygon, const std::vector<const Polygon2D_t
    }
 }
 
+//{CodeReview:Triangulation}
 void Triangulate(std::vector<Polygon2D_t>& polygons, PolygonWinding winding, std::vector<const Vector2*>& triangles)
 {
    std::vector<Polygon2D_t*> polygonsForHierarchy;
@@ -799,6 +801,7 @@ static void AdjustForPossibleResultingCollinearity(AugmentedVertexList& augmente
    }
 }
 
+//{CodeReview:Triangulation}
 static void Triangulate_R(AugmentedVertexList& augmentedVertices, std::forward_list< AugmentedVertexList::iterator >& ears, PolygonWinding winding, std::vector<const Vector2*>& triangles)
 {
    if (augmentedVertices.size() == 3)

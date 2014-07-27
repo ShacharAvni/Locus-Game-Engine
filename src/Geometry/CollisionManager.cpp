@@ -157,6 +157,7 @@ void CollisionManager_Impl::UpdateCollisionCollections()
    yCollisions = std::vector<std::vector<bool>>(numCollidables, std::vector<bool>(numCollidables));
 }
 
+//{CodeReview:BroadPhaseCollisions}
 void CollisionManager_Impl::UpdateCollisions(std::vector<CollisionInterval*>& sortedIntervals, const std::function<void(std::size_t, std::size_t, Collidable*, Collidable*)>& intervalIntersectionFunction)
 {
    Util::InsertionSort<CollisionInterval*>(sortedIntervals, CollisionIntervalComparator());
@@ -245,6 +246,7 @@ void CollisionManager::Clear()
    impl->zIntervals.clear();
 }
 
+//{CodeReview:BroadPhaseCollisions}
 void CollisionManager::UpdateCollisions()
 {
    impl->collisionList.clear();
@@ -281,6 +283,7 @@ void CollisionManager::UpdateCollisions()
    }
 }
 
+//{CodeReview:BroadPhaseCollisions}
 void CollisionManager::TransmitCollisions()
 {
    for (const std::pair<Collidable*, Collidable*>& collisionPair : impl->collisionList)

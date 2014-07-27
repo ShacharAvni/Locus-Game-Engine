@@ -23,6 +23,7 @@ struct CollisionManager_Impl;
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
+//{CodeReview:BroadPhaseCollisions}
 class LOCUS_GEOMETRY_API CollisionManager
 {
 public:

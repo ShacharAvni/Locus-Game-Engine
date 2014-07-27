@@ -329,6 +329,7 @@ void Matrix<ScalarType>::ScalarMultiplyRow(unsigned int rowToChange, ScalarType 
    }
 }
 
+//{CodeReview:RowReduction}
 template <typename ScalarType>
 void Matrix<ScalarType>::MakeRowEchelon(bool reduce)
 {
@@ -360,6 +361,7 @@ const ScalarType* const Matrix<ScalarType>::Elements() const
    return values.data();
 }
 
+//{CodeReview:RowReduction}
 template <typename ScalarType>
 void Matrix<ScalarType>::MakeRowEchelon(unsigned int col, bool reduce)
 {

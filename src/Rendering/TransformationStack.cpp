@@ -161,7 +161,7 @@ void TransformationStack::UploadMatricesToShader(ShaderController& shaderControl
 
       //for now, assume that only rotations, translations, and homogeneous scales have been done.
       //Therefore, the normal matrix would be the same as the top left sub matrix of the model view matrix
-      //(Otherwise, we would have to use the transpose of the inverse the top left sub matrix)
+      //(Otherwise, we would have to use the transpose of the inverse of the top left sub matrix)
       shaderController.SetMatrix3Uniform(ShaderSource::Mat_Normal, modelViewMatrix.SubMatrix(3, 3).Elements());
    }
 }

@@ -159,6 +159,7 @@ std::string Frag(GLInfo::GLSLVersion version, bool textured, unsigned int numLig
 
 ///////////////////////////// 1.30 Shaders ////////////////////////////////////
 
+//{CodeReview:ShaderGeneration}
 static std::string Vert_1_30(bool textured, unsigned int numLights)
 {
    GLInfo::GLSLVersion version = GLInfo::GLSLVersion::V_130;
@@ -250,6 +251,7 @@ static std::string Vert_1_30(bool textured, unsigned int numLights)
    return source;
 }
 
+//{CodeReview:ShaderGeneration}
 static std::string Frag_1_30(bool textured, unsigned int numLights)
 {
    GLInfo::GLSLVersion version = GLInfo::GLSLVersion::V_130;
@@ -339,6 +341,9 @@ static std::string Frag_1_30(bool textured, unsigned int numLights)
    return source;
 }
 
+///////////////////////////// Pre 1.30 Shaders ////////////////////////////////////
+
+//{CodeReview:ShaderGeneration}
 static std::string Vert_Pre_1_30(GLInfo::GLSLVersion version, bool textured, unsigned int numLights)
 {
    bool shouldUseLights = (numLights > 0);
@@ -412,6 +417,7 @@ static std::string Vert_Pre_1_30(GLInfo::GLSLVersion version, bool textured, uns
    return source;
 }
 
+//{CodeReview:ShaderGeneration}
 static std::string Frag_Pre_1_30(GLInfo::GLSLVersion version, bool textured, unsigned int numLights)
 {
    std::string source;

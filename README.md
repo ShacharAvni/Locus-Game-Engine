@@ -6,15 +6,9 @@ Locus Game Engine
 Locus is a cross-platform 3D game engine written in C++ and OpenGL. It is a hobby project so it is not meant to compete
 with AAA game engines though some of its code may prove useful to other projects.
 
-Locus is split up into the following modules, each compiled as a separate library:
+##Code Review
 
-* Locus_Common: A collection of data structures and other common code used throughout the Locus codebase
-* Locus_FileSystem: File and archive reading (mainly a wrapper around PhysFS)
-* Locus_Audio: Audio file loading and playback (mainly a wrapper around OpenAL)
-* Locus_Math: Matrix, polynomials and other algebra routines
-* Locus_Geometry: 3D and 2D geometry and collision detection
-* Locus_Rendering: 3D rendering
-* Locus_Simulation: Window and user interaction (mainly a wrapper around GLFW)
+If you wish to review the code for Locus, please see README_CODE_REVIEW.txt.
 
 ##Supported Platforms
 

@@ -222,9 +222,6 @@ void Texture::GenerateManualMipmapsUsingPowerOf2Image(Image& image)
    int numLevels = std::max(divisionsX, divisionsY);
    numLevels = std::min(numLevels, maxLevels);
 
-   //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-   //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, (numLevels - 1));
-
    Texture::SendTextureData(image, 0);
 
    for (int level = 1; level < numLevels; ++level)

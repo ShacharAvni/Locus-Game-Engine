@@ -49,6 +49,7 @@ std::size_t SJTPermutations::NumElements() const
    return numElements;
 }
 
+//{CodeReview:SJTPermutations}
 bool SJTPermutations::GenerateNext()
 {
    PermutationElement* largestWithNonZeroDirection = nullptr;

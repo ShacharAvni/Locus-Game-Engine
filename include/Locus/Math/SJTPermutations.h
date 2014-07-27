@@ -20,6 +20,8 @@ namespace Locus
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
+//{CodeReview:SJTPermutations}
+
 //implementation of the Steinhaus–Johnson–Trotter algorithm for
 //generating permutations of alternating parity with Even's Speedup
 class LOCUS_MATH_API SJTPermutations

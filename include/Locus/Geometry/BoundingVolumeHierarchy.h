@@ -46,6 +46,7 @@ class OrientedBox;
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
+//{CodeReview:NarrowPhaseCollisions}
 template <class BoundingVolume>
 class LOCUS_GEOMETRY_API BoundingVolumeHierarchy
 {

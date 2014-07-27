@@ -22,6 +22,7 @@ namespace Locus
 namespace ShaderSource
 {
 
+//{CodeReview:ShaderGeneration}
 LOCUS_RENDERING_API std::string Vert(GLInfo::GLSLVersion version, bool textured, unsigned int numLights);
 LOCUS_RENDERING_API std::string Frag(GLInfo::GLSLVersion version, bool textured, unsigned int numLights);
 
