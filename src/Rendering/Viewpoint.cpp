@@ -49,6 +49,11 @@ const DualTransformation& Viewpoint::GetTransformation() const
    return transformation;
 }
 
+Vector3 Viewpoint::ToEyePosition(const Vector3& worldPosition) const
+{
+   return transformation.GetInverse().MultVertex( worldPosition );
+}
+
 void Viewpoint::TranslateBy(const Vector3& translation)
 {
    transformation.TranslateBy(translation);

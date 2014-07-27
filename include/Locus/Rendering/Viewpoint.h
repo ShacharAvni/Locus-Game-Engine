@@ -33,6 +33,8 @@ public:
    const Transformation& GetRotation() const;
    const DualTransformation& GetTransformation() const;
 
+   Vector3 ToEyePosition(const Vector3& worldPosition) const;
+
    void TranslateBy(const Vector3& translation);
    void RotateBy(const Vector3& rotation);
 
