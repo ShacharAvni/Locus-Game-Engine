@@ -57,7 +57,7 @@ src directories. This will be easier if you have downloaded the Locus code base 
 
 * Code Tag: //{CodeReview:NarrowPhaseCollisions}
 * Class: BoundingVolumeHierarchy
-* Files: include/Locus/Geometry/BoundingVolumeHierarchy.h, src/Geometry/CollisionManager.cpp
+* Files: include/Locus/Geometry/BoundingVolumeHierarchy.h, src/Geometry/BoundingVolumeHierarchy.cpp
 * Description: This class is an octree decomposition of a mesh into an Oriented Bounding Box
   Tree, a Sphere Tree, or an Axis Aligned Bounding Box Tree, depending on the template
   parameter.
