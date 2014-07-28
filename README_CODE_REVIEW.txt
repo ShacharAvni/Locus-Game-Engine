@@ -41,7 +41,7 @@ src directories. This will be easier if you have downloaded the Locus code base 
 
 4.1) Geometry
 
-4.1.1) Broad-Phase Collision Detection
+- Broad-Phase Collision Detection
 
 * Code Tag: //{CodeReview:BroadPhaseCollisions}
 * Class: CollisionManager
@@ -50,10 +50,10 @@ src directories. This will be easier if you have downloaded the Locus code base 
   Collidable objects.
 
 * Methods to Review:
-  void UpdateCollisions()
-  void TransmitCollisions()
+  void CollisionManager::UpdateCollisions()
+  void CollisionManager::TransmitCollisions()
 
-4.1.2) Narrow-Phase Collsion Detection
+- Narrow-Phase Collsion Detection
 
 * Code Tag: //{CodeReview:NarrowPhaseCollisions}
 * Class: BoundingVolumeHierarchy
@@ -67,7 +67,7 @@ src directories. This will be easier if you have downloaded the Locus code base 
   void BoundingVolumeHierarchy<BoundingVolume>::GetIntersection(const Moveable& thisMoveable, const BoundingVolumeHierarchy<BoundingVolume>& otherBoundingVolumeHierarchy, const Moveable& otherMoveable, std::unordered_set<std::size_t>& thisIntersectionSet, std::unordered_set<std::size_t>& otherIntersectionSet) const
   void BoundingVolumeHierarchy<BoundingVolume>::GetIntersection(const Moveable& thisMoveable, const OrientedBox& orientedBox, std::unordered_set<std::size_t>& thisIntersectionSet) const
 
-4.1.3) Triangulating Polygon Hierarchies of Arbitrary Depth using Ear Clipping
+- Triangulating Polygon Hierarchies Using Ear Clipping
 
 * Code Tag: //{CodeReview:Triangulation}
 * Files: include/Locus/Geometry/Triangulation.h, src/Geometry/Triangulation.cpp
@@ -81,7 +81,7 @@ src directories. This will be easier if you have downloaded the Locus code base 
 
 4.2) Rendering
 
-4.2.1) Shader Generation for Point Lights
+- Shader Generation for Point Lights
 
 * Code Tag: //{CodeReview:ShaderGeneration}
 * Files: include/Locus/Rendering/ShaderSourceStore.h, src/Rendering/ShaderSourceStore.cpp
@@ -95,7 +95,7 @@ src directories. This will be easier if you have downloaded the Locus code base 
 
 4.3) Math
 
-4.3.1) Solving Polynomials of Arbitrary Degree Using Newton's Method
+- Solving Polynomials Using Newton's Method
 
 * Code Tag: //{CodeReview:NewtonsMethod}
 * Class: Polynomial
@@ -105,7 +105,7 @@ src directories. This will be easier if you have downloaded the Locus code base 
 * Method to Review:
   bool Polynomial<ScalarType>::SolveWithNewtonsMethod(std::vector<ScalarType>& roots) const
 
-4.3.2) Row Reducing a Matrix
+- Matrix Row Reduction
 
 * Code Tag: //{CodeReview:RowReduction}
 * Class: Matrix
@@ -115,7 +115,7 @@ src directories. This will be easier if you have downloaded the Locus code base 
 * Method to Review:
   void Matrix<ScalarType>::MakeRowEchelon(bool reduce)
 
-4.3.3) Steinhaus–Johnson–Trotter Permutation Algorithm with Even's Speedup
+- Steinhaus–Johnson–Trotter Permutation Algorithm with Even's Speedup
 
 * Code Tag: //{CodeReview:SJTPermutations}
 * Class: SJTPermutations
