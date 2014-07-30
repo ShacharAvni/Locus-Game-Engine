@@ -8,11 +8,7 @@
 *                                                                                                        *
 \********************************************************************************************************/
 
-#pragma once
-
-#include "LocusGeometryAPI.h"
-
-#include "Polygon.h"
+#include "Locus/Geometry/PolygonFwd.h"
 
 #include <vector>
 
@@ -21,8 +17,14 @@ namespace Locus
 
 class Vector2;
 
-LOCUS_GEOMETRY_API void Triangulate(const Polygon2D_t& polygon, std::vector<const Vector2*>& triangles);
-LOCUS_GEOMETRY_API void Triangulate(const Polygon2D_t& polygon, const std::vector<const Polygon2D_t*>& innerPolygons, std::vector<const Vector2*>& triangles);
-LOCUS_GEOMETRY_API void Triangulate(std::vector<Polygon2D_t>& polygons, PolygonWinding winding, std::vector<const Vector2*>& triangles);
+namespace EarClipping
+{
+
+extern const float EXPERIMENTAL_TOLERANCE;
+
+void Triangulate(const Polygon2D_t& polygon, std::vector<const Vector2*>& triangles);
+void Triangulate(const Polygon2D_t& polygon, const std::vector<const Polygon2D_t*>& innerPolygons, std::vector<const Vector2*>& triangles);
+
+}
 
 }

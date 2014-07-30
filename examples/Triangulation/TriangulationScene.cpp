@@ -272,7 +272,7 @@ void TriangulationScene::TriangulateCompletedPolygons()
       {
          std::vector<const Vector2*> trianglePoints;
 
-         Locus::EarClipping::Triangulate(polygonsToTriangulate, Locus::PolygonWinding::CounterClockwise, trianglePoints);
+         Locus::Triangulate(polygonsToTriangulate, Locus::PolygonWinding::CounterClockwise, trianglePoints);
 
          std::size_t numTriangles = trianglePoints.size() / 3;
 

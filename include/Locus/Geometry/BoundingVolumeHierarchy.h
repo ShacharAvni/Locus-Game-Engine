@@ -108,7 +108,9 @@ public:
 private:
    static BoundingVolume InstantiateBoundingVolumeFromPoints(const std::vector<Vector3>& points);
 
-   static void FinalizeIntersection(const Moveable& thisMoveable, const Moveable& otherMoveable, std::vector<Node*>& thisRemainingNodes, const std::vector<Node*>& otherCheckList, std::unordered_set<std::size_t>& thisIntersectionSet);
+   static void GatherIntersectionsFromCheckList(const Node* node, const std::vector<Node*>& checkList, const Moveable& moveable, const Moveable& checkMoveable, std::vector<Node*>& hitList, std::unordered_set<std::size_t>& intersectionSet);
+
+   static void FinalizeIntersection(const Moveable& thisMoveable, const Moveable& otherMoveable, const std::vector<Node*>& thisRemainingNodes, const std::vector<Node*>& otherCheckList, std::unordered_set<std::size_t>& thisIntersectionSet);
 
    std::unique_ptr<Node> root;
 };

@@ -34,8 +34,8 @@
 #include <functional>
 #include <type_traits>
 
-#include <stdint.h>
-#include <assert.h>
+#include <cstdint>
+#include <cassert>
 
 namespace Locus
 {

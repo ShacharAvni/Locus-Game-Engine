@@ -42,6 +42,8 @@ add_library(Locus_Geometry
 			Collidable.cpp
 			CollisionManager.cpp
 			DualTransformation.cpp
+			EarClipping.cpp
+			EarClippingImpl.cpp
 			Frustum.cpp
 			Geometry.cpp
 			Line.cpp
@@ -67,6 +69,8 @@ add_library(Locus_Geometry
 			${LOCUS_GEOMETRY_INCLUDE}/Collidable.h
 			${LOCUS_GEOMETRY_INCLUDE}/CollisionManager.h
 			${LOCUS_GEOMETRY_INCLUDE}/DualTransformation.h
+			EarClipping.h
+			EarClippingImpl.h
 			${LOCUS_GEOMETRY_INCLUDE}/Frustum.h
 			${LOCUS_GEOMETRY_INCLUDE}/Geometry.h
 			${LOCUS_GEOMETRY_INCLUDE}/IntersectionTypes.h

@@ -236,7 +236,7 @@ AxisAlignedBox BoundingVolumeHierarchy<AxisAlignedBox>::InstantiateBoundingVolum
 }
 
 template <class BoundingVolume>
-void BoundingVolumeHierarchy<BoundingVolume>::FinalizeIntersection(const Moveable& thisMoveable, const Moveable& otherMoveable, std::vector<Node*>& thisRemainingNodes, const std::vector<Node*>& otherCheckList, std::unordered_set<std::size_t>& thisIntersectionSet)
+void BoundingVolumeHierarchy<BoundingVolume>::FinalizeIntersection(const Moveable& thisMoveable, const Moveable& otherMoveable, const std::vector<Node*>& thisRemainingNodes, const std::vector<Node*>& otherCheckList, std::unordered_set<std::size_t>& thisIntersectionSet)
 {
    std::queue<Node*> remainingNodes;
    for (Node* node : thisRemainingNodes)
@@ -258,28 +258,54 @@ void BoundingVolumeHierarchy<BoundingVolume>::FinalizeIntersection(const Moveabl
       }
       else
       {
-         bool intersectsOne = false;
          for (const Node* node : otherCheckList)
          {
             if (checkNode->boundingVolume.Intersects(thisMoveable, node->boundingVolume, otherMoveable))
             {
-               intersectsOne = true;
-               break;
-            }
-         }
-
-         if (intersectsOne)
-         {
-            for (std::size_t childIndex = 0; childIndex < Num_Tree_Children; ++childIndex)
-            {
-               if (checkNode->children[childIndex] != nullptr)
+               for (std::unique_ptr<Node>& child : checkNode->children)
                {
-                  remainingNodes.push(checkNode->children[childIndex].get());
+                  if (child != nullptr)
+                  {
+                     remainingNodes.push(child.get());
+                  }
                }
+
+               break;
             }
          }
       }
    } while (remainingNodes.size() > 0);
+}
+
+template <class BoundingVolume>
+void BoundingVolumeHierarchy<BoundingVolume>::GatherIntersectionsFromCheckList(const Node* node, const std::vector<Node*>& checkList, const Moveable& moveable, const Moveable& checkMoveable, std::vector<Node*>& hitList, std::unordered_set<std::size_t>& intersectionSet)
+{
+   for (const std::unique_ptr<Node>& child : node->children)
+   {
+      if (child != nullptr)
+      {
+         for (const Node* otherNode : checkList)
+         {
+            if (!otherNode->isLeaf)
+            {
+               if (child->boundingVolume.Intersects(moveable, otherNode->boundingVolume, checkMoveable))
+               {
+                  if (child->isLeaf)
+                  {
+                     for (std::size_t containedTriangle : child->containedTriangles)
+                     {
+                        intersectionSet.insert(containedTriangle);
+                     }
+                  }
+                  else
+                  {
+                     hitList.push_back(child.get());
+                  }
+               }
+            }
+         }
+      }
+   }
 }
 
 //{CodeReview:NarrowPhaseCollisions}
@@ -313,32 +339,7 @@ void BoundingVolumeHierarchy<BoundingVolume>::GetIntersection(const Moveable& th
             }
             else
             {
-               for (std::size_t childIndex = 0; childIndex < Num_Tree_Children; ++childIndex)
-               {
-                  if (node->children[childIndex] != nullptr)
-                  {
-                     for (const Node* otherNode : otherCurrentCheckList)
-                     {
-                        if (!otherNode->isLeaf)
-                        {
-                           if (node->children[childIndex]->boundingVolume.Intersects(thisMoveable, otherNode->boundingVolume, otherMoveable))
-                           {
-                              if (node->children[childIndex]->isLeaf)
-                              {
-                                 for (std::size_t containedTriangle : node->children[childIndex]->containedTriangles)
-                                 {
-                                    thisIntersectionSet.insert(containedTriangle);
-                                 }
-                              }
-                              else
-                              {
-                                 thisHitList.push_back(node->children[childIndex].get());
-                              }
-                           }
-                        }
-                     }
-                  }
-               }
+               GatherIntersectionsFromCheckList(node, otherCurrentCheckList, thisMoveable, otherMoveable, thisHitList, thisIntersectionSet);
             }
          }
 
@@ -353,41 +354,16 @@ void BoundingVolumeHierarchy<BoundingVolume>::GetIntersection(const Moveable& th
             }
             else
             {
-               for (std::size_t childIndex = 0; childIndex < Num_Tree_Children; ++childIndex)
-               {
-                  if (node->children[childIndex] != nullptr)
-                  {
-                     for (const Node* thisNode : thisCurrentCheckList)
-                     {
-                        if (!thisNode->isLeaf)
-                        {
-                           if (node->children[childIndex]->boundingVolume.Intersects(otherMoveable, thisNode->boundingVolume, thisMoveable))
-                           {
-                              if (node->children[childIndex]->isLeaf)
-                              {
-                                 for (std::size_t containedTriangle : node->children[childIndex]->containedTriangles)
-                                 {
-                                    otherIntersectionSet.insert(containedTriangle);
-                                 }
-                              }
-                              else
-                              {
-                                 otherHitList.push_back(node->children[childIndex].get());
-                              }
-                           }
-                        }
-                     }
-                  }
-               }
+               GatherIntersectionsFromCheckList(node, thisCurrentCheckList, otherMoveable, thisMoveable, otherHitList, otherIntersectionSet);
             }
          }
 
-         if ( (thisHitList.size() == 0) && (otherHitList.size() > 0) )
+         if ((thisHitList.size() == 0) && (otherHitList.size() > 0))
          {
             FinalizeIntersection(otherMoveable, thisMoveable, otherHitList, thisCurrentCheckList, otherIntersectionSet);
             break;
          }
-         else if ( (otherHitList.size() == 0) && (thisHitList.size() > 0) )
+         else if ((otherHitList.size() == 0) && (thisHitList.size() > 0))
          {
             FinalizeIntersection(thisMoveable, otherMoveable, thisHitList, otherCurrentCheckList, thisIntersectionSet);
             break;
@@ -423,22 +399,22 @@ void BoundingVolumeHierarchy<BoundingVolume>::GetIntersection(const Moveable& th
             }
             else
             {
-               for (std::size_t childIndex = 0; childIndex < Num_Tree_Children; ++childIndex)
+               for (const std::unique_ptr<Node>& child : node->children)
                {
-                  if (node->children[childIndex] != nullptr)
+                  if (child != nullptr)
                   {
-                     if (orientedBox.Intersects(node->children[childIndex]->boundingVolume, thisMoveable))
+                     if (orientedBox.Intersects(child->boundingVolume, thisMoveable))
                      {
-                        if (node->children[childIndex]->isLeaf)
+                        if (child->isLeaf)
                         {
-                           for (std::size_t containedTriangle : node->children[childIndex]->containedTriangles)
+                           for (std::size_t containedTriangle : child->containedTriangles)
                            {
                               thisIntersectionSet.insert(containedTriangle);
                            }
                         }
                         else
                         {
-                           thisHitList.push_back(node->children[childIndex].get());
+                           thisHitList.push_back(child.get());
                         }
                      }
                   }

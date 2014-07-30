@@ -15,7 +15,7 @@
 
 #include "Locus/Common/Float.h"
 
-#include <assert.h>
+#include <cassert>
 
 namespace Locus
 {

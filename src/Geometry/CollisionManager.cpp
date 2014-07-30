@@ -22,7 +22,7 @@
 #include <list>
 #include <functional>
 
-#include <assert.h>
+#include <cassert>
 
 namespace Locus
 {
