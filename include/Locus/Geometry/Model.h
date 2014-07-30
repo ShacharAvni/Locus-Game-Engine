@@ -1053,7 +1053,7 @@ private:
             }
 
             std::vector<const Vector2*> triangles;
-            EarClipping::Triangulate(polygons, PolygonWinding::CounterClockwise, triangles);
+            Locus::Triangulate(polygons, PolygonWinding::CounterClockwise, triangles);
 
             std::vector<VertexType> triangleToAdd(3);
 
