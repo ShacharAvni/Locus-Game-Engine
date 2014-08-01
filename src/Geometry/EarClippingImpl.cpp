@@ -57,7 +57,7 @@ const Polygon2D_t* FindMaxInteriorPointInListAndRemovePolygonFromConsideration(s
    return polygonWithMaxX;
 }
 
-AugmentedVertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, Vector2& intersectionPointOnEdge, AugmentedVertexList::iterator& pointOnEdgeWithMaximumXIter, PolygonWinding winding)
+VertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(VertexList& vertices, const Vector2& maxInteriorPoint, Vector2& intersectionPointOnEdge, VertexList::iterator& pointOnEdgeWithMaximumXIter, PolygonWinding winding)
 {
    //a) Call the vertex on the hole with the maximum x coordinate P. Call the ray { P, (1,0) } R. Intersect R
    //   with the edges of the outer polygon. Find the edge whose intersection is closest to P. Call this edge E.
@@ -65,11 +65,11 @@ AugmentedVertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(Augmente
    //   if R goes through one of the endpoints of E, then the mutually visible vertex is this endpoint. Otherwise,
    //   R intersects the line segment at a point other than the endpoints (see b)
 
-   AugmentedVertexList::iterator augmentedVerticesEnd = augmentedVertices.end();
+   VertexList::iterator verticesEnd = vertices.end();
 
-   AugmentedVertexList::iterator mutuallyVisibleVertexIter = augmentedVerticesEnd;
+   VertexList::iterator mutuallyVisibleVertexIter = verticesEnd;
 
-   AugmentedVertexList::iterator possibleMutuallyVisibleVertex = augmentedVerticesEnd;
+   VertexList::iterator possibleMutuallyVisibleVertex = verticesEnd;
 
    Line2D_t rayFromMaxVertex(maxInteriorPoint, Vector2::XAxis(), true);
 
@@ -77,51 +77,51 @@ AugmentedVertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(Augmente
 
    LineSegment2D_t lineSegmentOnOuterPolygon;
    Vector2 intersectionPoint1, intersectionPoint2;
-   AugmentedVertexList::iterator pointOnThisEdgeWithMaximumXIter = augmentedVerticesEnd;
+   VertexList::iterator pointOnThisEdgeWithMaximumXIter = verticesEnd;
 
-   for (AugmentedVertexList::iterator augmentedVertexIter = augmentedVertices.begin(); augmentedVertexIter != augmentedVerticesEnd; ++augmentedVertexIter)
+   for (VertexList::iterator vertexIterator = vertices.begin(); vertexIterator != verticesEnd; ++vertexIterator)
    {
-      AugmentedVertexList::iterator nextVertexIter = augmentedVertexIter.next();
+      VertexList::iterator nextVertexIterator = vertexIterator.next();
 
-      lineSegmentOnOuterPolygon.P1 = *(augmentedVertexIter->vertex);
-      lineSegmentOnOuterPolygon.P2 = *(nextVertexIter->vertex);
+      lineSegmentOnOuterPolygon.P1 = *(vertexIterator->point);
+      lineSegmentOnOuterPolygon.P2 = *(nextVertexIterator->point);
 
       IntersectionType intersection = rayFromMaxVertex.LineSegmentIntersection(lineSegmentOnOuterPolygon, intersectionPoint1, intersectionPoint2, EXPERIMENTAL_TOLERANCE);
 
       if ((intersection == IntersectionType::LineSegment) || (intersection == IntersectionType::Point))
       {
-         possibleMutuallyVisibleVertex = augmentedVertexIter;
+         possibleMutuallyVisibleVertex = vertexIterator;
          bool rayHitEndPointOfEdge = true;
 
          if (lineSegmentOnOuterPolygon.P1.x > lineSegmentOnOuterPolygon.P2.x)
          {
-            pointOnThisEdgeWithMaximumXIter = augmentedVertexIter;
+            pointOnThisEdgeWithMaximumXIter = vertexIterator;
          }
          else
          {
-            pointOnThisEdgeWithMaximumXIter = nextVertexIter;
+            pointOnThisEdgeWithMaximumXIter = nextVertexIterator;
          }
 
          if (intersection == IntersectionType::LineSegment)
          {
             if (lineSegmentOnOuterPolygon.P1.x < lineSegmentOnOuterPolygon.P2.x)
             {
-               possibleMutuallyVisibleVertex = augmentedVertexIter;
+               possibleMutuallyVisibleVertex = vertexIterator;
             }
             else
             {
-               possibleMutuallyVisibleVertex = nextVertexIter;
+               possibleMutuallyVisibleVertex = nextVertexIterator;
             }
          }
          else if (intersection == IntersectionType::Point)
          {
             if (intersectionPoint1.PreciselyEqualTo(lineSegmentOnOuterPolygon.P1))
             {
-               possibleMutuallyVisibleVertex = augmentedVertexIter;
+               possibleMutuallyVisibleVertex = vertexIterator;
             }
             else if (intersectionPoint1.PreciselyEqualTo(lineSegmentOnOuterPolygon.P2))
             {
-               possibleMutuallyVisibleVertex = nextVertexIter;
+               possibleMutuallyVisibleVertex = nextVertexIterator;
             }
             else
             {
@@ -129,7 +129,7 @@ AugmentedVertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(Augmente
             }
          }
 
-         float distance = rayHitEndPointOfEdge ? (possibleMutuallyVisibleVertex->vertex->x - maxInteriorPoint.x) : (intersectionPoint1.x - maxInteriorPoint.x);
+         float distance = rayHitEndPointOfEdge ? (possibleMutuallyVisibleVertex->point->x - maxInteriorPoint.x) : (intersectionPoint1.x - maxInteriorPoint.x);
 
          bool sameishDistance = Float::FEqual(distance, minDistance);
 
@@ -139,9 +139,9 @@ AugmentedVertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(Augmente
 
             if (sameishDistance)
             {
-               const Vector2* beforeMutuallyVisibleVertex = possibleMutuallyVisibleVertex.previous()->vertex;
+               const Vector2* beforeMutuallyVisibleVertex = possibleMutuallyVisibleVertex.previous()->point;
 
-               takeThisVertex = (GetConvexOrReflexVertexType(beforeMutuallyVisibleVertex, possibleMutuallyVisibleVertex->vertex, &maxInteriorPoint, winding) == VertexType::Convex);
+               takeThisVertex = (GetConvexOrReflexVertexType(beforeMutuallyVisibleVertex, possibleMutuallyVisibleVertex->point, &maxInteriorPoint, winding) == VertexType::Convex);
             }
 
             if (takeThisVertex)
@@ -152,7 +152,7 @@ AugmentedVertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(Augmente
                }
                else
                {
-                  mutuallyVisibleVertexIter = augmentedVerticesEnd;
+                  mutuallyVisibleVertexIter = verticesEnd;
                   pointOnEdgeWithMaximumXIter = pointOnThisEdgeWithMaximumXIter;
                   intersectionPointOnEdge = intersectionPoint1;
                }
@@ -166,11 +166,11 @@ AugmentedVertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(Augmente
    return mutuallyVisibleVertexIter;
 }
 
-AugmentedVertexList::iterator DetermineMutuallyVisibleVertexFromRayCastResult(AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, const Vector2& intersectionPointOnEdge, AugmentedVertexList::iterator pointOnEdgeWithMaximumXIter, PolygonWinding winding)
+VertexList::iterator DetermineMutuallyVisibleVertexFromRayCastResult(VertexList& vertices, const Vector2& maxInteriorPoint, const Vector2& intersectionPointOnEdge, VertexList::iterator pointOnEdgeWithMaximumXIter, PolygonWinding winding)
 {
-   AugmentedVertexList::iterator augmentedVerticesEnd = augmentedVertices.end();
+   VertexList::iterator verticesEnd = vertices.end();
 
-   AugmentedVertexList::iterator mutuallyVisibleVertexIter = augmentedVerticesEnd;
+   VertexList::iterator mutuallyVisibleVertexIter = verticesEnd;
 
    // Form a triangle with P (see explanation of a) above) (P1), the intersection point on
    // the edge (P2) and the point on the edge with maximum X (P3).
@@ -180,35 +180,35 @@ AugmentedVertexList::iterator DetermineMutuallyVisibleVertexFromRayCastResult(Au
    // Otherwise, the reflex vertex of the outer polygon that falls into this triangle and
    // minimizes the angle to the ray (i.e. x axis) is the mutually visible vertex
 
-   Triangle2D_t checkTriangle(maxInteriorPoint, intersectionPointOnEdge, *(pointOnEdgeWithMaximumXIter->vertex));
+   Triangle2D_t checkTriangle(maxInteriorPoint, intersectionPointOnEdge, *(pointOnEdgeWithMaximumXIter->point));
 
-   std::forward_list<AugmentedVertexList::iterator> reflexPointsOnTriangle;
-   bool hasAnyReflexPointsOnTriangle = false;
+   VertexListIteratorList reflexVerticesOnTriangle;
+   bool hasAnyReflexVerticesOnTriangle = false;
 
-   for (AugmentedVertexList::iterator augmentedVertexIterator = augmentedVertices.begin(); augmentedVertexIterator != augmentedVerticesEnd; ++augmentedVertexIterator)
+   for (VertexList::iterator vertexIterator = vertices.begin(); vertexIterator != verticesEnd; ++vertexIterator)
    {
-      if (checkTriangle.PointIsOnPolygon(*(augmentedVertexIterator->vertex), EXPERIMENTAL_TOLERANCE))
+      if (checkTriangle.PointIsOnPolygon(*(vertexIterator->point), EXPERIMENTAL_TOLERANCE))
       {
-         if (GetConvexOrReflexVertexType(augmentedVertexIterator, winding) == VertexType::Reflex)
+         if (GetConvexOrReflexVertexType(vertexIterator, winding) == VertexType::Reflex)
          {
-            reflexPointsOnTriangle.push_front(augmentedVertexIterator);
-            hasAnyReflexPointsOnTriangle = true;
+            reflexVerticesOnTriangle.push_front(vertexIterator);
+            hasAnyReflexVerticesOnTriangle = true;
          }
       }
    }
 
-   if (hasAnyReflexPointsOnTriangle)
+   if (hasAnyReflexVerticesOnTriangle)
    {
-      mutuallyVisibleVertexIter = reflexPointsOnTriangle.front();
-      reflexPointsOnTriangle.pop_front();
+      mutuallyVisibleVertexIter = reflexVerticesOnTriangle.front();
+      reflexVerticesOnTriangle.pop_front();
 
-      float minDistance = mutuallyVisibleVertexIter->vertex->distanceTo(maxInteriorPoint);
-      float minAngle = (*(mutuallyVisibleVertexIter->vertex) - maxInteriorPoint).angleBetweenRadians( Vector2::XAxis() );
+      float minDistance = mutuallyVisibleVertexIter->point->distanceTo(maxInteriorPoint);
+      float minAngle = (*(mutuallyVisibleVertexIter->point) - maxInteriorPoint).angleBetweenRadians( Vector2::XAxis() );
 
-      for (const AugmentedVertexList::iterator& reflexVertexIter : reflexPointsOnTriangle)
+      for (const VertexList::iterator& reflexVertexIter : reflexVerticesOnTriangle)
       {
-         float angle = (*(reflexVertexIter->vertex) - maxInteriorPoint).angleBetweenRadians( Vector2::XAxis() );
-         float distance = reflexVertexIter->vertex->distanceTo(maxInteriorPoint);
+         float angle = (*(reflexVertexIter->point) - maxInteriorPoint).angleBetweenRadians( Vector2::XAxis() );
+         float distance = reflexVertexIter->point->distanceTo(maxInteriorPoint);
 
          if (angle < minAngle)
          {
@@ -237,38 +237,38 @@ AugmentedVertexList::iterator DetermineMutuallyVisibleVertexFromRayCastResult(Au
    return mutuallyVisibleVertexIter;
 }
 
-AugmentedVertexList::iterator FindMutuallyVisibleVertex(AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, PolygonWinding winding)
+VertexList::iterator FindMutuallyVisibleVertex(VertexList& vertices, const Vector2& maxInteriorPoint, PolygonWinding winding)
 {
    // Find a vertex on the outer polygon visible to that vertex
 
    Vector2 intersectionPointOnEdge;
-   AugmentedVertexList::iterator pointOnEdgeWithMaximumXIter = augmentedVertices.end();
+   VertexList::iterator pointOnEdgeWithMaximumXIter = vertices.end();
 
-   AugmentedVertexList::iterator mutuallyVisibleVertex = RayCastFromMaxInteriorPointToOuterPolygon(augmentedVertices, maxInteriorPoint, intersectionPointOnEdge, pointOnEdgeWithMaximumXIter, winding);
+   VertexList::iterator mutuallyVisibleVertex = RayCastFromMaxInteriorPointToOuterPolygon(vertices, maxInteriorPoint, intersectionPointOnEdge, pointOnEdgeWithMaximumXIter, winding);
 
-   if (mutuallyVisibleVertex == augmentedVertices.end())
+   if (mutuallyVisibleVertex == vertices.end())
    {
-      mutuallyVisibleVertex = DetermineMutuallyVisibleVertexFromRayCastResult(augmentedVertices, maxInteriorPoint, intersectionPointOnEdge, pointOnEdgeWithMaximumXIter, winding);
+      mutuallyVisibleVertex = DetermineMutuallyVisibleVertexFromRayCastResult(vertices, maxInteriorPoint, intersectionPointOnEdge, pointOnEdgeWithMaximumXIter, winding);
    }
 
    return mutuallyVisibleVertex;
 }
 
-void StitchOuterAndInnerPolygons(AugmentedVertexList& augmentedVertices, const Polygon2D_t& hole, std::size_t maxInteriorPointIndex, AugmentedVertexList::iterator mutuallyVisibleVertexIter)
+void StitchOuterAndInnerPolygons(VertexList& vertices, const Polygon2D_t& hole, std::size_t maxInteriorPointIndex, VertexList::iterator mutuallyVisibleVertexIter)
 {
    // Attach hole to outer vertices through the mutually visible vertex
 
-   AugmentedVertexList::iterator insertIterator = mutuallyVisibleVertexIter.next();
+   VertexList::iterator insertIterator = mutuallyVisibleVertexIter.next();
 
    for (std::size_t holeVertex = 1, holeVertexIndex = maxInteriorPointIndex, holeSize = hole.NumPoints(); holeVertex <= holeSize + 1; ++holeVertex, holeVertexIndex = (holeVertexIndex + 1) % holeSize)
    {
-      augmentedVertices.insert(insertIterator, AugmentedVertex(&hole[holeVertexIndex]));
+      vertices.insert(insertIterator, Vertex(&hole[holeVertexIndex]));
    }
 
-   augmentedVertices.insert(insertIterator, AugmentedVertex(mutuallyVisibleVertexIter->vertex));
+   vertices.insert(insertIterator, Vertex(mutuallyVisibleVertexIter->point));
 }
 
-void MakeSimple(AugmentedVertexList& augmentedVertices, const std::vector<const Polygon2D_t*>& innerPolygons, PolygonWinding winding)
+void MakeSimple(VertexList& vertices, const std::vector<const Polygon2D_t*>& innerPolygons, PolygonWinding winding)
 {
    std::forward_list<const Polygon2D_t*> innerPolygonsRemaining;
    for (const Polygon2D_t* innerPolygon : innerPolygons)
@@ -281,101 +281,110 @@ void MakeSimple(AugmentedVertexList& augmentedVertices, const std::vector<const 
       std::size_t maxInteriorPointIndex;
       const Polygon2D_t* innerPolygon = FindMaxInteriorPointInListAndRemovePolygonFromConsideration(innerPolygonsRemaining, maxInteriorPointIndex);
 
-      AugmentedVertexList::iterator mutuallyVisibleVertex = FindMutuallyVisibleVertex(augmentedVertices, (*innerPolygon)[maxInteriorPointIndex], winding);
+      VertexList::iterator mutuallyVisibleVertex = FindMutuallyVisibleVertex(vertices, (*innerPolygon)[maxInteriorPointIndex], winding);
 
-      assert(mutuallyVisibleVertex != augmentedVertices.end());
+      assert(mutuallyVisibleVertex != vertices.end());
 
-      StitchOuterAndInnerPolygons(augmentedVertices, *innerPolygon, maxInteriorPointIndex, mutuallyVisibleVertex);
+      StitchOuterAndInnerPolygons(vertices, *innerPolygon, maxInteriorPointIndex, mutuallyVisibleVertex);
    }
 }
 
-void MigrateCollinearVertices(AugmentedVertexList::iterator& to, const AugmentedVertexList::iterator& from)
+void MigrateCollinearPoints(VertexList::iterator& to, const VertexList::iterator& from)
 {
-   for (const Vector2* collinearVertex : from->collinearVertices)
+   for (const Vector2* collinearPoint : from->collinearPoints)
    {
-      to->collinearVertices.push_back(collinearVertex);
+      to->collinearPoints.push_back(collinearPoint);
    }
 }
 
-void RemoveCollinearVerticesFromConsideration(AugmentedVertexList& augmentedVertices)
+void RemoveCollinearPointsFromConsideration(VertexList& vertices)
 {
-   if (augmentedVertices.size() > 3)
+   if (vertices.size() > 3)
    {
-      AugmentedVertexList::iterator first = augmentedVertices.begin();
-      AugmentedVertexList::iterator second = first.next();
+      VertexList::iterator first = vertices.begin();
+      VertexList::iterator second = first.next();
 
-      Line2D_t ray(*(first->vertex), (*(second->vertex) - *(first->vertex)).normVector(), true); 
+      Line2D_t ray(*(first->point), (*(second->point) - *(first->point)).normVector(), true); 
 
-      AugmentedVertexList::iterator currentSafe = first;
-      AugmentedVertexList::iterator possibleCollinear = second;
-      AugmentedVertexList::iterator currentCheck = second.next();
+      VertexList::iterator currentSafe = first;
+      VertexList::iterator possibleCollinear = second;
+      VertexList::iterator currentCheck = second.next();
 
       do
       {
-         if (ray.IsPointOnLine(*(currentCheck->vertex), COLLINEAR_TOLERANCE))
+         if (ray.IsPointOnLine(*(currentCheck->point), COLLINEAR_TOLERANCE))
          {
-            currentSafe->collinearVertices.push_back(possibleCollinear->vertex);
-            augmentedVertices.erase(possibleCollinear);
+            currentSafe->collinearPoints.push_back(possibleCollinear->point);
+            vertices.erase(possibleCollinear);
          }
          else
          {
             currentSafe = possibleCollinear;
 
-            ray.P = *(currentSafe->vertex);
-            ray.V = (*(currentCheck->vertex) - ray.P).normVector();
+            ray.P = *(currentSafe->point);
+            ray.V = (*(currentCheck->point) - ray.P).normVector();
          }
 
          possibleCollinear = currentCheck;
          currentCheck = currentCheck.next();
-      } while (possibleCollinear != augmentedVertices.begin());
+      } while (possibleCollinear != vertices.begin());
 
-      ray.P = *(currentSafe->vertex);
-      ray.V = (*(possibleCollinear->vertex) - ray.P).normVector();
+      ray.P = *(currentSafe->point);
+      ray.V = (*(possibleCollinear->point) - ray.P).normVector();
 
-      if (ray.IsPointOnLine(*(currentCheck->vertex), COLLINEAR_TOLERANCE))
+      if (ray.IsPointOnLine(*(currentCheck->point), COLLINEAR_TOLERANCE))
       {
-         currentSafe->collinearVertices.push_back(possibleCollinear->vertex);
+         currentSafe->collinearPoints.push_back(possibleCollinear->point);
 
-         MigrateCollinearVertices(currentSafe, possibleCollinear);
+         MigrateCollinearPoints(currentSafe, possibleCollinear);
 
-         augmentedVertices.erase(possibleCollinear);
+         vertices.erase(possibleCollinear);
       }
    }
 }
 
 //{CodeReview:Triangulation}
-void InternalTriangulate(AugmentedVertexList& augmentedVertices, PolygonWinding winding, std::vector<const Vector2*>& triangles)
+void InternalTriangulate(VertexList& vertices, PolygonWinding winding, std::vector<const Vector2*>& triangles)
 {
-   triangles.reserve( triangles.size() + (3 * (augmentedVertices.size() - 2)) );
+   triangles.reserve( triangles.size() + (3 * (vertices.size() - 2)) );
 
-   RemoveCollinearVerticesFromConsideration(augmentedVertices);
+   RemoveCollinearPointsFromConsideration(vertices);
 
-   if (augmentedVertices.size() >= 3)
+   if (vertices.size() >= 3)
    {
-      std::forward_list< AugmentedVertexList::iterator > ears;
+      VertexListIteratorList ears;
 
-      for (AugmentedVertexList::iterator augmentedVertexIterator = augmentedVertices.begin(), end = augmentedVertices.end(); augmentedVertexIterator != end; ++augmentedVertexIterator)
+      VertexList::iterator verticesEnd = vertices.end();
+
+      for (VertexList::iterator vertexIterator = vertices.begin(); vertexIterator != verticesEnd; ++vertexIterator)
       {
-         augmentedVertexIterator->vertexType = GetConvexOrReflexVertexType(augmentedVertexIterator, winding);
+         vertexIterator->type = GetConvexOrReflexVertexType(vertexIterator, winding);
       }
 
-      for (AugmentedVertexList::iterator augmentedVertexIterator = augmentedVertices.begin(), end = augmentedVertices.end(); augmentedVertexIterator != end; ++augmentedVertexIterator)
+      for (VertexList::iterator vertexIterator = vertices.begin(); vertexIterator != verticesEnd; ++vertexIterator)
       {
-         CheckForEarAndUpdateVertexType(augmentedVertices, augmentedVertexIterator);
+         CheckForEarAndUpdateVertexType(vertices, vertexIterator);
 
-         if (augmentedVertexIterator->vertexType == VertexType::Ear)
+         if (vertexIterator->type == VertexType::Ear)
          {
-            ears.push_front(augmentedVertexIterator);
+            ears.push_front(vertexIterator);
          }
       }
 
-      InternalTriangulate_R(augmentedVertices, ears, winding, triangles);
+      InternalTriangulate_R(vertices, ears, winding, triangles);
    }
 }
 
-VertexType GetConvexOrReflexVertexType(const Vector2* firstVertex, const Vector2* secondVertex, const Vector2* thirdVertex, PolygonWinding winding)
+void GetPointsStraddlingVertex(VertexList::const_iterator vertexIterator, const Vector2*& pointBefore, const Vector2*& pointAtVertex, const Vector2*& pointAfter)
 {
-   Vector3 cross = (*secondVertex - *firstVertex).cross(*thirdVertex - *secondVertex);
+   pointBefore = (vertexIterator.previous())->point;
+   pointAtVertex = vertexIterator->point;
+   pointAfter = (vertexIterator.next())->point;
+}
+
+VertexType GetConvexOrReflexVertexType(const Vector2* pointBefore, const Vector2* pointOfInterest, const Vector2* pointAfter, PolygonWinding winding)
+{
+   Vector3 cross = (*pointOfInterest - *pointBefore).cross(*pointAfter - *pointOfInterest);
 
    if (cross.z == 0.0f)
    {
@@ -391,34 +400,32 @@ VertexType GetConvexOrReflexVertexType(const Vector2* firstVertex, const Vector2
    }
 }
 
-VertexType GetConvexOrReflexVertexType(AugmentedVertexList::const_iterator augmentedVertexIterator, PolygonWinding winding)
+VertexType GetConvexOrReflexVertexType(VertexList::const_iterator vertexIterator, PolygonWinding winding)
 {
-   const Vector2* firstVertex = (augmentedVertexIterator.previous())->vertex;
-   const Vector2* secondVertex = augmentedVertexIterator->vertex;
-   const Vector2* thirdVertex = (augmentedVertexIterator.next())->vertex;
+   const Vector2 *pointBefore, *pointAtVertex, *pointAfter;
+   GetPointsStraddlingVertex(vertexIterator, pointBefore, pointAtVertex, pointAfter);
 
-   return GetConvexOrReflexVertexType(firstVertex, secondVertex, thirdVertex, winding);
+   return GetConvexOrReflexVertexType(pointBefore, pointAtVertex, pointAfter, winding);
 }
 
-void CheckForEarAndUpdateVertexType(AugmentedVertexList& augmentedVertices, AugmentedVertexList::iterator augmentedVertexIterator)
+void CheckForEarAndUpdateVertexType(VertexList& vertices, VertexList::iterator vertexIterator)
 {
-   if (augmentedVertexIterator->vertexType != VertexType::Reflex)
+   if (vertexIterator->type != VertexType::Reflex)
    {
-      const Vector2* firstVertex = (augmentedVertexIterator.previous())->vertex;
-      const Vector2* secondVertex = augmentedVertexIterator->vertex;
-      const Vector2* thirdVertex = (augmentedVertexIterator.next())->vertex;
+      const Vector2 *firstPoint, *secondPoint, *thirdPoint;
+      GetPointsStraddlingVertex(vertexIterator, firstPoint, secondPoint, thirdPoint);
 
-      Triangle2D_t checkTriangle(*firstVertex, *secondVertex, *thirdVertex);
+      Triangle2D_t checkTriangle(*firstPoint, *secondPoint, *thirdPoint);
 
-      for (AugmentedVertexList::iterator checkVertexIterator = augmentedVertices.begin(), end = augmentedVertices.end(); checkVertexIterator != end; ++checkVertexIterator)
+      for (VertexList::iterator checkVertexIterator = vertices.begin(), end = vertices.end(); checkVertexIterator != end; ++checkVertexIterator)
       {
-         if ( (checkVertexIterator->vertex != firstVertex) && (checkVertexIterator->vertex != secondVertex) && (checkVertexIterator->vertex != thirdVertex) )
+         if ( (checkVertexIterator->point != firstPoint) && (checkVertexIterator->point != secondPoint) && (checkVertexIterator->point != thirdPoint) )
          {
-            if (checkVertexIterator->vertexType == VertexType::Reflex)
+            if (checkVertexIterator->type == VertexType::Reflex)
             {
-               if (checkTriangle.PointIsOnPolygon(*(checkVertexIterator->vertex), EXPERIMENTAL_TOLERANCE))
+               if (checkTriangle.PointIsOnPolygon(*(checkVertexIterator->point), EXPERIMENTAL_TOLERANCE))
                {
-                  augmentedVertexIterator->vertexType = VertexType::Convex;
+                  vertexIterator->type = VertexType::Convex;
 
                   return;
                }
@@ -426,15 +433,15 @@ void CheckForEarAndUpdateVertexType(AugmentedVertexList& augmentedVertices, Augm
          }
       }
 
-      augmentedVertexIterator->vertexType = VertexType::Ear;
+      vertexIterator->type = VertexType::Ear;
    }
 }
 
-void RemoveEar(const Vector2* vertex, std::forward_list< AugmentedVertexList::iterator >& ears)
+void RemoveEar(const Vector2* point, VertexListIteratorList& ears)
 {
-   for (AugmentedVertexList::iterator& earIterator : ears)
+   for (VertexList::iterator& earIterator : ears)
    {
-      if (earIterator->vertex == vertex)
+      if (earIterator->point == point)
       {
          ears.remove(earIterator);
          break;
@@ -442,34 +449,34 @@ void RemoveEar(const Vector2* vertex, std::forward_list< AugmentedVertexList::it
    }
 }
 
-void ReclassifyVertex(AugmentedVertexList& augmentedVertices, AugmentedVertexList::iterator augmentedVertexIterator, PolygonWinding winding, std::forward_list< AugmentedVertexList::iterator >& ears)
+void ReclassifyVertex(VertexList& vertices, VertexList::iterator vertexIterator, PolygonWinding winding, VertexListIteratorList& ears)
 {
-   VertexType beforeType = augmentedVertexIterator->vertexType;
+   VertexType beforeType = vertexIterator->type;
 
    if (beforeType == VertexType::Reflex)
    {
-      augmentedVertexIterator->vertexType = GetConvexOrReflexVertexType(augmentedVertexIterator, winding);
+      vertexIterator->type = GetConvexOrReflexVertexType(vertexIterator, winding);
    }
 
-   CheckForEarAndUpdateVertexType(augmentedVertices, augmentedVertexIterator);
+   CheckForEarAndUpdateVertexType(vertices, vertexIterator);
 
-   if (augmentedVertexIterator->vertexType == VertexType::Ear)
+   if (vertexIterator->type == VertexType::Ear)
    {
       if (beforeType != VertexType::Ear)
       {
-         ears.push_front(augmentedVertexIterator);
+         ears.push_front(vertexIterator);
       }
    }
    else if (beforeType == VertexType::Ear)
    {
-      RemoveEar(augmentedVertexIterator->vertex, ears);
+      RemoveEar(vertexIterator->point, ears);
    }
 }
 
-void AddTriangle_R(std::vector<const Vector2*>& triangles, const Vector2* trianglePoint1, std::list<const Vector2*>& collinearVertices1, 
-                           const Vector2* trianglePoint2, std::list<const Vector2*>& collinearVertices2, const Vector2* trianglePoint3, std::list<const Vector2*>& collinearVertices3)
+void AddTriangle_R(std::vector<const Vector2*>& triangles, const Vector2* trianglePoint1, std::list<const Vector2*>& collinearPoints1, 
+                   const Vector2* trianglePoint2, std::list<const Vector2*>& collinearPoints2, const Vector2* trianglePoint3, std::list<const Vector2*>& collinearPoints3)
 {
-   if (collinearVertices1.empty() && collinearVertices2.empty() && collinearVertices3.empty())
+   if (collinearPoints1.empty() && collinearPoints2.empty() && collinearPoints3.empty())
    {
       triangles.push_back(trianglePoint1);
       triangles.push_back(trianglePoint2);
@@ -477,15 +484,15 @@ void AddTriangle_R(std::vector<const Vector2*>& triangles, const Vector2* triang
    }
    else
    {
-      if (!collinearVertices1.empty())
+      if (!collinearPoints1.empty())
       {
-         bool point3HasCollinearVertices = !collinearVertices3.empty();
+         bool point3HasCollinearVertices = !collinearPoints3.empty();
 
-         const Vector2* anchorPoint = point3HasCollinearVertices ? collinearVertices3.back() : trianglePoint3;
+         const Vector2* anchorPoint = point3HasCollinearVertices ? collinearPoints3.back() : trianglePoint3;
 
          const Vector2* lastPoint = trianglePoint1;
 
-         for (const Vector2* collinearPoint : collinearVertices1)
+         for (const Vector2* collinearPoint : collinearPoints1)
          {
             triangles.push_back(lastPoint);
             triangles.push_back(collinearPoint);
@@ -498,15 +505,15 @@ void AddTriangle_R(std::vector<const Vector2*>& triangles, const Vector2* triang
 
          if (point3HasCollinearVertices)
          {
-            collinearVertices3.pop_back();
+            collinearPoints3.pop_back();
 
-            if (collinearVertices3.empty())
+            if (collinearPoints3.empty())
             {
                triangles.push_back(anchorPoint);
                triangles.push_back(lastPoint);
                triangles.push_back(trianglePoint3);
 
-               AddTriangle_R(triangles, trianglePoint2, collinearVertices2, trianglePoint3, collinearVertices3, lastPoint, emptyList);
+               AddTriangle_R(triangles, trianglePoint2, collinearPoints2, trianglePoint3, collinearPoints3, lastPoint, emptyList);
             }
             else
             {
@@ -514,163 +521,162 @@ void AddTriangle_R(std::vector<const Vector2*>& triangles, const Vector2* triang
                triangles.push_back(trianglePoint2);
                triangles.push_back(anchorPoint);
 
-               AddTriangle_R(triangles, trianglePoint3, collinearVertices3, anchorPoint, emptyList, trianglePoint2, collinearVertices2);
+               AddTriangle_R(triangles, trianglePoint3, collinearPoints3, anchorPoint, emptyList, trianglePoint2, collinearPoints2);
             }
          }
          else
          {
-            AddTriangle_R(triangles, trianglePoint2, collinearVertices2, trianglePoint3, collinearVertices3, lastPoint, emptyList);
+            AddTriangle_R(triangles, trianglePoint2, collinearPoints2, trianglePoint3, collinearPoints3, lastPoint, emptyList);
          }
       }
-      else if (!collinearVertices2.empty())
+      else if (!collinearPoints2.empty())
       {
-         AddTriangle_R(triangles, trianglePoint2, collinearVertices2, trianglePoint3, collinearVertices3, trianglePoint1, collinearVertices1);
+         AddTriangle_R(triangles, trianglePoint2, collinearPoints2, trianglePoint3, collinearPoints3, trianglePoint1, collinearPoints1);
       }
       else
       {
-         AddTriangle_R(triangles, trianglePoint3, collinearVertices3, trianglePoint1, collinearVertices1, trianglePoint2, collinearVertices2);
+         AddTriangle_R(triangles, trianglePoint3, collinearPoints3, trianglePoint1, collinearPoints1, trianglePoint2, collinearPoints2);
       }
    }
 }
 
-void AddTriangle(std::vector<const Vector2*>& triangles, const AugmentedVertexList::iterator& ear, bool last)
+void AddTriangle(std::vector<const Vector2*>& triangles, const VertexList::iterator& ear, bool last)
 {
-   AugmentedVertexList::iterator previous = ear.previous();
-   AugmentedVertexList::iterator next = ear.next();
+   VertexList::iterator previous = ear.previous();
+   VertexList::iterator next = ear.next();
 
-   const Vector2* trianglePoint1 = previous->vertex;
-   const Vector2* trianglePoint2 = ear->vertex;
-   const Vector2* trianglePoint3 = next->vertex;
+   const Vector2 *trianglePoint1, *trianglePoint2, *trianglePoint3;
+   GetPointsStraddlingVertex(ear, trianglePoint1, trianglePoint2, trianglePoint3);
 
    if ( Triangle2D_t::IsValidTriangle(*trianglePoint1, *trianglePoint2, *trianglePoint3, EXPERIMENTAL_TOLERANCE) )
    {
       std::list<const Vector2*> emptyList;
 
-      AddTriangle_R(triangles, trianglePoint1, previous->collinearVertices, trianglePoint2, ear->collinearVertices, trianglePoint3, last ? next->collinearVertices : emptyList);
+      AddTriangle_R(triangles, trianglePoint1, previous->collinearPoints, trianglePoint2, ear->collinearPoints, trianglePoint3, last ? next->collinearPoints : emptyList);
    }
 }
 
-void AddRemainingTriangles(std::vector<const Vector2*>& triangles, AugmentedVertexList& augmentedVertices)
+void AddRemainingTriangles(std::vector<const Vector2*>& triangles, VertexList& vertices)
 {
-   std::size_t numVerticesRemaining = augmentedVertices.size();
+   std::size_t numVerticesRemaining = vertices.size();
 
    assert( numVerticesRemaining > 0 );
 
    std::list<const Vector2*> emptyList;
 
-   AugmentedVertexList::iterator first = augmentedVertices.begin();
+   VertexList::iterator first = vertices.begin();
 
    if (numVerticesRemaining == 2)
    {
-      AugmentedVertexList::iterator second = first.next();
+      VertexList::iterator second = first.next();
 
-      assert( (first->collinearVertices.size() == 1) || (second->collinearVertices.size() == 1) );
+      assert( (first->collinearPoints.size() == 1) || (second->collinearPoints.size() == 1) );
 
-      if (first->collinearVertices.size() == 1)
+      if (first->collinearPoints.size() == 1)
       {
-         AddTriangle_R(triangles, first->vertex, emptyList, first->collinearVertices.front(), emptyList, second->vertex, emptyList);
+         AddTriangle_R(triangles, first->point, emptyList, first->collinearPoints.front(), emptyList, second->point, emptyList);
       }
-      else if (second->collinearVertices.size() == 1)
+      else if (second->collinearPoints.size() == 1)
       {
-         AddTriangle_R(triangles, first->vertex, emptyList, second->vertex, emptyList, second->collinearVertices.front(), emptyList);
+         AddTriangle_R(triangles, first->point, emptyList, second->point, emptyList, second->collinearPoints.front(), emptyList);
       }
    }
    else
    {
-      assert( first->collinearVertices.size() == 2 );
+      assert( first->collinearPoints.size() == 2 );
             
-      AddTriangle_R(triangles, first->vertex, emptyList, first->collinearVertices.front(), emptyList, first->collinearVertices.back(), emptyList);
+      AddTriangle_R(triangles, first->point, emptyList, first->collinearPoints.front(), emptyList, first->collinearPoints.back(), emptyList);
    }
 }
 
-void AdjustForPossibleResultingCollinearity(AugmentedVertexList& augmentedVertices, std::forward_list< AugmentedVertexList::iterator >& ears, AugmentedVertexList::iterator& beforeEar, AugmentedVertexList::iterator& afterEar)
+void AdjustForPossibleResultingCollinearity(VertexList& vertices, VertexListIteratorList& ears, VertexList::iterator& beforeEar, VertexList::iterator& afterEar)
 {
-   beforeEar->collinearVertices.clear();
+   beforeEar->collinearPoints.clear();
 
-   if (augmentedVertices.size() > 3)
+   if (vertices.size() > 3)
    {
-      Vector2 beforeToAfter = (*(afterEar->vertex) - *(beforeEar->vertex)).normVector();
+      Vector2 beforeToAfter = (*(afterEar->point) - *(beforeEar->point)).normVector();
 
-      Line2D_t rayBefore(*(beforeEar->vertex), -beforeToAfter, true);
-      Line2D_t rayAfter(*(afterEar->vertex), beforeToAfter, true);
+      Line2D_t rayBefore(*(beforeEar->point), -beforeToAfter, true);
+      Line2D_t rayAfter(*(afterEar->point), beforeToAfter, true);
 
-      AugmentedVertexList::iterator twiceBeforeEar = beforeEar.previous();
-      AugmentedVertexList::iterator twiceAfterEar = afterEar.next();
+      VertexList::iterator twiceBeforeEar = beforeEar.previous();
+      VertexList::iterator twiceAfterEar = afterEar.next();
 
-      bool removeBeforeEar = rayBefore.IsPointOnLine(*(twiceBeforeEar->vertex), COLLINEAR_TOLERANCE);
-      bool removeAfterEar = rayAfter.IsPointOnLine(*(twiceAfterEar->vertex), COLLINEAR_TOLERANCE);
+      bool removeBeforeEar = rayBefore.IsPointOnLine(*(twiceBeforeEar->point), COLLINEAR_TOLERANCE);
+      bool removeAfterEar = rayAfter.IsPointOnLine(*(twiceAfterEar->point), COLLINEAR_TOLERANCE);
 
       if (removeBeforeEar && removeAfterEar)
       {
-         twiceBeforeEar->collinearVertices.push_back(beforeEar->vertex);
-         twiceBeforeEar->collinearVertices.push_back(afterEar->vertex);
+         twiceBeforeEar->collinearPoints.push_back(beforeEar->point);
+         twiceBeforeEar->collinearPoints.push_back(afterEar->point);
 
-         MigrateCollinearVertices(twiceBeforeEar, afterEar);
+         MigrateCollinearPoints(twiceBeforeEar, afterEar);
       }
       else if (removeBeforeEar)
       {
-         twiceBeforeEar->collinearVertices.push_back(beforeEar->vertex);
+         twiceBeforeEar->collinearPoints.push_back(beforeEar->point);
       }
       else if (removeAfterEar)
       {
-         beforeEar->collinearVertices.push_back(afterEar->vertex);
+         beforeEar->collinearPoints.push_back(afterEar->point);
 
-         MigrateCollinearVertices(beforeEar, afterEar);
+         MigrateCollinearPoints(beforeEar, afterEar);
       }
 
       if (removeBeforeEar)
       {
-         if (beforeEar->vertexType == VertexType::Ear)
+         if (beforeEar->type == VertexType::Ear)
          {
-            RemoveEar(beforeEar->vertex, ears);
+            RemoveEar(beforeEar->point, ears);
          }
 
-         augmentedVertices.erase(beforeEar);
+         vertices.erase(beforeEar);
       }
 
       if (removeAfterEar)
       {
-         if (afterEar->vertexType == VertexType::Ear)
+         if (afterEar->type == VertexType::Ear)
          {
-            RemoveEar(afterEar->vertex, ears);
+            RemoveEar(afterEar->point, ears);
          }
 
-         augmentedVertices.erase(afterEar);
+         vertices.erase(afterEar);
       }
    }
 }
 
 //{CodeReview:Triangulation}
-void InternalTriangulate_R(AugmentedVertexList& augmentedVertices, std::forward_list< AugmentedVertexList::iterator >& ears, PolygonWinding winding, std::vector<const Vector2*>& triangles)
+void InternalTriangulate_R(VertexList& vertices, VertexListIteratorList& ears, PolygonWinding winding, std::vector<const Vector2*>& triangles)
 {
-   if (augmentedVertices.size() == 3)
+   if (vertices.size() == 3)
    {
-      AddTriangle(triangles, augmentedVertices.begin(), true);
+      AddTriangle(triangles, vertices.begin(), true);
    }
-   else if (augmentedVertices.size() < 3)
+   else if (vertices.size() < 3)
    {
-      AddRemainingTriangles(triangles, augmentedVertices);
+      AddRemainingTriangles(triangles, vertices);
    }
    else
    {
       assert( !ears.empty() );
 
-      AugmentedVertexList::iterator ear = ears.front();
+      VertexList::iterator ear = ears.front();
       ears.pop_front();
 
-      AugmentedVertexList::iterator firstAdjacent = ear.previous();
-      AugmentedVertexList::iterator secondAdjacent = ear.next();
+      VertexList::iterator firstAdjacent = ear.previous();
+      VertexList::iterator secondAdjacent = ear.next();
 
       AddTriangle(triangles, ear, false);
 
-      augmentedVertices.erase(ear);
+      vertices.erase(ear);
 
-      ReclassifyVertex(augmentedVertices, firstAdjacent, winding, ears);
-      ReclassifyVertex(augmentedVertices, secondAdjacent, winding, ears);
+      ReclassifyVertex(vertices, firstAdjacent, winding, ears);
+      ReclassifyVertex(vertices, secondAdjacent, winding, ears);
 
-      AdjustForPossibleResultingCollinearity(augmentedVertices, ears, firstAdjacent, secondAdjacent);
+      AdjustForPossibleResultingCollinearity(vertices, ears, firstAdjacent, secondAdjacent);
 
-      InternalTriangulate_R(augmentedVertices, ears, winding, triangles);
+      InternalTriangulate_R(vertices, ears, winding, triangles);
    }
 }
 

@@ -82,65 +82,59 @@ IntersectionType Line<Vector3>::GetLineIntersection(const Line<Vector3>& otherLi
    {
       return IntersectionType::None;
    }
-   else
+
+   //from http://geomalgorithms.com/a07-_distance.html
+
+   Vector3 wZero = P - otherLine.P;
+
+   float a = V.dot(V);
+   float b = V.dot(otherLine.V);
+   float c = otherLine.V.dot(otherLine.V);
+   float d = V.dot(wZero);
+   float e = otherLine.V.dot(wZero);
+
+   float ACMinusBSquared = a * c - b * b;
+
+   if (ACMinusBSquared == 0.0f)
    {
-      //from http://geomalgorithms.com/a07-_distance.html
+      return GetParallelLineIntersection(otherLine, intersectionPoint1, intersectionPoint2, toleranceFactor);
+   }
 
-      Vector3 wZero = P - otherLine.P;
+   Vector3 closestPointOnThisLine = P + ( (b * e - c * d) / ACMinusBSquared ) * V;
+   Vector3 closestPointOnOtherLine = otherLine.P + ( (a * e - b * d) / ACMinusBSquared ) * otherLine.V;
 
-      float a = V.dot(V);
-      float b = V.dot(otherLine.V);
-      float c = otherLine.V.dot(otherLine.V);
-      float d = V.dot(wZero);
-      float e = otherLine.V.dot(wZero);
-
-      float ACMinusBSquared = a * c - b * b;
-
-      if (ACMinusBSquared == 0.0f)
+   if (Float::FEqual<float>(closestPointOnThisLine.distanceTo(closestPointOnOtherLine), 0.0f, toleranceFactor))
+   {
+      if (isRay || otherLine.isRay)
       {
-         return GetParallelLineIntersection(otherLine, intersectionPoint1, intersectionPoint2, toleranceFactor);
-      }
-      else
-      {
-         Vector3 closestPointOnThisLine = P + ( (b * e - c * d) / ACMinusBSquared ) * V;
-         Vector3 closestPointOnOtherLine = otherLine.P + ( (a * e - b * d) / ACMinusBSquared ) * otherLine.V;
-
-         if (Float::FEqual<float>(closestPointOnThisLine.distanceTo(closestPointOnOtherLine), 0.0f, toleranceFactor))
+         if (isRay && otherLine.isRay)
          {
-            if (isRay || otherLine.isRay)
+            if (!IsPointOnLine(closestPointOnThisLine, toleranceFactor) || !otherLine.IsPointOnLine(closestPointOnThisLine, toleranceFactor))
             {
-               if (isRay && otherLine.isRay)
-               {
-                  if (!IsPointOnLine(closestPointOnThisLine, toleranceFactor) || !otherLine.IsPointOnLine(closestPointOnThisLine, toleranceFactor))
-                  {
-                     return IntersectionType::None;
-                  }
-               }
-               else if (isRay)
-               {
-                  if (!IsPointOnLine(closestPointOnThisLine, toleranceFactor))
-                  {
-                     return IntersectionType::None;
-                  }
-               }
-               else
-               {
-                  if (!otherLine.IsPointOnLine(closestPointOnThisLine, toleranceFactor))
-                  {
-                     return IntersectionType::None;
-                  }
-               }
+               return IntersectionType::None;
             }
-
-            intersectionPoint1 = closestPointOnThisLine;
-            return IntersectionType::Point;
+         }
+         else if (isRay)
+         {
+            if (!IsPointOnLine(closestPointOnThisLine, toleranceFactor))
+            {
+               return IntersectionType::None;
+            }
          }
          else
          {
-            return IntersectionType::None;
+            if (!otherLine.IsPointOnLine(closestPointOnThisLine, toleranceFactor))
+            {
+               return IntersectionType::None;
+            }
          }
       }
+
+      intersectionPoint1 = closestPointOnThisLine;
+      return IntersectionType::Point;
    }
+   
+   return IntersectionType::None;
 }
 
 template <>

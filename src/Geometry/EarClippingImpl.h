@@ -37,45 +37,49 @@ enum class VertexType
    Ear
 };
 
-struct AugmentedVertex
+struct Vertex
 {
-   AugmentedVertex(const Vector2* vertex)
-      : vertex(vertex), vertexType(VertexType::Reflex)
+   Vertex(const Vector2* point)
+      : point(point),
+        type(VertexType::Reflex)
    {
    }
 
-   const Vector2* vertex;
-   VertexType vertexType;
-   std::list<const Vector2*> collinearVertices;
+   const Vector2* point;
+   VertexType type;
+   std::list<const Vector2*> collinearPoints;
 };
 
-typedef CircularList<AugmentedVertex> AugmentedVertexList;
+typedef CircularList<Vertex> VertexList;
 
-void MakeSimple(AugmentedVertexList& augmentedVertices, const std::vector<const Polygon2D_t*>& innerPolygons, PolygonWinding winding);
+typedef std::forward_list< VertexList::iterator > VertexListIteratorList;
 
-AugmentedVertexList::iterator FindMutuallyVisibleVertex(AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, PolygonWinding winding);
+void MakeSimple(VertexList& vertices, const std::vector<const Polygon2D_t*>& innerPolygons, PolygonWinding winding);
+
+VertexList::iterator FindMutuallyVisibleVertex(VertexList& vertices, const Vector2& maxInteriorPoint, PolygonWinding winding);
 const Polygon2D_t* FindMaxInteriorPointInListAndRemovePolygonFromConsideration(std::forward_list<const Polygon2D_t*>& innerPolygons, std::size_t& maxInteriorPointIndex);
-AugmentedVertexList::iterator DetermineMutuallyVisibleVertexFromRayCastResult(AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, const Vector2& intersectionPointOnEdge, AugmentedVertexList::iterator pointOnEdgeWithMaximumXIter, PolygonWinding winding);
-AugmentedVertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(AugmentedVertexList& augmentedVertices, const Vector2& maxInteriorPoint, Vector2& intersectionPointOnEdge, AugmentedVertexList::iterator& pointOnEdgeWithMaximumXIter, PolygonWinding winding);
-void StitchOuterAndInnerPolygons(AugmentedVertexList& augmentedVertices, const Polygon2D_t& hole, std::size_t maxInteriorPointIndex, AugmentedVertexList::iterator mutuallyVisibleVertexIter);
+VertexList::iterator DetermineMutuallyVisibleVertexFromRayCastResult(VertexList& vertices, const Vector2& maxInteriorPoint, const Vector2& intersectionPointOnEdge, VertexList::iterator pointOnEdgeWithMaximumXIter, PolygonWinding winding);
+VertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(VertexList& vertices, const Vector2& maxInteriorPoint, Vector2& intersectionPointOnEdge, VertexList::iterator& pointOnEdgeWithMaximumXIter, PolygonWinding winding);
+void StitchOuterAndInnerPolygons(VertexList& vertices, const Polygon2D_t& hole, std::size_t maxInteriorPointIndex, VertexList::iterator mutuallyVisibleVertexIter);
 
-void RemoveCollinearVerticesFromConsideration(AugmentedVertexList& augmentedVertices);
-void AdjustForPossibleResultingCollinearity(AugmentedVertexList& augmentedVertices, std::forward_list< AugmentedVertexList::iterator >& ears, AugmentedVertexList::iterator& beforeEar, AugmentedVertexList::iterator& afterEar);
-void MigrateCollinearVertices(AugmentedVertexList::iterator& to, const AugmentedVertexList::iterator& from);
+void RemoveCollinearPointsFromConsideration(VertexList& vertices);
+void AdjustForPossibleResultingCollinearity(VertexList& vertices, VertexListIteratorList& ears, VertexList::iterator& beforeEar, VertexList::iterator& afterEar);
+void MigrateCollinearPoints(VertexList::iterator& to, const VertexList::iterator& from);
 
-VertexType GetConvexOrReflexVertexType(const Vector2* firstVertex, const Vector2* secondVertex, const Vector2* thirdVertex, PolygonWinding winding);
-VertexType GetConvexOrReflexVertexType(AugmentedVertexList::const_iterator augmentedVertexIterator, PolygonWinding winding);
-void CheckForEarAndUpdateVertexType(AugmentedVertexList& augmentedVertices, AugmentedVertexList::iterator augmentedVertexIterator);
-void RemoveEar(const Vector2* vertex, std::forward_list< AugmentedVertexList::iterator >& ears);
-void ReclassifyVertex(AugmentedVertexList& augmentedVertices, AugmentedVertexList::iterator augmentedVertexIterator, PolygonWinding winding, std::forward_list< AugmentedVertexList::iterator >& ears);
+void GetPointsStraddlingVertex(VertexList::const_iterator vertexIterator, const Vector2*& pointBefore, const Vector2*& pointAtVertex, const Vector2*& pointAfter);
+VertexType GetConvexOrReflexVertexType(const Vector2* pointBefore, const Vector2* pointOfInterest, const Vector2* pointAfter, PolygonWinding winding);
+VertexType GetConvexOrReflexVertexType(VertexList::const_iterator vertexIterator, PolygonWinding winding);
+void CheckForEarAndUpdateVertexType(VertexList& vertices, VertexList::iterator vertexIterator);
+void RemoveEar(const Vector2* point, VertexListIteratorList& ears);
+void ReclassifyVertex(VertexList& vertices, VertexList::iterator vertexIterator, PolygonWinding winding, VertexListIteratorList& ears);
 
-void InternalTriangulate(AugmentedVertexList& augmentedVertices, PolygonWinding winding, std::vector<const Vector2*>& triangles);
-void InternalTriangulate_R(AugmentedVertexList& augmentedVertices, std::forward_list< AugmentedVertexList::iterator >& ears, PolygonWinding winding, std::vector<const Vector2*>& triangles);
+void InternalTriangulate(VertexList& vertices, PolygonWinding winding, std::vector<const Vector2*>& triangles);
+void InternalTriangulate_R(VertexList& vertices, VertexListIteratorList& ears, PolygonWinding winding, std::vector<const Vector2*>& triangles);
 
-void AddTriangle(std::vector<const Vector2*>& triangles, const AugmentedVertexList::iterator& ear, bool last);
-void AddRemainingTriangles(std::vector<const Vector2*>& triangles, AugmentedVertexList& augmentedVertices);
-void AddTriangle_R(std::vector<const Vector2*>& triangles, const Vector2* trianglePoint1, std::list<const Vector2*>& collinearVertices1, 
-                   const Vector2* trianglePoint2, std::list<const Vector2*>& collinearVertices2, const Vector2* trianglePoint3, std::list<const Vector2*>& collinearVertices3);
+void AddTriangle(std::vector<const Vector2*>& triangles, const VertexList::iterator& ear, bool last);
+void AddRemainingTriangles(std::vector<const Vector2*>& triangles, VertexList& vertices);
+void AddTriangle_R(std::vector<const Vector2*>& triangles, const Vector2* trianglePoint1, std::list<const Vector2*>& collinearPoints1, 
+                   const Vector2* trianglePoint2, std::list<const Vector2*>& collinearPoints2, const Vector2* trianglePoint3, std::list<const Vector2*>& collinearPoints3);
 
 }
 

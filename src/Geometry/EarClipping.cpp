@@ -23,14 +23,14 @@ void Triangulate(const Polygon2D_t& polygon, std::vector<const Vector2*>& triang
 {
    if (polygon.IsWellDefined())
    {
-      AugmentedVertexList augmentedVertices;
+      VertexList vertices;
 
       for (std::size_t pointIndex = 0, numPoints = polygon.NumPoints(); pointIndex < numPoints; ++pointIndex)
       {
-         augmentedVertices.push_back( AugmentedVertex(&polygon[pointIndex]) );
+         vertices.push_back( Vertex(&polygon[pointIndex]) );
       }
 
-      InternalTriangulate(augmentedVertices, polygon.GetWinding(Vector3::ZAxis()), triangles);
+      InternalTriangulate(vertices, polygon.GetWinding(Vector3::ZAxis()), triangles);
    }
 }
 
@@ -51,16 +51,16 @@ void Triangulate(const Polygon2D_t& polygon, const std::vector<const Polygon2D_t
          }
       }
 
-      AugmentedVertexList augmentedVertices;
+      VertexList vertices;
 
       for (std::size_t pointIndex = 0, numPoints = polygon.NumPoints(); pointIndex < numPoints; ++pointIndex)
       {
-         augmentedVertices.push_back( AugmentedVertex(&polygon[pointIndex]) );
+         vertices.push_back( Vertex(&polygon[pointIndex]) );
       }
 
-      MakeSimple(augmentedVertices, innerPolygons, polygonWinding);
+      MakeSimple(vertices, innerPolygons, polygonWinding);
 
-      InternalTriangulate(augmentedVertices, polygonWinding, triangles);
+      InternalTriangulate(vertices, polygonWinding, triangles);
    }
 }
 
