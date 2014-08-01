@@ -70,14 +70,15 @@ src directories. This will be easier if you have downloaded the Locus code base 
 - Triangulating Polygon Hierarchies Using Ear Clipping
 
 * Code Tag: //{CodeReview:Triangulation}
-* Files: include/Locus/Geometry/Triangulation.h, src/Geometry/Triangulation.cpp
+* Files: src/Geometry/Triangulation.cpp, src/Geometry/EarClipping.cpp, src/Geometry/EarClippingImpl.cpp
 * Description: This an implementation of the algorithm described here
   http://www.geometrictools.com/Documentation/TriangulationByEarClipping.pdf
 
 * Functions to Review:
-  void Triangulate(const Polygon2D_t& polygon, const std::vector<const Polygon2D_t*>& innerPolygons, std::vector<const Vector2*>& triangles)
   void Triangulate(std::vector<Polygon2D_t>& polygons, PolygonWinding winding, std::vector<const Vector2*>& triangles)
-  void Triangulate_R(AugmentedVertexList& augmentedVertices, std::forward_list< AugmentedVertexList::iterator >& ears, PolygonWinding winding, std::vector<const Vector2*>& triangles)
+  void EarClipping::Triangulate(const Polygon2D_t& polygon, const std::vector<const Polygon2D_t*>& innerPolygons, std::vector<const Vector2*>& triangles)
+  void EarClipping::InternalTriangulate(VertexList& vertices, PolygonWinding winding, std::vector<const Vector2*>& triangles)
+  void EarClipping::InternalTriangulate_R(VertexList& vertices, VertexListIteratorList& ears, PolygonWinding winding, std::vector<const Vector2*>& triangles)
 
 4.2) Rendering
 
