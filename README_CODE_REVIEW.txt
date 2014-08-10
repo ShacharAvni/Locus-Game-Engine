@@ -8,6 +8,7 @@ Thank you for taking the time to review the Locus Game Engine code.
 The purpose of this document is to point you towards the more interesting
 aspects of the Locus code base.
 
+
 2) Locus First-Party Code
 
 All Locus first-party code is contained in the following directories:
@@ -15,6 +16,7 @@ All Locus first-party code is contained in the following directories:
 include - Contains the Locus public headers
 src - Contains the Locus implementation
 examples - Contains code for sample executables that use Locus
+
 
 3) Locus Modules
 
@@ -29,15 +31,22 @@ Locus is split up into the following modules, each compiled as a separate librar
 * Locus_Rendering: 3D rendering (using OpenGL)
 * Locus_Simulation: Window and user interaction (mainly a wrapper around GLFW)
 
+
 4) Code to Review
 
-This section points out the actual classes, methods, or functions that may be of interest
-to review, organized by Locus Module. I have chosen these examples because I believe they
-each show a clean, elegant solution to a complex problem.
+This section points out code examples that may be of interest to review, organized by
+Locus Module. I have chosen these examples because I believe they each show a clean,
+elegant solution to a complex problem.
 
-To find the given examples in the code base, I have given them each a tag in the form
-//{CodeReview:X}. For each example, search for its corresponding tag in the include and
-src directories. This will be easier if you have downloaded the Locus code base to disk.
+I have given each code example a tag in the form //{CodeReview:X}
+
+The tags will point you towards the pertinent method definitions, method declarations and
+class declarations to review.
+
+To find a given example in the code base, search for its corresponding tag in the include
+and src directories. This will be easier if you have downloaded the Locus code base to
+disk.
+
 
 4.1) Geometry
 
@@ -49,9 +58,6 @@ src directories. This will be easier if you have downloaded the Locus code base 
 * Description: This class manages the broad-phase collision detection of a collection of
   Collidable objects.
 
-* Methods to Review:
-  void CollisionManager::UpdateCollisions()
-  void CollisionManager::TransmitCollisions()
 
 - Narrow-Phase Collsion Detection
 
@@ -62,10 +68,6 @@ src directories. This will be easier if you have downloaded the Locus code base 
   Tree, a Sphere Tree, or an Axis Aligned Bounding Box Tree, depending on the template
   parameter.
 
-* Methods to Review:
-  BoundingVolumeHierarchy<BoundingVolume>::Node::Node()
-  void BoundingVolumeHierarchy<BoundingVolume>::GetIntersection(const Moveable& thisMoveable, const BoundingVolumeHierarchy<BoundingVolume>& otherBoundingVolumeHierarchy, const Moveable& otherMoveable, std::unordered_set<std::size_t>& thisIntersectionSet, std::unordered_set<std::size_t>& otherIntersectionSet) const
-  void BoundingVolumeHierarchy<BoundingVolume>::GetIntersection(const Moveable& thisMoveable, const OrientedBox& orientedBox, std::unordered_set<std::size_t>& thisIntersectionSet) const
 
 - Triangulating Polygon Hierarchies Using Ear Clipping
 
@@ -74,11 +76,6 @@ src directories. This will be easier if you have downloaded the Locus code base 
 * Description: This an implementation of the algorithm described here
   http://www.geometrictools.com/Documentation/TriangulationByEarClipping.pdf
 
-* Functions to Review:
-  void Triangulate(std::vector<Polygon2D_t>& polygons, PolygonWinding winding, std::vector<const Vector2*>& triangles)
-  void EarClipping::Triangulate(const Polygon2D_t& polygon, const std::vector<const Polygon2D_t*>& innerPolygons, std::vector<const Vector2*>& triangles)
-  void EarClipping::InternalTriangulate(VertexList& vertices, PolygonWinding winding, std::vector<const Vector2*>& triangles)
-  void EarClipping::InternalTriangulate_R(VertexList& vertices, VertexListIteratorList& ears, PolygonWinding winding, std::vector<const Vector2*>& triangles)
 
 4.2) Rendering
 
@@ -88,11 +85,6 @@ src directories. This will be easier if you have downloaded the Locus code base 
 * Files: include/Locus/Rendering/ShaderSourceStore.h, src/Rendering/ShaderSourceStore.cpp
 * Description: These are functions for generating shader code for N point light sources.
 
-* Functions to Review:
-  std::string Vert_1_30(bool textured, unsigned int numLights)
-  std::string Frag_1_30(bool textured, unsigned int numLights)
-  std::string Vert_Pre_1_30(GLInfo::GLSLVersion version, bool textured, unsigned int numLights)
-  std::string Frag_Pre_1_30(GLInfo::GLSLVersion version, bool textured, unsigned int numLights)
 
 4.3) Math
 
@@ -101,10 +93,8 @@ src directories. This will be easier if you have downloaded the Locus code base 
 * Code Tag: //{CodeReview:NewtonsMethod}
 * Class: Polynomial
 * Files: include/Locus/Math/Polynomial.h, src/Math/Polynomial.cpp
-* Description: This method solves for the real roots of an arbitrary degree Polynomial.
+* Description: This method solves for the real roots of a polynomial with arbitrary degree.
 
-* Method to Review:
-  bool Polynomial<ScalarType>::SolveWithNewtonsMethod(std::vector<ScalarType>& roots) const
 
 - Matrix Row Reduction
 
@@ -113,8 +103,6 @@ src directories. This will be easier if you have downloaded the Locus code base 
 * Files: include/Locus/Math/Matrix.h, src/Math/Matrix.cpp
 * Description: This method turns the Matrix into row echelon form.
 
-* Method to Review:
-  void Matrix<ScalarType>::MakeRowEchelon(bool reduce)
 
 - Steinhaus–Johnson–Trotter Permutation Algorithm with Even's Speedup
 
@@ -124,6 +112,3 @@ src directories. This will be easier if you have downloaded the Locus code base 
 * Description: Generate the next permutation of alternating parity of the integers
   {0, 1, 2, ..., N} given their current order. This is an implementation of the
   algorithm described here http://en.wikipedia.org/wiki/Steinhaus%E2%80%93Johnson%E2%80%93Trotter_algorithm
-
-* Method to Review:
-  bool SJTPermutations::GenerateNext()
