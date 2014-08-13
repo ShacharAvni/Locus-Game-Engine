@@ -11,7 +11,7 @@
 #include "Locus/Geometry/Triangulation.h"
 #include "Locus/Geometry/PolygonHierarchy.h"
 
-#include "EarClipping.h"
+#include "EarClipper.h"
 
 #include <queue>
 
@@ -20,12 +20,12 @@ namespace Locus
 
 void Triangulate(const Polygon2D_t& polygon, std::vector<const Vector2*>& triangles)
 {
-   EarClipping::Triangulate(polygon, triangles);
+   EarClipper(polygon).Triangulate(triangles);
 }
 
 void Triangulate(const Polygon2D_t& polygon, const std::vector<const Polygon2D_t*>& innerPolygons, std::vector<const Vector2*>& triangles)
 {
-   EarClipping::Triangulate(polygon, innerPolygons, triangles);
+   EarClipper(polygon, innerPolygons).Triangulate(triangles);
 }
 
 //{CodeReview:Triangulation}
@@ -39,7 +39,7 @@ void Triangulate(std::vector<Polygon2D_t>& polygons, PolygonWinding winding, std
       polygonsForHierarchy.push_back(&polygon);
    }
 
-   PolygonHierarchy<Polygon2D_t> polygonHierarchy(polygonsForHierarchy, winding, Vector3::ZAxis(), EarClipping::EXPERIMENTAL_TOLERANCE);
+   PolygonHierarchy<Polygon2D_t> polygonHierarchy(polygonsForHierarchy, winding, Vector3::ZAxis(), EarClipper::EXPERIMENTAL_TOLERANCE);
 
    std::queue< const PolygonHierarchy<Polygon2D_t>::Node* > polygonNodesToTriangulate;
 
@@ -77,7 +77,7 @@ void Triangulate(std::vector<Polygon2D_t>& polygons, PolygonWinding winding, std
             }
          }
 
-         EarClipping::Triangulate(*(node->polygon), innerPolygons, triangles);
+         EarClipper(*(node->polygon), innerPolygons).Triangulate(triangles);
       }
    }
 }

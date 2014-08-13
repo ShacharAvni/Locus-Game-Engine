@@ -8,7 +8,7 @@
 *                                                                                                        *
 \********************************************************************************************************/
 
-#include "EarClippingImpl.h"
+#include "EarClipper.h"
 
 #include "Locus/Geometry/Polygon.h"
 #include "Locus/Geometry/Triangle.h"
@@ -20,13 +20,74 @@
 namespace Locus
 {
 
-namespace EarClipping
-{
+const float EarClipper::EXPERIMENTAL_TOLERANCE = 1.0f;
 
 static const float COLLINEAR_TOLERANCE = 1.0f;
-extern const float EXPERIMENTAL_TOLERANCE = 1.0f;
 
-const Polygon2D_t* FindMaxInteriorPointInListAndRemovePolygonFromConsideration(std::forward_list<const Polygon2D_t*>& innerPolygons, std::size_t& maxInteriorPointIndex)
+EarClipper::EarClipper(const Polygon2D_t& polygon)
+{
+   if (polygon.IsWellDefined())
+   {
+      for (std::size_t pointIndex = 0, numPoints = polygon.NumPoints(); pointIndex < numPoints; ++pointIndex)
+      {
+         vertices.push_back( Vertex(&polygon[pointIndex]) );
+      }
+
+      polygonWinding = polygon.GetWinding(Vector3::ZAxis());
+   }
+}
+
+//{CodeReview:Triangulation}
+EarClipper::EarClipper(const Polygon2D_t& polygon, const std::vector<const Polygon2D_t*>& innerPolygons)
+{
+   if (polygon.IsWellDefined())
+   {
+      Vector3 checkNormal = Vector3::ZAxis();
+
+      polygonWinding = polygon.GetWinding(checkNormal);
+
+      for (std::size_t pointIndex = 0, numPoints = polygon.NumPoints(); pointIndex < numPoints; ++pointIndex)
+      {
+         vertices.push_back( Vertex(&polygon[pointIndex]) );
+      }
+
+      MakeSimple(innerPolygons, checkNormal);
+   }
+}
+
+//{CodeReview:Triangulation}
+void EarClipper::Triangulate(std::vector<const Vector2*>& triangles)
+{
+   triangles.reserve( triangles.size() + (3 * (vertices.size() - 2)) );
+
+   RemoveCollinearPointsFromConsideration();
+
+   if (vertices.size() >= 3)
+   {
+      VertexListIteratorList ears;
+
+      VertexList::iterator verticesEnd = vertices.end();
+
+      for (VertexList::iterator vertexIterator = vertices.begin(); vertexIterator != verticesEnd; ++vertexIterator)
+      {
+         vertexIterator->type = GetConvexOrReflexVertexType(vertexIterator);
+      }
+
+      for (VertexList::iterator vertexIterator = vertices.begin(); vertexIterator != verticesEnd; ++vertexIterator)
+      {
+         CheckForEarAndUpdateVertexType(vertexIterator);
+
+         if (vertexIterator->type == VertexType::Ear)
+         {
+            ears.push_front(vertexIterator);
+         }
+      }
+
+      Triangulate_R(ears, triangles);
+   }
+}
+
+const Polygon2D_t* EarClipper::FindMaxInteriorPointInListAndRemovePolygonFromConsideration(std::forward_list<const Polygon2D_t*>& innerPolygons, std::size_t& maxInteriorPointIndex)
 {
    std::forward_list<const Polygon2D_t*>::iterator polygonIteratorToErase = innerPolygons.before_begin();
 
@@ -57,7 +118,7 @@ const Polygon2D_t* FindMaxInteriorPointInListAndRemovePolygonFromConsideration(s
    return polygonWithMaxX;
 }
 
-VertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(VertexList& vertices, const Vector2& maxInteriorPoint, Vector2& intersectionPointOnEdge, VertexList::iterator& pointOnEdgeWithMaximumXIter, PolygonWinding winding)
+EarClipper::VertexList::iterator EarClipper::RayCastFromMaxInteriorPointToOuterPolygon(const Vector2& maxInteriorPoint, Vector2& intersectionPointOnEdge, VertexList::iterator& pointOnEdgeWithMaximumXIter)
 {
    //a) Call the vertex on the hole with the maximum x coordinate P. Call the ray { P, (1,0) } R. Intersect R
    //   with the edges of the outer polygon. Find the edge whose intersection is closest to P. Call this edge E.
@@ -141,7 +202,7 @@ VertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(VertexList& verti
             {
                const Vector2* beforeMutuallyVisibleVertex = possibleMutuallyVisibleVertex.previous()->point;
 
-               takeThisVertex = (GetConvexOrReflexVertexType(beforeMutuallyVisibleVertex, possibleMutuallyVisibleVertex->point, &maxInteriorPoint, winding) == VertexType::Convex);
+               takeThisVertex = (GetConvexOrReflexVertexType(beforeMutuallyVisibleVertex, possibleMutuallyVisibleVertex->point, &maxInteriorPoint) == VertexType::Convex);
             }
 
             if (takeThisVertex)
@@ -166,7 +227,7 @@ VertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(VertexList& verti
    return mutuallyVisibleVertexIter;
 }
 
-VertexList::iterator DetermineMutuallyVisibleVertexFromRayCastResult(VertexList& vertices, const Vector2& maxInteriorPoint, const Vector2& intersectionPointOnEdge, VertexList::iterator pointOnEdgeWithMaximumXIter, PolygonWinding winding)
+EarClipper::VertexList::iterator EarClipper::DetermineMutuallyVisibleVertexFromRayCastResult(const Vector2& maxInteriorPoint, const Vector2& intersectionPointOnEdge, VertexList::iterator pointOnEdgeWithMaximumXIter)
 {
    VertexList::iterator verticesEnd = vertices.end();
 
@@ -189,7 +250,7 @@ VertexList::iterator DetermineMutuallyVisibleVertexFromRayCastResult(VertexList&
    {
       if (checkTriangle.PointIsOnPolygon(*(vertexIterator->point), EXPERIMENTAL_TOLERANCE))
       {
-         if (GetConvexOrReflexVertexType(vertexIterator, winding) == VertexType::Reflex)
+         if (GetConvexOrReflexVertexType(vertexIterator) == VertexType::Reflex)
          {
             reflexVerticesOnTriangle.push_front(vertexIterator);
             hasAnyReflexVerticesOnTriangle = true;
@@ -237,24 +298,24 @@ VertexList::iterator DetermineMutuallyVisibleVertexFromRayCastResult(VertexList&
    return mutuallyVisibleVertexIter;
 }
 
-VertexList::iterator FindMutuallyVisibleVertex(VertexList& vertices, const Vector2& maxInteriorPoint, PolygonWinding winding)
+EarClipper::VertexList::iterator EarClipper::FindMutuallyVisibleVertex(const Vector2& maxInteriorPoint)
 {
    // Find a vertex on the outer polygon visible to that vertex
 
    Vector2 intersectionPointOnEdge;
    VertexList::iterator pointOnEdgeWithMaximumXIter = vertices.end();
 
-   VertexList::iterator mutuallyVisibleVertex = RayCastFromMaxInteriorPointToOuterPolygon(vertices, maxInteriorPoint, intersectionPointOnEdge, pointOnEdgeWithMaximumXIter, winding);
+   VertexList::iterator mutuallyVisibleVertex = RayCastFromMaxInteriorPointToOuterPolygon(maxInteriorPoint, intersectionPointOnEdge, pointOnEdgeWithMaximumXIter);
 
    if (mutuallyVisibleVertex == vertices.end())
    {
-      mutuallyVisibleVertex = DetermineMutuallyVisibleVertexFromRayCastResult(vertices, maxInteriorPoint, intersectionPointOnEdge, pointOnEdgeWithMaximumXIter, winding);
+      mutuallyVisibleVertex = DetermineMutuallyVisibleVertexFromRayCastResult(maxInteriorPoint, intersectionPointOnEdge, pointOnEdgeWithMaximumXIter);
    }
 
    return mutuallyVisibleVertex;
 }
 
-void StitchOuterAndInnerPolygons(VertexList& vertices, const Polygon2D_t& hole, std::size_t maxInteriorPointIndex, VertexList::iterator mutuallyVisibleVertexIter)
+void EarClipper::StitchOuterAndInnerPolygons(const Polygon2D_t& hole, std::size_t maxInteriorPointIndex, VertexList::iterator mutuallyVisibleVertexIter)
 {
    // Attach hole to outer vertices through the mutually visible vertex
 
@@ -268,11 +329,18 @@ void StitchOuterAndInnerPolygons(VertexList& vertices, const Polygon2D_t& hole, 
    vertices.insert(insertIterator, Vertex(mutuallyVisibleVertexIter->point));
 }
 
-void MakeSimple(VertexList& vertices, const std::vector<const Polygon2D_t*>& innerPolygons, PolygonWinding winding)
+void EarClipper::MakeSimple(const std::vector<const Polygon2D_t*>& innerPolygons, const Vector3& checkNormal)
 {
    std::forward_list<const Polygon2D_t*> innerPolygonsRemaining;
    for (const Polygon2D_t* innerPolygon : innerPolygons)
    {
+      if ((innerPolygon == nullptr) || !innerPolygon->IsWellDefined() || (innerPolygon->GetWinding(checkNormal) == polygonWinding))
+      {
+         //If any inner polygons are not well defined or are not the appropriate
+         //winding, then only the outer polygon will be triangulated.
+         return;
+      }
+
       innerPolygonsRemaining.push_front(innerPolygon);
    }
 
@@ -281,15 +349,15 @@ void MakeSimple(VertexList& vertices, const std::vector<const Polygon2D_t*>& inn
       std::size_t maxInteriorPointIndex;
       const Polygon2D_t* innerPolygon = FindMaxInteriorPointInListAndRemovePolygonFromConsideration(innerPolygonsRemaining, maxInteriorPointIndex);
 
-      VertexList::iterator mutuallyVisibleVertex = FindMutuallyVisibleVertex(vertices, (*innerPolygon)[maxInteriorPointIndex], winding);
+      VertexList::iterator mutuallyVisibleVertex = FindMutuallyVisibleVertex((*innerPolygon)[maxInteriorPointIndex]);
 
       assert(mutuallyVisibleVertex != vertices.end());
 
-      StitchOuterAndInnerPolygons(vertices, *innerPolygon, maxInteriorPointIndex, mutuallyVisibleVertex);
+      StitchOuterAndInnerPolygons(*innerPolygon, maxInteriorPointIndex, mutuallyVisibleVertex);
    }
 }
 
-void MigrateCollinearPoints(VertexList::iterator& to, const VertexList::iterator& from)
+void EarClipper::MigrateCollinearPoints(VertexList::iterator& to, const VertexList::iterator& from)
 {
    for (const Vector2* collinearPoint : from->collinearPoints)
    {
@@ -297,7 +365,7 @@ void MigrateCollinearPoints(VertexList::iterator& to, const VertexList::iterator
    }
 }
 
-void RemoveCollinearPointsFromConsideration(VertexList& vertices)
+void EarClipper::RemoveCollinearPointsFromConsideration()
 {
    if (vertices.size() > 3)
    {
@@ -343,46 +411,14 @@ void RemoveCollinearPointsFromConsideration(VertexList& vertices)
    }
 }
 
-//{CodeReview:Triangulation}
-void InternalTriangulate(VertexList& vertices, PolygonWinding winding, std::vector<const Vector2*>& triangles)
-{
-   triangles.reserve( triangles.size() + (3 * (vertices.size() - 2)) );
-
-   RemoveCollinearPointsFromConsideration(vertices);
-
-   if (vertices.size() >= 3)
-   {
-      VertexListIteratorList ears;
-
-      VertexList::iterator verticesEnd = vertices.end();
-
-      for (VertexList::iterator vertexIterator = vertices.begin(); vertexIterator != verticesEnd; ++vertexIterator)
-      {
-         vertexIterator->type = GetConvexOrReflexVertexType(vertexIterator, winding);
-      }
-
-      for (VertexList::iterator vertexIterator = vertices.begin(); vertexIterator != verticesEnd; ++vertexIterator)
-      {
-         CheckForEarAndUpdateVertexType(vertices, vertexIterator);
-
-         if (vertexIterator->type == VertexType::Ear)
-         {
-            ears.push_front(vertexIterator);
-         }
-      }
-
-      InternalTriangulate_R(vertices, ears, winding, triangles);
-   }
-}
-
-void GetPointsStraddlingVertex(VertexList::const_iterator vertexIterator, const Vector2*& pointBefore, const Vector2*& pointAtVertex, const Vector2*& pointAfter)
+void EarClipper::GetPointsStraddlingVertex(VertexList::const_iterator vertexIterator, const Vector2*& pointBefore, const Vector2*& pointAtVertex, const Vector2*& pointAfter)
 {
    pointBefore = (vertexIterator.previous())->point;
    pointAtVertex = vertexIterator->point;
    pointAfter = (vertexIterator.next())->point;
 }
 
-VertexType GetConvexOrReflexVertexType(const Vector2* pointBefore, const Vector2* pointOfInterest, const Vector2* pointAfter, PolygonWinding winding)
+EarClipper::VertexType EarClipper::GetConvexOrReflexVertexType(const Vector2* pointBefore, const Vector2* pointOfInterest, const Vector2* pointAfter)
 {
    Vector3 cross = (*pointOfInterest - *pointBefore).cross(*pointAfter - *pointOfInterest);
 
@@ -392,23 +428,23 @@ VertexType GetConvexOrReflexVertexType(const Vector2* pointBefore, const Vector2
    }
    else if (cross.z > 0.0f)
    {
-      return (winding == PolygonWinding::CounterClockwise) ? VertexType::Convex : VertexType::Reflex;
+      return (polygonWinding == PolygonWinding::CounterClockwise) ? VertexType::Convex : VertexType::Reflex;
    }
    else
    {
-      return (winding == PolygonWinding::CounterClockwise) ? VertexType::Reflex : VertexType::Convex;
+      return (polygonWinding == PolygonWinding::CounterClockwise) ? VertexType::Reflex : VertexType::Convex;
    }
 }
 
-VertexType GetConvexOrReflexVertexType(VertexList::const_iterator vertexIterator, PolygonWinding winding)
+EarClipper::VertexType EarClipper::GetConvexOrReflexVertexType(VertexList::const_iterator vertexIterator)
 {
    const Vector2 *pointBefore, *pointAtVertex, *pointAfter;
    GetPointsStraddlingVertex(vertexIterator, pointBefore, pointAtVertex, pointAfter);
 
-   return GetConvexOrReflexVertexType(pointBefore, pointAtVertex, pointAfter, winding);
+   return GetConvexOrReflexVertexType(pointBefore, pointAtVertex, pointAfter);
 }
 
-void CheckForEarAndUpdateVertexType(VertexList& vertices, VertexList::iterator vertexIterator)
+void EarClipper::CheckForEarAndUpdateVertexType(VertexList::iterator vertexIterator)
 {
    if (vertexIterator->type != VertexType::Reflex)
    {
@@ -437,7 +473,7 @@ void CheckForEarAndUpdateVertexType(VertexList& vertices, VertexList::iterator v
    }
 }
 
-void RemoveEar(const Vector2* point, VertexListIteratorList& ears)
+void EarClipper::RemoveEar(const Vector2* point, VertexListIteratorList& ears)
 {
    for (VertexList::iterator& earIterator : ears)
    {
@@ -449,16 +485,16 @@ void RemoveEar(const Vector2* point, VertexListIteratorList& ears)
    }
 }
 
-void ReclassifyVertex(VertexList& vertices, VertexList::iterator vertexIterator, PolygonWinding winding, VertexListIteratorList& ears)
+void EarClipper::ReclassifyVertex(VertexList::iterator vertexIterator, VertexListIteratorList& ears)
 {
    VertexType beforeType = vertexIterator->type;
 
    if (beforeType == VertexType::Reflex)
    {
-      vertexIterator->type = GetConvexOrReflexVertexType(vertexIterator, winding);
+      vertexIterator->type = GetConvexOrReflexVertexType(vertexIterator);
    }
 
-   CheckForEarAndUpdateVertexType(vertices, vertexIterator);
+   CheckForEarAndUpdateVertexType(vertexIterator);
 
    if (vertexIterator->type == VertexType::Ear)
    {
@@ -473,8 +509,10 @@ void ReclassifyVertex(VertexList& vertices, VertexList::iterator vertexIterator,
    }
 }
 
-void AddTriangle_R(std::vector<const Vector2*>& triangles, const Vector2* trianglePoint1, std::list<const Vector2*>& collinearPoints1, 
-                   const Vector2* trianglePoint2, std::list<const Vector2*>& collinearPoints2, const Vector2* trianglePoint3, std::list<const Vector2*>& collinearPoints3)
+void EarClipper::AddTriangle_R(std::vector<const Vector2*>& triangles,
+                               const Vector2* trianglePoint1, std::list<const Vector2*>& collinearPoints1, 
+                               const Vector2* trianglePoint2, std::list<const Vector2*>& collinearPoints2,
+                               const Vector2* trianglePoint3, std::list<const Vector2*>& collinearPoints3)
 {
    if (collinearPoints1.empty() && collinearPoints2.empty() && collinearPoints3.empty())
    {
@@ -540,7 +578,7 @@ void AddTriangle_R(std::vector<const Vector2*>& triangles, const Vector2* triang
    }
 }
 
-void AddTriangle(std::vector<const Vector2*>& triangles, const VertexList::iterator& ear, bool last)
+void EarClipper::AddTriangle(std::vector<const Vector2*>& triangles, const VertexList::iterator& ear, bool last)
 {
    VertexList::iterator previous = ear.previous();
    VertexList::iterator next = ear.next();
@@ -552,11 +590,11 @@ void AddTriangle(std::vector<const Vector2*>& triangles, const VertexList::itera
    {
       std::list<const Vector2*> emptyList;
 
-      AddTriangle_R(triangles, trianglePoint1, previous->collinearPoints, trianglePoint2, ear->collinearPoints, trianglePoint3, last ? next->collinearPoints : emptyList);
+      EarClipper::AddTriangle_R(triangles, trianglePoint1, previous->collinearPoints, trianglePoint2, ear->collinearPoints, trianglePoint3, last ? next->collinearPoints : emptyList);
    }
 }
 
-void AddRemainingTriangles(std::vector<const Vector2*>& triangles, VertexList& vertices)
+void EarClipper::AddRemainingTriangles(std::vector<const Vector2*>& triangles)
 {
    std::size_t numVerticesRemaining = vertices.size();
 
@@ -574,22 +612,22 @@ void AddRemainingTriangles(std::vector<const Vector2*>& triangles, VertexList& v
 
       if (first->collinearPoints.size() == 1)
       {
-         AddTriangle_R(triangles, first->point, emptyList, first->collinearPoints.front(), emptyList, second->point, emptyList);
+         EarClipper::AddTriangle_R(triangles, first->point, emptyList, first->collinearPoints.front(), emptyList, second->point, emptyList);
       }
       else if (second->collinearPoints.size() == 1)
       {
-         AddTriangle_R(triangles, first->point, emptyList, second->point, emptyList, second->collinearPoints.front(), emptyList);
+         EarClipper::AddTriangle_R(triangles, first->point, emptyList, second->point, emptyList, second->collinearPoints.front(), emptyList);
       }
    }
    else
    {
       assert( first->collinearPoints.size() == 2 );
             
-      AddTriangle_R(triangles, first->point, emptyList, first->collinearPoints.front(), emptyList, first->collinearPoints.back(), emptyList);
+      EarClipper::AddTriangle_R(triangles, first->point, emptyList, first->collinearPoints.front(), emptyList, first->collinearPoints.back(), emptyList);
    }
 }
 
-void AdjustForPossibleResultingCollinearity(VertexList& vertices, VertexListIteratorList& ears, VertexList::iterator& beforeEar, VertexList::iterator& afterEar)
+void EarClipper::AdjustForPossibleResultingCollinearity(VertexListIteratorList& ears, VertexList::iterator& beforeEar, VertexList::iterator& afterEar)
 {
    beforeEar->collinearPoints.clear();
 
@@ -647,7 +685,7 @@ void AdjustForPossibleResultingCollinearity(VertexList& vertices, VertexListIter
 }
 
 //{CodeReview:Triangulation}
-void InternalTriangulate_R(VertexList& vertices, VertexListIteratorList& ears, PolygonWinding winding, std::vector<const Vector2*>& triangles)
+void EarClipper::Triangulate_R(VertexListIteratorList& ears, std::vector<const Vector2*>& triangles)
 {
    if (vertices.size() == 3)
    {
@@ -655,7 +693,7 @@ void InternalTriangulate_R(VertexList& vertices, VertexListIteratorList& ears, P
    }
    else if (vertices.size() < 3)
    {
-      AddRemainingTriangles(triangles, vertices);
+      AddRemainingTriangles(triangles);
    }
    else
    {
@@ -671,15 +709,13 @@ void InternalTriangulate_R(VertexList& vertices, VertexListIteratorList& ears, P
 
       vertices.erase(ear);
 
-      ReclassifyVertex(vertices, firstAdjacent, winding, ears);
-      ReclassifyVertex(vertices, secondAdjacent, winding, ears);
+      ReclassifyVertex(firstAdjacent, ears);
+      ReclassifyVertex(secondAdjacent, ears);
 
-      AdjustForPossibleResultingCollinearity(vertices, ears, firstAdjacent, secondAdjacent);
+      AdjustForPossibleResultingCollinearity(ears, firstAdjacent, secondAdjacent);
 
-      InternalTriangulate_R(vertices, ears, winding, triangles);
+      Triangulate_R(ears, triangles);
    }
-}
-
 }
 
 }
