@@ -71,7 +71,7 @@ float Vector2::angleBetweenRadians(const Vector2& v) const
 {
    float denominator = norm() * v.norm();
 
-   if (Float::FNotZero<float>(denominator))
+   if (Float::NotZero<float>(denominator))
    {
       return acos( dot(v) / denominator );
    }
@@ -90,13 +90,13 @@ float Vector2::AngleWithXAxisRadians(float x, float y)
 {
    float angle = 0.0f;
       
-   if (Float::FEqual<float>(x, 0.0f))
+   if (Float::Equal<float>(x, 0.0f))
    {
-      if (Float::FEqual<float>(y, 0.0f))
+      if (Float::Equal<float>(y, 0.0f))
       {
          angle = 0.0f;
       }
-      else if (Float::FGreater<float>(y, 0.0f))
+      else if (Float::Greater<float>(y, 0.0f))
       {
          angle = PI/2;
       }
@@ -109,17 +109,17 @@ float Vector2::AngleWithXAxisRadians(float x, float y)
    {
       angle = atan(abs(y/x));
 
-      if (Float::FLessOrEqual<float>(x, 0.0f) && Float::FGreaterOrEqual<float>(y, 0.0f))
+      if (Float::LessOrEqual<float>(x, 0.0f) && Float::GreaterOrEqual<float>(y, 0.0f))
       {
          //second quadrant
          angle = PI - angle;
       }
-      else if (Float::FLessOrEqual<float>(x, 0.0f) && Float::FLess<float>(y, 0.0f))
+      else if (Float::LessOrEqual<float>(x, 0.0f) && Float::Less<float>(y, 0.0f))
       {
          //third quadrant
          angle = PI + angle;
       }
-      else if (Float::FGreater<float>(x, 0.0f)  && Float::FLess<float>(y, 0.0f))
+      else if (Float::Greater<float>(x, 0.0f)  && Float::Less<float>(y, 0.0f))
       {
          //fourth quadrant
          angle = 2 * PI - angle;
@@ -176,7 +176,7 @@ float Vector2::dot(const Vector2& v) const
 
 bool Vector2::isOrthogonalTo(const Vector2& v) const
 {
-   return Float::FIsZero<float>( abs(dot(v)) );
+   return Float::IsZero<float>( abs(dot(v)) );
 }
 
 Vector3 Vector2::cross(const Vector2& v) const
@@ -187,7 +187,7 @@ Vector3 Vector2::cross(const Vector2& v) const
 bool Vector2::goesTheSameWayAs(const Vector2& other) const
 {
    //i.e. angle between this and other is less than 90 degrees
-   return Float::FGreater<float>(dot(other), 0.0f);
+   return Float::Greater<float>(dot(other), 0.0f);
 }
 
 bool Vector2::goesExactlyTheSameWayAs(const Vector2& other) const
@@ -197,7 +197,7 @@ bool Vector2::goesExactlyTheSameWayAs(const Vector2& other) const
 
 bool Vector2::ApproximatelyEqualTo(const Vector2& other, float toleranceFactor) const
 {
-   return ( Float::FEqual<float>(x, other.x, toleranceFactor) && Float::FEqual<float>(y, other.y, toleranceFactor) );
+   return ( Float::Equal<float>(x, other.x, toleranceFactor) && Float::Equal<float>(y, other.y, toleranceFactor) );
 }
 
 bool Vector2::PreciselyEqualTo(const Vector2& other) const

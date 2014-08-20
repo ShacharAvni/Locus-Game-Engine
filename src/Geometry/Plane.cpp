@@ -78,7 +78,7 @@ float Plane::distanceTo(const Vector3& v) const
 
 bool Plane::pointIsOnPlane(const Vector3& p) const
 {
-   return Float::FIsZero<float>( signedDistanceTo(p) );
+   return Float::IsZero<float>( signedDistanceTo(p) );
 }
 
 Vector3 Plane::getProjection(const Vector3& p) const
@@ -91,13 +91,13 @@ bool Plane::intersectsLineAtOnePoint(const Line3D_t& line, float& s) const
 {
    float denominator = N.dot(line.V);
 
-   if (Float::FNotZero<float>(denominator))
+   if (Float::NotZero<float>(denominator))
    {
       s = N.dot(P - line.P)/denominator;
 
       if (line.isRay)
       {
-         return Float::FGreaterOrEqual<float>(s, 0.0f);
+         return Float::GreaterOrEqual<float>(s, 0.0f);
       }
       else
       {
@@ -128,7 +128,7 @@ Plane::IntersectionQuery Plane::getLineSegmentIntersection(const LineSegment3D_t
 
    if (intersectsLineAtOnePoint(line, s))
    {
-      if (Float::FGreaterOrEqual<float>(s, 0.0f) && Float::FLessOrEqual<float>(s, 1.0f))
+      if (Float::GreaterOrEqual<float>(s, 0.0f) && Float::LessOrEqual<float>(s, 1.0f))
       {
          intersectionPoint = line.GetPointOnLine(s);
          return IntersectionQuery::Intersects;
@@ -176,7 +176,7 @@ Plane::IntersectionQuery Plane::triangleIntersectionTest(const Triangle3D_t& tri
    {
       float distance = signedDistanceTo(triangle[pointIndex]);
 
-      if (Float::FGreater<float>(distance, 0.0f))
+      if (Float::Greater<float>(distance, 0.0f))
       {
          allOnNegativeSide = false;
          if (!allOnPositiveSide)
@@ -184,7 +184,7 @@ Plane::IntersectionQuery Plane::triangleIntersectionTest(const Triangle3D_t& tri
             return IntersectionQuery::None;
          }
       }
-      else if (Float::FLess<float>(distance, 0.0f))
+      else if (Float::Less<float>(distance, 0.0f))
       {
          allOnPositiveSide = false;
          if (!allOnNegativeSide)
@@ -249,13 +249,13 @@ IntersectionType Plane::getPlaneIntersection(const Plane& otherPlane, Vector3& p
 
       float denominator = (otherPlane.N.y * N.x - otherPlane.N.x * N.y);
 
-      if (Float::FNotZero<float>(denominator))
+      if (Float::NotZero<float>(denominator))
       {
          pointOnLine.z = 0.0f;
 
          pointOnLine.y = (D2 * N.x - D1 * otherPlane.N.x) / denominator;
 
-         if (Float::FIsZero<float>(N.x))
+         if (Float::IsZero<float>(N.x))
          {
             //there are infinite possibilities for x in this case
             pointOnLine.x = 0.0f;
@@ -275,13 +275,13 @@ IntersectionType Plane::getPlaneIntersection(const Plane& otherPlane, Vector3& p
 
          denominator = (otherPlane.N.z * N.x - otherPlane.N.x * N.z);
 
-         if (Float::FNotZero<float>(denominator))
+         if (Float::NotZero<float>(denominator))
          {
             pointOnLine.y = 0.0f;
 
             pointOnLine.z = (D2 * N.x - otherPlane.N.x * D1) / denominator;
 
-            if (Float::FIsZero<float>(N.x))
+            if (Float::IsZero<float>(N.x))
             {
                //there are infinite possibilities for x in this case
                pointOnLine.x = 0.0f;
@@ -310,7 +310,7 @@ IntersectionType Plane::getPlaneIntersection(const Plane& otherPlane, Vector3& p
 
             pointOnLine.z = (D2 * N.y - otherPlane.N.y * D1) / denominator;
 
-            if (Float::FIsZero<float>(N.y))
+            if (Float::IsZero<float>(N.y))
             {
                //there are infinite possibilities for y in this case
                pointOnLine.y = 0.0f;

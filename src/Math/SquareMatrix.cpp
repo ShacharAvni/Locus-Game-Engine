@@ -174,7 +174,7 @@ bool SquareMatrix<ScalarType>::IsDiagonal() const
       {
          if (row != col)
          {
-            if (Float::FNotZero<ScalarType>(this->At(row, col)))
+            if (Float::NotZero<ScalarType>(this->At(row, col)))
             {
                return false;
             }
@@ -214,7 +214,7 @@ ScalarType SquareMatrix<ScalarType>::Determinant() const
 template <typename ScalarType>
 bool SquareMatrix<ScalarType>::IsInvertible() const
 {
-   return Float::FNotZero<ScalarType>(Determinant());
+   return Float::NotZero<ScalarType>(Determinant());
 }
 
 template <typename ScalarType>
@@ -247,7 +247,7 @@ bool SquareMatrix<ScalarType>::Invert()
 
    for (unsigned int col = 0; col < this->Columns; ++col)
    {
-      if (Float::FNotEqual<ScalarType>(augmentedMatrix(col, col), 1, Float::STANDARD_TOLERANCE))
+      if (Float::NotEqual<ScalarType>(augmentedMatrix(col, col), 1))
       {
          return false;
       }
@@ -397,7 +397,7 @@ bool SquareMatrix<ScalarType>::SolveEigenvectors(std::vector<std::vector<ScalarT
          {
             if (augmentedMatrix.IsRowAllZero(row, numColumnsInAugmentedMatrix - 2))
             {
-               if (Float::FNotZero<ScalarType>(augmentedMatrix(row, numColumnsInAugmentedMatrix - 1)))
+               if (Float::NotZero<ScalarType>(augmentedMatrix(row, numColumnsInAugmentedMatrix - 1)))
                {
                   //Here we have zero = (something not zero) so we have no solutions
                   return false;

@@ -51,7 +51,7 @@ void Polynomial<ScalarType>::ForceDegree(unsigned int newDegree)
 {
    values.resize(newDegree + 1);
 
-   if (Float::FIsZero<ScalarType>(values[newDegree]))
+   if (Float::IsZero<ScalarType>(values[newDegree]))
    {
       values[newDegree] = 1;
    }
@@ -64,7 +64,7 @@ bool Polynomial<ScalarType>::IsNull() const
 {
    for (unsigned int termIndex = 0; termIndex < degree + 1; ++termIndex)
    {
-      if (Float::FNotZero<ScalarType>(values[termIndex]))
+      if (Float::NotZero<ScalarType>(values[termIndex]))
       {
          return false;
       }
@@ -157,7 +157,7 @@ bool Polynomial<ScalarType>::Solve(std::vector<ScalarType>& roots) const
 
       for (const std::complex<ScalarType>& potentiallyComplexRoot : potentiallyComplexRoots)
       {
-         if (Float::FIsZero<ScalarType>(potentiallyComplexRoot.imag()))
+         if (IsReal(potentiallyComplexRoot))
          {
             roots.push_back(potentiallyComplexRoot.real());
          }
@@ -188,7 +188,7 @@ const std::array<std::complex<ScalarType>, 3>& Polynomial<ScalarType>::CubicRoot
 template <typename ScalarType>
 bool Polynomial<ScalarType>::SolveLinear(std::vector<std::complex<ScalarType>>& roots) const
 {
-   if (Float::FIsZero(values[1]))
+   if (Float::IsZero(values[1]))
    {
       return false;
    }
@@ -203,7 +203,7 @@ bool Polynomial<ScalarType>::SolveLinear(std::vector<std::complex<ScalarType>>& 
 template <typename ScalarType>
 bool Polynomial<ScalarType>::SolveQuadratic(std::vector<std::complex<ScalarType>>& roots) const
 {
-   if (Float::FIsZero(values[2]))
+   if (Float::IsZero(values[2]))
    {
       return SolveLinear(roots);
    }
@@ -236,7 +236,7 @@ bool Polynomial<ScalarType>::SolveQuadratic(std::vector<std::complex<ScalarType>
 template <typename ScalarType>
 bool Polynomial<ScalarType>::SolveCubic(std::vector<std::complex<ScalarType>>& roots) const
 {
-   if (Float::FIsZero(values[3]))
+   if (Float::IsZero(values[3]))
    {
       return SolveQuadratic(roots);
    }
@@ -282,7 +282,7 @@ bool Polynomial<ScalarType>::SolveCubic(std::vector<std::complex<ScalarType>>& r
 template <typename ScalarType>
 bool Polynomial<ScalarType>::SolveQuartic(std::vector<std::complex<ScalarType>>& roots) const
 {
-   if (Float::FIsZero(values[4]))
+   if (Float::IsZero(values[4]))
    {
       return SolveCubic(roots);
    }
@@ -299,11 +299,11 @@ bool Polynomial<ScalarType>::SolveQuartic(std::vector<std::complex<ScalarType>>&
 
    std::complex<ScalarType> Q;
 
-   if (Float::FNotZero<ScalarType>(discriminant) && Float::FIsZero<ScalarType>(D0))
+   if (Float::NotZero<ScalarType>(discriminant) && Float::IsZero<ScalarType>(D0))
    {
       Q = D1;
    }
-   else if (Float::FIsZero<ScalarType>(discriminant) && Float::FIsZero<ScalarType>(D0))
+   else if (Float::IsZero<ScalarType>(discriminant) && Float::IsZero<ScalarType>(D0))
    {
       Q = 0;
    }
@@ -359,7 +359,7 @@ bool Polynomial<ScalarType>::SolveForSInQuarticFormula(ScalarType a, ScalarType 
 {
    const ScalarType minusTwoThirdsP = ((-2 * p) / 3);
 
-   if (Float::IsZero(Q))
+   if (IsZero(Q))
    {
       const ScalarType halfSqrtOfAbsMinusTwoThirdsP = (static_cast<ScalarType>(0.5) * std::sqrt(std::abs(minusTwoThirdsP)));
 
@@ -378,20 +378,20 @@ bool Polynomial<ScalarType>::SolveForSInQuarticFormula(ScalarType a, ScalarType 
 
       const ScalarType oneOverThreeA = (1 / (3 * a));
 
-      for (unsigned int rootIndex = 0; rootIndex < 3; ++rootIndex)
+      for (const std::complex<ScalarType>& rootOfUnity : cubicRootsOfUnity)
       {
-         std::complex<ScalarType> QTimesRootOfUnity = (Q * cubicRootsOfUnity[rootIndex]);
+         std::complex<ScalarType> QTimesRootOfUnity = (Q * rootOfUnity);
 
          S = std::sqrt( minusTwoThirdsP + oneOverThreeA * (QTimesRootOfUnity + (D0 / QTimesRootOfUnity)) ) * static_cast<ScalarType>(0.5);
 
-         if (Float::NotZero(S))
+         if (NotZero(S))
          {
             return true;
          }
       }
    }
 
-   return Float::NotZero(S);
+   return NotZero(S);
 }
 
 //{CodeReview:NewtonsMethod}
@@ -424,7 +424,7 @@ bool Polynomial<ScalarType>::SolveWithNewtonsMethod(std::vector<ScalarType>& roo
          ScalarType thisCriticalPointValue = ValueAt(criticalPoints[criticalPointIndex]);
 
          if ( ((lastCriticalPointValue > 0) && (thisCriticalPointValue < 0)) ||
-               ((lastCriticalPointValue < 0) && (thisCriticalPointValue > 0)) )
+              ((lastCriticalPointValue < 0) && (thisCriticalPointValue > 0)) )
          {
             startingPoints.push_back( (criticalPoints[criticalPointIndex - 1] + criticalPoints[criticalPointIndex]) / 2 );
          }
@@ -465,7 +465,7 @@ bool Polynomial<ScalarType>::SolveWithNewtonsMethod(std::vector<ScalarType>& roo
          value = ValueAt(x);
       } while (Float::NotZero(value) && (iterations < Max_Iterations));
 
-      if (Float::Equal<ScalarType>(value, 0, 100 * Float::STANDARD_TOLERANCE))
+      if (Float::IsZero<ScalarType>(value, 100 * Float::DEFAULT_TOLERANCE))
       {
          roots.push_back(x);
       }

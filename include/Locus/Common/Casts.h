@@ -65,6 +65,7 @@ void LossyCastAssertHelper(From valueToCast, std::true_type, std::true_type)
 
 #endif
 
+/// Cast from one integral type to another, asserting when data is lost.
 template <typename From, typename To>
 To LossyCast(From valueToCast)
 {
@@ -77,4 +78,4 @@ To LossyCast(From valueToCast)
    return static_cast<To>(valueToCast);
 }
 
-}
+} // namespace Locus

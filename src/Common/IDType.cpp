@@ -8,15 +8,11 @@
 *                                                                                                        *
 \********************************************************************************************************/
 
-#include "Locus/Common/IDGenerator.h"
+#include "Locus/Common/IDType.h"
 
 namespace Locus
 {
 
 const ID_t BAD_ID = 0;
-
-IDGenerator::~IDGenerator()
-{
-}
 
 }

@@ -15,6 +15,12 @@
 namespace Locus
 {
 
+/*!
+ * \brief Wrapper around a std::list<T> with iterators enhanced with previous() and next() methods
+ * that wrap around the list.
+ *
+ * All methods wrap the same-named method of std::list<T>.
+ */
 template <class T, class Allocator = std::allocator<T>>
 class CircularList
 {
@@ -147,6 +153,7 @@ private:
    };
 
 public:
+   /// Analogous to std::list<T>::iterator but enhanced with previous() and next() methods that wrap around the list.
    class iterator : public iterator_base<typename mylist_t::iterator, T, mylist_t*>
    {
       friend class CircularList;
@@ -158,6 +165,7 @@ public:
 
    };
 
+   /// Analogous to std::list<T>::const_iterator but enhanced with previous() and next() methods that wrap around the list.
    class const_iterator : public iterator_base<typename mylist_t::const_iterator, const T, const mylist_t*>
    {
       friend class CircularList;
@@ -173,6 +181,7 @@ public:
 
    };
 
+   /// Analogous to std::list<T>::reverse_iterator but enhanced with previous() and next() methods that wrap around the list.
    class reverse_iterator : public iterator_base<typename mylist_t::reverse_iterator, T, mylist_t*>
    {
       friend class CircularList;
@@ -184,6 +193,7 @@ public:
 
    };
 
+   /// Analogous to std::list<T>::const_reverse_iterator but enhanced with previous() and next() methods that wrap around the list.
    class const_reverse_iterator : public iterator_base<typename mylist_t::const_reverse_iterator, const T, const mylist_t*>
    {
       friend class CircularList;
@@ -538,7 +548,7 @@ bool operator >=(CircularList<T, Allocator>& lhs, CircularList<T, Allocator>& rh
    return lhs.innerList >= rhs.innerList;
 }
 
-}
+} // namespace Locus
 
 namespace std
 {

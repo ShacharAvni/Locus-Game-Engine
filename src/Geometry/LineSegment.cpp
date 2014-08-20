@@ -67,7 +67,7 @@ bool LineSegment<PointType>::PointIsOnLineSegment(const PointType& checkPoint, f
       segmentVector /= norm;
 
       float dot = checkVector.dot(segmentVector);
-      return Float::FGreaterOrEqual<float>(dot, 0.0f, toleranceFactor) && Float::FLessOrEqual<float>(dot, norm, toleranceFactor);
+      return Float::GreaterOrEqual<float>(dot, 0.0f, toleranceFactor) && Float::LessOrEqual<float>(dot, norm, toleranceFactor);
    }
    else
    {
@@ -94,7 +94,7 @@ IntersectionType LineSegment<PointType>::GetCollinearLineSegmentIntersection(con
 
    PointType lineSegment2Points[2] = {otherLineSegment.P1, otherLineSegment.P2};
 
-   if (Float::FGreater<float>(line2Projections[0], line2Projections[1]))
+   if (Float::Greater<float>(line2Projections[0], line2Projections[1]))
    {
       //other line segment is ordered in the opposite direction as this line segment
 
@@ -102,15 +102,15 @@ IntersectionType LineSegment<PointType>::GetCollinearLineSegmentIntersection(con
       std::swap(lineSegment2Points[0], lineSegment2Points[1]);
    }
 
-   if (Float::FLess<float>(line2Projections[1], projP1Line1) || Float::FGreater<float>(line2Projections[0], projP2Line1))
+   if (Float::Less<float>(line2Projections[1], projP1Line1) || Float::Greater<float>(line2Projections[0], projP2Line1))
    {
       return IntersectionType::None;
    }
    else
    {
-      if (Float::FLess<float>(line2Projections[0], projP1Line1))
+      if (Float::Less<float>(line2Projections[0], projP1Line1))
       {
-         if (Float::FLessOrEqual<float>(line2Projections[1], projP2Line1))
+         if (Float::LessOrEqual<float>(line2Projections[1], projP2Line1))
          {
             pIntersection1 = P1;
             pIntersection2 = lineSegment2Points[1];
@@ -125,7 +125,7 @@ IntersectionType LineSegment<PointType>::GetCollinearLineSegmentIntersection(con
       {
          pIntersection1 = lineSegment2Points[0];
 
-         if (Float::FLessOrEqual<float>(line2Projections[1], projP2Line1))
+         if (Float::LessOrEqual<float>(line2Projections[1], projP2Line1))
          {
             pIntersection2 = lineSegment2Points[1];
          }
@@ -161,8 +161,8 @@ bool LineSegment<PointType>::GetCollinearLineSegmentIntersection(const LineSegme
    float projP1Line2 = (otherLineSegment.P1 - P1).dot(normVector);
    float projP2Line2 = (otherLineSegment.P2 - P1).dot(normVector);
 
-   return ( (Float::FGreaterOrEqual<float>(projP1Line2, 0.0f) && Float::FLessOrEqual<float>(projP1Line2, projP2Line1)) ||
-            (Float::FGreaterOrEqual<float>(projP2Line2, 0.0f) && Float::FLessOrEqual<float>(projP2Line2, projP2Line1)) );
+   return ( (Float::GreaterOrEqual<float>(projP1Line2, 0.0f) && Float::LessOrEqual<float>(projP1Line2, projP2Line1)) ||
+            (Float::GreaterOrEqual<float>(projP2Line2, 0.0f) && Float::LessOrEqual<float>(projP2Line2, projP2Line1)) );
 }
 
 template <class PointType>

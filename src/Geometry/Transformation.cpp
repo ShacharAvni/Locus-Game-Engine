@@ -94,9 +94,9 @@ Transformation Transformation::ZRotation(float radians)
 Transformation Transformation::Scale(const Vector3& scale)
 {
    //scale vectors can't have zeroes
-   Vector3 properScale(Float::FIsZero<float>(scale.x) ? 1.0f : scale.x,
-                        Float::FIsZero<float>(scale.y) ? 1.0f : scale.y,
-                        Float::FIsZero<float>(scale.z) ? 1.0f : scale.z);
+   Vector3 properScale(Float::IsZero<float>(scale.x) ? 1.0f : scale.x,
+                        Float::IsZero<float>(scale.y) ? 1.0f : scale.y,
+                        Float::IsZero<float>(scale.z) ? 1.0f : scale.z);
 
    return Transformation(properScale.x,               0,               0,        0,
                                      0,   properScale.y,               0,        0,
@@ -156,18 +156,18 @@ void Transformation::InverseTranslateBy(const Vector3& t)
 
 void Transformation::RotateBy(const Vector3& rotation)
 {
-   if (!Float::FIsZero<float>(rotation.y)) MultMatrix( Transformation::YRotation(rotation.y) );
-   if (!Float::FIsZero<float>(rotation.x)) MultMatrix( Transformation::XRotation(rotation.x) );
-   if (!Float::FIsZero<float>(rotation.z)) MultMatrix( Transformation::ZRotation(rotation.z) );
+   if (!Float::IsZero<float>(rotation.y)) MultMatrix( Transformation::YRotation(rotation.y) );
+   if (!Float::IsZero<float>(rotation.x)) MultMatrix( Transformation::XRotation(rotation.x) );
+   if (!Float::IsZero<float>(rotation.z)) MultMatrix( Transformation::ZRotation(rotation.z) );
 }
 
 void Transformation::InverseRotateBy(const Vector3& rotation)
 {
    Transformation rotationInverseResult;
 
-   if (!Float::FIsZero<float>(rotation.z)) rotationInverseResult.MultMatrix( Transformation::ZRotation(-rotation.z) );
-   if (!Float::FIsZero<float>(rotation.x)) rotationInverseResult.MultMatrix( Transformation::XRotation(-rotation.x) );
-   if (!Float::FIsZero<float>(rotation.y)) rotationInverseResult.MultMatrix( Transformation::YRotation(-rotation.y) );
+   if (!Float::IsZero<float>(rotation.z)) rotationInverseResult.MultMatrix( Transformation::ZRotation(-rotation.z) );
+   if (!Float::IsZero<float>(rotation.x)) rotationInverseResult.MultMatrix( Transformation::XRotation(-rotation.x) );
+   if (!Float::IsZero<float>(rotation.y)) rotationInverseResult.MultMatrix( Transformation::YRotation(-rotation.y) );
 
    rotationInverseResult.MultMatrix(*this);
 
@@ -181,9 +181,9 @@ void Transformation::ScaleBy(const Vector3& scale)
 
 void Transformation::InverseScaleBy(const Vector3& scale)
 {
-   Transformation scaleInverseResult = Transformation::Scale( Vector3(Float::FIsZero<float>(scale.x) ? 1.0f : 1/scale.x,
-                                                                       Float::FIsZero<float>(scale.y) ? 1.0f : 1/scale.y,
-                                                                       Float::FIsZero<float>(scale.z) ? 1.0f : 1/scale.z) );
+   Transformation scaleInverseResult = Transformation::Scale( Vector3(Float::IsZero<float>(scale.x) ? 1.0f : 1/scale.x,
+                                                                       Float::IsZero<float>(scale.y) ? 1.0f : 1/scale.y,
+                                                                       Float::IsZero<float>(scale.z) ? 1.0f : 1/scale.z) );
 
    scaleInverseResult.MultMatrix(*this);
 

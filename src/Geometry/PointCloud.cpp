@@ -123,7 +123,7 @@ void PointCloud::UpdateMaxDistanceToCenter()
       Vector3 worldVertex = modelTransformation.MultVertex(vertexPosition);
       float distance = (worldVertex - centroid).norm();
 
-      if (Float::FGreater<float>(distance, maxDistanceToCenter))
+      if (Float::Greater<float>(distance, maxDistanceToCenter))
       {
          maxDistanceToCenter = distance;
       }

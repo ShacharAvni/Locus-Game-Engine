@@ -11,7 +11,7 @@
 #pragma once
 
 #include "LocusCommonAPI.h"
-#include "IDGenerator.h"
+#include "IDType.h"
 
 #include <mutex>
 
@@ -20,13 +20,13 @@ namespace Locus
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
-class LOCUS_COMMON_API SequentialIDGenerator : public IDGenerator
+class LOCUS_COMMON_API SequentialIDGenerator
 {
 public:
    SequentialIDGenerator();
 
-   virtual ID_t NextID();
-   virtual void Reset();
+   ID_t NextID();
+   void Reset();
 
 private:
    ID_t nextID;

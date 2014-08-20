@@ -41,12 +41,12 @@ struct CollisionInterval
 
    bool Intersects(const CollisionInterval& other) const
    {
-      return(!(Float::FGreater<float>(min, other.max) || Float::FLess<float>(max, other.min)));
+      return(! (Float::Greater<float>(min, other.max) || Float::Less<float>(max, other.min)) );
    }
 
    bool operator <(const CollisionInterval& other) const
    {
-      return Float::FLess<float>(min, other.min);
+      return Float::Less<float>(min, other.min);
    }
 
    Collidable* owner;

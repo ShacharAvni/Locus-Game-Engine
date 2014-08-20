@@ -53,7 +53,7 @@ PointType Line<PointType>::GetPointOnLine(float s) const
 {
    if (isRay)
    {
-      if (Float::FLess<float>(s, 0.0f))
+      if (Float::Less<float>(s, 0.0f))
       {
          return P;
       }
@@ -69,7 +69,7 @@ bool Line<PointType>::IsPointOnLine(const PointType& checkPoint, float tolerance
 
    if (isRay)
    {
-      isOnLine = isOnLine && Float::FGreaterOrEqual<float>( (checkPoint - P).dot(V), 0.0f, toleranceFactor );
+      isOnLine = isOnLine && Float::GreaterOrEqual<float>( (checkPoint - P).dot(V), 0.0f, toleranceFactor );
    }
 
    return isOnLine;
@@ -103,7 +103,7 @@ IntersectionType Line<Vector3>::GetLineIntersection(const Line<Vector3>& otherLi
    Vector3 closestPointOnThisLine = P + ( (b * e - c * d) / ACMinusBSquared ) * V;
    Vector3 closestPointOnOtherLine = otherLine.P + ( (a * e - b * d) / ACMinusBSquared ) * otherLine.V;
 
-   if (Float::FEqual<float>(closestPointOnThisLine.distanceTo(closestPointOnOtherLine), 0.0f, toleranceFactor))
+   if (Float::Equal<float>(closestPointOnThisLine.distanceTo(closestPointOnOtherLine), 0.0f, toleranceFactor))
    {
       if (isRay || otherLine.isRay)
       {

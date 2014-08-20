@@ -169,7 +169,7 @@ Mesh MeshUtility::MakeSphere(float radius, unsigned int subdivisions)
       {
          for (std::size_t i = 0; i < Triangle3D_t::NumPointsOnATriangle; ++i)
          {
-            if (Float::FEqual<float>(triangleOnSphere[i].textureCoordinate.x, 1.0f))
+            if (Float::Equal<float>(triangleOnSphere[i].textureCoordinate.x, 1.0f))
             {
                triangleOnSphere[i].textureCoordinate.x = 0.0f;
             }

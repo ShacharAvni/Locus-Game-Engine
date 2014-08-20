@@ -50,7 +50,7 @@ bool Frustum::Within(const Vector3& point) const
 {
    for (const Plane& plane : planes)
    {
-      if (Float::FLess<float>(plane.signedDistanceTo(point), 0.0f))
+      if (Float::Less<float>(plane.signedDistanceTo(point), 0.0f))
       {
          //point is on the negative side of one of the planes
          //therefore, it must be outside the frustum
@@ -69,7 +69,7 @@ bool Frustum::Within(const Vector3& centerOfSphere, float sphereRadius) const
    {
       float signedDistance = plane.signedDistanceTo(centerOfSphere);
 
-      if (Float::FLess<float>(signedDistance, 0.0f))
+      if (Float::Less<float>(signedDistance, 0.0f))
       {
          //since the Frustum's planes normals are normalized, the squared distance
          //is the same as the squared signed distance
