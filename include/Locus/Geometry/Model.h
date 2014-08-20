@@ -232,11 +232,11 @@ public:
    {
       PointCloud::Clear();
 
-      Util::ClearAndShrink(faces);
+      ClearAndShrink(faces);
 
       edgeIndexMap.clear();
 
-      Util::ClearAndShrink(edgeAdjacency);
+      ClearAndShrink(edgeAdjacency);
 
       numTotalVertices = 0;
    }
@@ -633,8 +633,10 @@ protected:
 
    bool IsDegenerateFace(const face_t& face)
    {
-      return ( (face[0].positionID == face[1].positionID) || (face[0].positionID == face[2].positionID) || (face[1].positionID == face[2].positionID) || 
-               !Triangle3D_t::IsValidTriangle(positions[face[0].positionID], positions[face[1].positionID], positions[face[2].positionID], Float::NO_TOLERANCE) );
+      return ( (face[0].positionID == face[1].positionID) ||
+               (face[0].positionID == face[2].positionID) ||
+               (face[1].positionID == face[2].positionID) ||
+               !Triangle3D_t::IsValidTriangle(positions[face[0].positionID], positions[face[1].positionID], positions[face[2].positionID], NO_TOLERANCE) );
    }
 
    virtual void Construct(const std::vector<std::vector<VertexType>>& faceTriangles, std::vector<std::size_t>* degenerateFaceIndices = nullptr)
@@ -664,7 +666,7 @@ protected:
 
       //NOTE: may cause degenerate faces
       std::vector<std::size_t> sortedPositionIndices;
-      Util::GetUniqueItems<Vector3>(vertPositions, positions, sortedPositionIndices);
+      GetUniqueItems<Vector3>(vertPositions, positions, sortedPositionIndices);
 
       //construct faces
       std::size_t numDegenerateFaces = 0;

@@ -51,7 +51,7 @@ void Polynomial<ScalarType>::ForceDegree(unsigned int newDegree)
 {
    values.resize(newDegree + 1);
 
-   if (Float::IsZero<ScalarType>(values[newDegree]))
+   if (FIsZero<ScalarType>(values[newDegree]))
    {
       values[newDegree] = 1;
    }
@@ -64,7 +64,7 @@ bool Polynomial<ScalarType>::IsNull() const
 {
    for (unsigned int termIndex = 0; termIndex < degree + 1; ++termIndex)
    {
-      if (Float::NotZero<ScalarType>(values[termIndex]))
+      if (FNotZero<ScalarType>(values[termIndex]))
       {
          return false;
       }
@@ -188,7 +188,7 @@ const std::array<std::complex<ScalarType>, 3>& Polynomial<ScalarType>::CubicRoot
 template <typename ScalarType>
 bool Polynomial<ScalarType>::SolveLinear(std::vector<std::complex<ScalarType>>& roots) const
 {
-   if (Float::IsZero(values[1]))
+   if (FIsZero(values[1]))
    {
       return false;
    }
@@ -203,7 +203,7 @@ bool Polynomial<ScalarType>::SolveLinear(std::vector<std::complex<ScalarType>>& 
 template <typename ScalarType>
 bool Polynomial<ScalarType>::SolveQuadratic(std::vector<std::complex<ScalarType>>& roots) const
 {
-   if (Float::IsZero(values[2]))
+   if (FIsZero(values[2]))
    {
       return SolveLinear(roots);
    }
@@ -236,7 +236,7 @@ bool Polynomial<ScalarType>::SolveQuadratic(std::vector<std::complex<ScalarType>
 template <typename ScalarType>
 bool Polynomial<ScalarType>::SolveCubic(std::vector<std::complex<ScalarType>>& roots) const
 {
-   if (Float::IsZero(values[3]))
+   if (FIsZero(values[3]))
    {
       return SolveQuadratic(roots);
    }
@@ -282,7 +282,7 @@ bool Polynomial<ScalarType>::SolveCubic(std::vector<std::complex<ScalarType>>& r
 template <typename ScalarType>
 bool Polynomial<ScalarType>::SolveQuartic(std::vector<std::complex<ScalarType>>& roots) const
 {
-   if (Float::IsZero(values[4]))
+   if (FIsZero(values[4]))
    {
       return SolveCubic(roots);
    }
@@ -299,11 +299,11 @@ bool Polynomial<ScalarType>::SolveQuartic(std::vector<std::complex<ScalarType>>&
 
    std::complex<ScalarType> Q;
 
-   if (Float::NotZero<ScalarType>(discriminant) && Float::IsZero<ScalarType>(D0))
+   if (FNotZero<ScalarType>(discriminant) && FIsZero<ScalarType>(D0))
    {
       Q = D1;
    }
-   else if (Float::IsZero<ScalarType>(discriminant) && Float::IsZero<ScalarType>(D0))
+   else if (FIsZero<ScalarType>(discriminant) && FIsZero<ScalarType>(D0))
    {
       Q = 0;
    }
@@ -416,7 +416,7 @@ bool Polynomial<ScalarType>::SolveWithNewtonsMethod(std::vector<ScalarType>& roo
 
       startingPoints.reserve(numCriticalPoints);
 
-      startingPoints.push_back(criticalPoints[0] - (Float::FLOAT_BASE_TOLERANCE * 3));
+      startingPoints.push_back(criticalPoints[0] - (FLOAT_BASE_TOLERANCE * 3));
 
       for (std::size_t criticalPointIndex = 1; criticalPointIndex < numCriticalPoints; ++criticalPointIndex)
       {
@@ -430,7 +430,7 @@ bool Polynomial<ScalarType>::SolveWithNewtonsMethod(std::vector<ScalarType>& roo
          }
       }
 
-      startingPoints.push_back(criticalPoints[numCriticalPoints - 1] + (Float::FLOAT_BASE_TOLERANCE * 3));
+      startingPoints.push_back(criticalPoints[numCriticalPoints - 1] + (FLOAT_BASE_TOLERANCE * 3));
    }
    else
    {
@@ -455,7 +455,7 @@ bool Polynomial<ScalarType>::SolveWithNewtonsMethod(std::vector<ScalarType>& roo
 
          ScalarType derivativeValue = derivative.ValueAt(x);
 
-         if (Float::IsZero(derivativeValue))
+         if (FIsZero(derivativeValue))
          {
             break;
          }
@@ -463,9 +463,9 @@ bool Polynomial<ScalarType>::SolveWithNewtonsMethod(std::vector<ScalarType>& roo
          x = (x - (value / derivativeValue));
 
          value = ValueAt(x);
-      } while (Float::NotZero(value) && (iterations < Max_Iterations));
+      } while (FNotZero(value) && (iterations < Max_Iterations));
 
-      if (Float::IsZero<ScalarType>(value, 100 * Float::DEFAULT_TOLERANCE))
+      if (FIsZero<ScalarType>(value, 100 * DEFAULT_TOLERANCE))
       {
          roots.push_back(x);
       }

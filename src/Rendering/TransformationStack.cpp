@@ -29,9 +29,9 @@ TransformationStack::TransformationStack()
 
 void TransformationStack::Clear()
 {
-   Util::ClearStack(transformationStacks[ModelView]);
-   Util::ClearStack(transformationStacks[Projection]);
-   Util::ClearStack(transformationStacks[Texture]);
+   ClearStack(transformationStacks[ModelView]);
+   ClearStack(transformationStacks[Projection]);
+   ClearStack(transformationStacks[Texture]);
 
    transformationStacks[ModelView].push( Transformation::Identity() );
    transformationStacks[Projection].push( Transformation::Identity() );

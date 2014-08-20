@@ -161,7 +161,7 @@ void SceneManager::RunSimulation(std::unique_ptr<Scene> scene)
 
    window.StartPollingEvents();
 
-   Util::ClearStack(sceneStack);
+   ClearStack(sceneStack);
 }
 
 }

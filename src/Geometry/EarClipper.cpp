@@ -192,7 +192,7 @@ EarClipper::VertexList::iterator EarClipper::RayCastFromMaxInteriorPointToOuterP
 
          float distance = rayHitEndPointOfEdge ? (possibleMutuallyVisibleVertex->point->x - maxInteriorPoint.x) : (intersectionPoint1.x - maxInteriorPoint.x);
 
-         bool sameishDistance = Float::Equal(distance, minDistance);
+         bool sameishDistance = FEqual(distance, minDistance);
 
          if ((distance < minDistance) || sameishDistance)
          {

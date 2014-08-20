@@ -41,12 +41,12 @@ struct CollisionInterval
 
    bool Intersects(const CollisionInterval& other) const
    {
-      return(! (Float::Greater<float>(min, other.max) || Float::Less<float>(max, other.min)) );
+      return(! (FGreater<float>(min, other.max) || FLess<float>(max, other.min)) );
    }
 
    bool operator <(const CollisionInterval& other) const
    {
-      return Float::Less<float>(min, other.min);
+      return FLess<float>(min, other.min);
    }
 
    Collidable* owner;
@@ -160,7 +160,7 @@ void CollisionManager_Impl::UpdateCollisionCollections()
 //{CodeReview:BroadPhaseCollisions}
 void CollisionManager_Impl::UpdateCollisions(std::vector<CollisionInterval*>& sortedIntervals, const std::function<void(std::size_t, std::size_t, Collidable*, Collidable*)>& intervalIntersectionFunction)
 {
-   Util::InsertionSort<CollisionInterval*>(sortedIntervals, CollisionIntervalComparator());
+   InsertionSort<CollisionInterval*>(sortedIntervals, CollisionIntervalComparator());
 
    std::list<const CollisionInterval*> intervalCheckList;
 

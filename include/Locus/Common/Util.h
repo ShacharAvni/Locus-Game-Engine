@@ -19,10 +19,6 @@
 namespace Locus
 {
 
-/// Contains utility functions.
-namespace Util
-{
-
 /*!
  * \brief Get the unique items in a std::vector and an index mapping, given a comparator.
  *
@@ -153,7 +149,5 @@ void ClearStack(std::stack<T>& stack)
       stack.pop();
    }
 }
-
-} // namespace Util
 
 } // namespace Locus

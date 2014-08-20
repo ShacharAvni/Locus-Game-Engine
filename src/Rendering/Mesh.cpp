@@ -94,7 +94,7 @@ void Mesh::Construct(const std::vector<std::vector<MeshVertex>>& faceTriangles, 
 
    //get unique texture coordinates
    std::vector<std::size_t> sortedTexCoordIndices;
-   Util::GetUniqueItems<TextureCoordinate>(vertTexCoords, textureCoordinates, sortedTexCoordIndices);
+   GetUniqueItems<TextureCoordinate>(vertTexCoords, textureCoordinates, sortedTexCoordIndices);
 
    //fill faces
 
@@ -157,8 +157,8 @@ void Mesh::Clear()
 {
    Model::Clear();
 
-   Util::ClearAndShrink(normals);
-   Util::ClearAndShrink(textureCoordinates);
+   ClearAndShrink(normals);
+   ClearAndShrink(textureCoordinates);
 }
 
 void Mesh::SetGPUVertexAttributes(ShaderController& ShaderController) const

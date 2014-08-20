@@ -37,8 +37,8 @@ void ResolveCollision(float coefficientOfRestitution,
 
    //a) compute velocities at the point of contact
 
-   bool hasAngularComponent[2] = { ( Float::NotZero<float>(motionProperties1.speed) && (motionProperties1.rotation != Vector3::ZeroVector()) ),
-                                   ( Float::NotZero<float>(motionProperties2.speed) && (motionProperties2.rotation != Vector3::ZeroVector()) ) };
+   bool hasAngularComponent[2] = { ( FNotZero<float>(motionProperties1.speed) && (motionProperties1.rotation != Vector3::ZeroVector()) ),
+                                   ( FNotZero<float>(motionProperties2.speed) && (motionProperties2.rotation != Vector3::ZeroVector()) ) };
 
    Vector3 contactVectors[2] = { collisionPoint - boundingSpheres[0].center, collisionPoint - boundingSpheres[1].center };
 
@@ -47,7 +47,7 @@ void ResolveCollision(float coefficientOfRestitution,
    Vector3 angularVelocities[2] = { motionProperties1.rotation * motionProperties1.angularSpeed, motionProperties2.rotation * motionProperties2.angularSpeed};
 
    Vector3 contactVelocities[2] = { velocities[0] + (hasAngularComponent[0] ? angularVelocities[0].cross(contactVectors[0]) : Vector3::ZeroVector()),
-                                     velocities[1] + (hasAngularComponent[1] ? angularVelocities[1].cross(contactVectors[1]) : Vector3::ZeroVector()) };
+                                    velocities[1] + (hasAngularComponent[1] ? angularVelocities[1].cross(contactVectors[1]) : Vector3::ZeroVector()) };
 
    //b) compute inverses of inertia tensors
 
@@ -118,11 +118,11 @@ void ResolveCollision(float coefficientOfRestitution,
    motionProperties1.speed = motionProperties1.direction.norm();
 
 #ifdef CLAMP_RESOLVED_SPEEDS
-   if (Float::Greater<float>(motionProperties1.speed, maxSpeed))
+   if (FGreater<float>(motionProperties1.speed, maxSpeed))
    {
       motionProperties1.speed = maxSpeed;
    }
-   else if (Float::Less<float>(motionProperties1.speed, minSpeed))
+   else if (FLess<float>(motionProperties1.speed, minSpeed))
    {
       motionProperties1.speed = minSpeed;
    }
@@ -134,11 +134,11 @@ void ResolveCollision(float coefficientOfRestitution,
    motionProperties2.speed = motionProperties2.direction.norm();
 
 #ifdef CLAMP_RESOLVED_SPEEDS
-   if (Float::Greater<float>(motionProperties2.speed, maxSpeed))
+   if (FGreater<float>(motionProperties2.speed, maxSpeed))
    {
       motionProperties2.speed = maxSpeed;
    }
-   else if (Float::Less<float>(motionProperties2.speed, minSpeed))
+   else if (FLess<float>(motionProperties2.speed, minSpeed))
    {
       motionProperties2.speed = minSpeed;
    }
@@ -152,11 +152,11 @@ void ResolveCollision(float coefficientOfRestitution,
    motionProperties1.angularSpeed = motionProperties1.rotation.norm();
  
 #ifdef CLAMP_RESOLVED_SPEEDS
-   if (Float::Greater<float>(motionProperties1.angularSpeed, maxRotationSpeed))
+   if (FGreater<float>(motionProperties1.angularSpeed, maxRotationSpeed))
    {
       motionProperties1.angularSpeed = maxRotationSpeed;
    }
-   else if (Float::Less<float>(motionProperties1.angularSpeed, minRotationSpeed))
+   else if (FLess<float>(motionProperties1.angularSpeed, minRotationSpeed))
    {
       motionProperties1.angularSpeed = minRotationSpeed;
    }
@@ -168,11 +168,11 @@ void ResolveCollision(float coefficientOfRestitution,
    motionProperties2.angularSpeed = motionProperties2.rotation.norm();
 
 #ifdef CLAMP_RESOLVED_SPEEDS
-   if (Float::Greater<float>(motionProperties2.angularSpeed, maxRotationSpeed))
+   if (FGreater<float>(motionProperties2.angularSpeed, maxRotationSpeed))
    {
       motionProperties2.angularSpeed = maxRotationSpeed;
    }
-   else if (Float::Less<float>(motionProperties2.angularSpeed, minRotationSpeed))
+   else if (FLess<float>(motionProperties2.angularSpeed, minRotationSpeed))
    {
       motionProperties2.angularSpeed = minRotationSpeed;
    }

@@ -46,14 +46,14 @@ void DrawablePointCloud::AddPosition(const Vector3& v, const Color& color)
 void DrawablePointCloud::Clear()
 {
    PointCloud::Clear();
-   Util::ClearAndShrink(colors);
+   ClearAndShrink(colors);
 }
 
 void DrawablePointCloud::Refit()
 {
    if (positions.size() == 0)
    {
-      Util::ClearAndShrink(colors);
+      ClearAndShrink(colors);
    }
    else if (colors.size() == 0)
    {

@@ -27,7 +27,7 @@ TextureCoordinate::TextureCoordinate(float x, float y)
 
 bool operator==(const TextureCoordinate& coord1, const TextureCoordinate& coord2)
 {
-   return ( Float::Equal<float>(coord1.x, coord2.x) && Float::Equal<float>(coord1.y, coord2.y) );
+   return ( FEqual<float>(coord1.x, coord2.x) && FEqual<float>(coord1.y, coord2.y) );
 }
 
 bool operator <(const TextureCoordinate& coord1, const TextureCoordinate& coord2)

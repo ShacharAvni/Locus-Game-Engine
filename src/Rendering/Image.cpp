@@ -110,7 +110,7 @@ const unsigned char* Image::PixelData() const
 
 void Image::ClearPixelData()
 {
-   Util::ClearAndShrink(pixelData);
+   ClearAndShrink(pixelData);
 }
 
 void Image::FlipVertically()

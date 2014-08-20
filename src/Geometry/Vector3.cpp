@@ -136,7 +136,7 @@ float Vector3::angleBetweenRadians(const Vector3& v) const
 {
    float denominator = norm() * v.norm();
 
-   if (Float::NotZero<float>(denominator))
+   if (FNotZero<float>(denominator))
    {
       return acos( dot(v) / denominator );
    }
@@ -194,7 +194,7 @@ float Vector3::dot(const Vector3& v) const
 
 bool Vector3::isOrthogonalTo(const Vector3& v) const
 {
-   return Float::IsZero<float>( abs(dot(v)) );
+   return FIsZero<float>( abs(dot(v)) );
 }
 
 Vector3 Vector3::cross(const Vector3& v) const
@@ -239,7 +239,7 @@ bool Vector3::goesExactlyTheSameWayAs(const Vector3& other) const
 
 bool Vector3::ApproximatelyEqualTo(const Vector3& other, float toleranceFactor) const
 {
-   return ( Float::Equal<float>(x, other.x, toleranceFactor) && Float::Equal<float>(y, other.y, toleranceFactor) && Float::Equal<float>(z, other.z, toleranceFactor) );
+   return ( FEqual<float>(x, other.x, toleranceFactor) && FEqual<float>(y, other.y, toleranceFactor) && FEqual<float>(z, other.z, toleranceFactor) );
 }
 
 bool Vector3::PreciselyEqualTo(const Vector3& other) const

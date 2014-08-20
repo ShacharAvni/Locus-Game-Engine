@@ -79,7 +79,7 @@ void PointCloud::AddPositions(const std::vector<Vector3>& positionsToAdd)
 
 void PointCloud::Clear()
 {
-   Util::ClearAndShrink(positions);
+   ClearAndShrink(positions);
    centroid = Vector3::ZeroVector();
 }
 
@@ -123,7 +123,7 @@ void PointCloud::UpdateMaxDistanceToCenter()
       Vector3 worldVertex = modelTransformation.MultVertex(vertexPosition);
       float distance = (worldVertex - centroid).norm();
 
-      if (Float::Greater<float>(distance, maxDistanceToCenter))
+      if (FGreater<float>(distance, maxDistanceToCenter))
       {
          maxDistanceToCenter = distance;
       }

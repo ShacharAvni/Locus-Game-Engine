@@ -99,7 +99,7 @@ Octree::Octree(const std::vector<Triangle3D_t>& triangles, std::size_t leafTrian
       {
          float extent = max[coordinate] - min[coordinate];
 
-         if (Float::Greater<float>(extent, biggestExtent))
+         if (FGreater<float>(extent, biggestExtent))
          {
             biggestCoordinate = coordinate;
             biggestExtent = extent;
@@ -112,6 +112,7 @@ Octree::Octree(const std::vector<Triangle3D_t>& triangles, std::size_t leafTrian
          if (coordinate != biggestCoordinate)
          {
             float difference = biggestExtent - (max[coordinate] - min[coordinate]);
+
             min[coordinate] = min[coordinate] - (difference / 2);
             max[coordinate] = max[coordinate] + (difference / 2);
          }

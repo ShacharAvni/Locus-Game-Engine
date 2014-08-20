@@ -176,7 +176,7 @@ bool Matrix<ScalarType>::IsRowAllZero(unsigned int row, unsigned int upToColumn)
 
    for (unsigned int col = 0; col <= upToColumn; ++col)
    {
-      if (Float::NotZero<ScalarType>(At(row, col)))
+      if (FNotZero<ScalarType>(At(row, col)))
       {
          return false;
       }
@@ -198,7 +198,7 @@ bool Matrix<ScalarType>::IsZeroMatrix() const
    {
       for (unsigned int col = 0; col < Columns; ++col)
       {
-         if (Float::NotZero<ScalarType>(At(row, col)))
+         if (FNotZero<ScalarType>(At(row, col)))
          {
             return false;
          }
@@ -365,13 +365,13 @@ const ScalarType* const Matrix<ScalarType>::Elements() const
 template <typename ScalarType>
 void Matrix<ScalarType>::MakeRowEchelon(unsigned int col, bool reduce)
 {
-   bool pivotInPlace = Float::NotZero<ScalarType>(At(col, col));
+   bool pivotInPlace = FNotZero<ScalarType>(At(col, col));
 
    if (!pivotInPlace)
    {
       for (unsigned int row = col + 1; row < Rows; ++row)
       {
-         if (Float::NotZero<ScalarType>(At(row, col)))
+         if (FNotZero<ScalarType>(At(row, col)))
          {
             SwapRows(col, row);
 
@@ -393,7 +393,7 @@ void Matrix<ScalarType>::MakeRowEchelon(unsigned int col, bool reduce)
          {
             ScalarType valueToMakeZero = At(row, col);
 
-            if (Float::NotZero<ScalarType>(valueToMakeZero))
+            if (FNotZero<ScalarType>(valueToMakeZero))
             {
                OperateOnRow(row, pivot, rowOfPivot, -valueToMakeZero);
             }
@@ -404,7 +404,7 @@ void Matrix<ScalarType>::MakeRowEchelon(unsigned int col, bool reduce)
       {
          ScalarType valueToMakeZero = At(row, col);
 
-         if (Float::NotZero<ScalarType>(valueToMakeZero))
+         if (FNotZero<ScalarType>(valueToMakeZero))
          {
             OperateOnRow(row, pivot, rowOfPivot, -valueToMakeZero);
          }
@@ -417,7 +417,7 @@ void Matrix<ScalarType>::ReducePivot(unsigned int col)
 {
    ScalarType pivot = At(col, col);
 
-   if (Float::NotZero<ScalarType>(pivot))
+   if (FNotZero<ScalarType>(pivot))
    {
       ScalarMultiplyRow(col, 1 / pivot);
    }

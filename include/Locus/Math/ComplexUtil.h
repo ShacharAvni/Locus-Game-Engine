@@ -30,33 +30,33 @@ inline T& ImaginaryPart(std::complex<T>& x)
 }
 
 template <typename T>
-inline bool IsReal(const std::complex<T>& x, T toleranceFactor = Float::DEFAULT_TOLERANCE)
+inline bool IsReal(const std::complex<T>& x, T toleranceFactor = DEFAULT_TOLERANCE)
 {
-   return Float::IsZero<T>(x.imag(), toleranceFactor);
+   return FIsZero<T>(x.imag(), toleranceFactor);
 }
 
 template <typename T>
-inline bool Equal(const std::complex<T>& x, const std::complex<T>& y, T toleranceFactor = Float::DEFAULT_TOLERANCE)
+inline bool Equal(const std::complex<T>& x, const std::complex<T>& y, T toleranceFactor = DEFAULT_TOLERANCE)
 {
-   return ( Float::Equal<T>(x.real(), y.real(), toleranceFactor) && Float::Equal<T>(x.imag(), y.imag(), toleranceFactor) );
+   return ( FEqual<T>(x.real(), y.real(), toleranceFactor) && FEqual<T>(x.imag(), y.imag(), toleranceFactor) );
 }
 
 template <typename T>
-inline bool NotEqual(const std::complex<T>& x, const std::complex<T>& y, T toleranceFactor = Float::DEFAULT_TOLERANCE)
+inline bool NotEqual(const std::complex<T>& x, const std::complex<T>& y, T toleranceFactor = DEFAULT_TOLERANCE)
 {
-   return ( Float::NotEqual<T>(x.real(), y.real(), toleranceFactor) || Float::NotEqual<T>(x.imag(), y.imag(), toleranceFactor) );
+   return ( FNotEqual<T>(x.real(), y.real(), toleranceFactor) || FNotEqual<T>(x.imag(), y.imag(), toleranceFactor) );
 }
 
 template <typename T>
-inline bool IsZero(const std::complex<T>& x, T toleranceFactor = Float::DEFAULT_TOLERANCE)
+inline bool IsZero(const std::complex<T>& x, T toleranceFactor = DEFAULT_TOLERANCE)
 {
-   return ( Float::IsZero<T>(x.real(), toleranceFactor) && Float::IsZero<T>(x.imag(), toleranceFactor) );
+   return ( FIsZero<T>(x.real(), toleranceFactor) && FIsZero<T>(x.imag(), toleranceFactor) );
 }
 
 template <typename T>
-inline bool NotZero(const std::complex<T>& x, T toleranceFactor = Float::DEFAULT_TOLERANCE)
+inline bool NotZero(const std::complex<T>& x, T toleranceFactor = DEFAULT_TOLERANCE)
 {
-   return ( Float::NotZero<T>(x.real(), toleranceFactor) || Float::NotZero<T>(x.imag(), toleranceFactor) );
+   return ( FNotZero<T>(x.real(), toleranceFactor) || FNotZero<T>(x.imag(), toleranceFactor) );
 }
 
 }

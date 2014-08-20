@@ -73,9 +73,9 @@ AxisAlignedBox::~AxisAlignedBox()
 
 bool AxisAlignedBox::Contains(const Vector3& point) const
 {
-   return ( Float::GreaterOrEqual<float>(point.x, min.x) && Float::LessOrEqual<float>(point.x, max.x) &&
-            Float::GreaterOrEqual<float>(point.y, min.y) && Float::LessOrEqual<float>(point.y, max.y) &&
-            Float::GreaterOrEqual<float>(point.z, min.z) && Float::LessOrEqual<float>(point.z, max.z) );
+   return ( FGreaterOrEqual<float>(point.x, min.x) && FLessOrEqual<float>(point.x, max.x) &&
+            FGreaterOrEqual<float>(point.y, min.y) && FLessOrEqual<float>(point.y, max.y) &&
+            FGreaterOrEqual<float>(point.z, min.z) && FLessOrEqual<float>(point.z, max.z) );
 }
 
 bool AxisAlignedBox::IsOutside(const Triangle3D_t& triangle) const
@@ -190,7 +190,7 @@ bool AxisAlignedBox::Intersects(const Sphere& sphere) const
       }
    }
 
-   return Float::LessOrEqual<float>(d, sphere.radius * sphere.radius);
+   return FLessOrEqual<float>(d, sphere.radius * sphere.radius);
 }
 
 void AxisAlignedBox::TransformBy(const Moveable& moveable)

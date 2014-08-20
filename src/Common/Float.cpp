@@ -13,15 +13,10 @@
 namespace Locus
 {
 
-namespace Float
-{
-
 const float NO_TOLERANCE = 0.0f;
 const float DEFAULT_TOLERANCE = 1.0f;
 
 const float FLOAT_BASE_TOLERANCE = 1e-4f;
 const double DOUBLE_BASE_TOLERANCE = 1e-7;
-
-}
 
 }

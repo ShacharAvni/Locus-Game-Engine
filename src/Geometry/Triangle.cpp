@@ -206,7 +206,7 @@ IntersectionType Triangle<PointType>::CoplanarTriangleIntersection(const Triangl
          std::vector<PointType> uniqueIntersectionPoints;
          std::vector<std::size_t> uniqueIndices;
 
-         Util::GetUniqueItems<PointType>(possibleIntersectionPoints, uniqueIntersectionPoints, uniqueIndices);
+         GetUniqueItems<PointType>(possibleIntersectionPoints, uniqueIntersectionPoints, uniqueIndices);
 
          ReorderCoplanarVertices<PointType>(uniqueIntersectionPoints, this->Normal(), PolygonWinding::CounterClockwise,
             [](const PointType& v)->Vector3
