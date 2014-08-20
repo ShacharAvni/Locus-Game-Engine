@@ -457,7 +457,7 @@ public:
          }
       }
 
-      Util::ClearAndShrink(newFaceVertices);
+      ClearAndShrink(newFaceVertices);
 
       std::vector<std::vector<VertexType>> connectedComponents;
       if (!DetermineConnectedComponents(edgeToVerticesOnBoundaryMap, connectedComponents))
@@ -469,7 +469,7 @@ public:
 
       CollectBoundaryFaces(connectedComponents, -plane.getNormal(), splitFaces);
 
-      Util::ClearAndShrink(connectedComponents);
+      ClearAndShrink(connectedComponents);
 
       modelOnPositiveSide.Construct(splitFaces);
 
@@ -830,7 +830,7 @@ private:
             }
          }
 
-         Util::ClearAndShrink(componentsVertexIsConnectedTo);
+         ClearAndShrink(componentsVertexIsConnectedTo);
 
          std::vector<std::vector<VertexType>> connectedComponentsUnordered;
          std::vector<std::vector<std::size_t>> connectedComponentsAsIndicesUnordered;
@@ -855,7 +855,7 @@ private:
             }
          }
 
-         Util::ClearAndShrink(connectedComponentsAsIndices);
+         ClearAndShrink(connectedComponentsAsIndices);
 
          std::size_t numConnectedComponents = connectedComponentsUnordered.size();
 
