@@ -20,12 +20,20 @@ namespace Locus
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
+/*!
+ * \brief Generates IDs in sequential fashion, starting at one.
+ *
+ * \details This class is thread safe.
+ */
 class LOCUS_COMMON_API SequentialIDGenerator
 {
 public:
    SequentialIDGenerator();
 
+   /// Gets the next sequential ID, returning Locus::BAD_ID on error.
    ID_t NextID();
+
+   /// Resets the next ID to one.
    void Reset();
 
 private:

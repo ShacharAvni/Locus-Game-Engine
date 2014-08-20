@@ -19,7 +19,7 @@ namespace Locus
  * \brief Wrapper around a std::list<T> with iterators enhanced with previous() and next() methods
  * that wrap around the list.
  *
- * All methods wrap the same-named method of std::list<T>.
+ * \details All methods wrap the same-named method of std::list<T>.
  */
 template <class T, class Allocator = std::allocator<T>>
 class CircularList

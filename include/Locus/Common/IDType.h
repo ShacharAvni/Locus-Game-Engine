@@ -15,7 +15,10 @@
 namespace Locus
 {
 
+/// Identifier type used by Locus.
 typedef unsigned int ID_t;
+
+/// Indicates an error in the ID generation.
 LOCUS_COMMON_API extern const ID_t BAD_ID;
 
 }

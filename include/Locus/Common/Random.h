@@ -19,14 +19,28 @@ namespace Locus
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
+/*!
+ * \brief Generates pseudo-random numbers.
+ *
+ * \details Wraps a std::mt19937 random generator.
+ */
 class LOCUS_COMMON_API Random
 {
 public:
    Random();
 
-   double randomDouble(double begin, double end);
-   int randomInt(int begin, int end);
-   bool flipCoin(double p);
+   /// Generates a random double between begin and end inclusively.
+   double RandomDouble(double begin, double end);
+
+   /// Generates a random integer between begin and end inclusively.
+   int RandomInt(int begin, int end);
+
+   /*!
+    * \brief Returns true with the given probability.
+    *
+    * \param probability must be between zero and one inclusively.
+    */
+   bool FlipCoin(double probability);
 
 private:
    std::random_device randomDevice;
@@ -35,4 +49,4 @@ private:
 
 #include "Locus/Preprocessor/EndSilenceDLLInterfaceWarnings"
 
-}
+} // namespace Locus

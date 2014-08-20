@@ -663,8 +663,8 @@ protected:
       }
 
       //NOTE: may cause degenerate faces
-      std::unordered_map<std::size_t, std::size_t> sortedPositionMap;
-      Util::GetUniqueItems<Vector3>(vertPositions, positions, sortedPositionMap);
+      std::vector<std::size_t> sortedPositionIndices;
+      Util::GetUniqueItems<Vector3>(vertPositions, positions, sortedPositionIndices);
 
       //construct faces
       std::size_t numDegenerateFaces = 0;
@@ -681,7 +681,7 @@ protected:
       {
          for (std::size_t i = 0; i < Triangle3D_t::NumPointsOnATriangle; ++i)
          {
-            vertex.positionID = sortedPositionMap[numTotalVertices];
+            vertex.positionID = sortedPositionIndices[numTotalVertices];
 
             face[i] = vertex;
             ++numTotalVertices;

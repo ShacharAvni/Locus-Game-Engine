@@ -30,13 +30,12 @@ enum class Endian
 /// Determines the system's CPU endianness.
 LOCUS_COMMON_API Endian SystemEndian();
 
-/*!
- * An integral number whose endianness can be swapped.
- */
-//TODO: Add support for float, double, and long double
+/// An integral number whose endianness can be swapped.
 template <typename T>
 class EndianNumber
 {
+//TODO: Add support for float, double, and long double
+
 public:
    static_assert(std::is_integral<T>::value, "T must be integral");
 
@@ -51,7 +50,7 @@ public:
     *
     * \sa Set
     *
-    * The number is initialized using the Set method.
+    * \details The number is initialized using the Set method.
     */
    EndianNumber(char (&buffer)[sizeof(T)])
    {
@@ -64,8 +63,8 @@ public:
     * \param buffer array of bytes with length the same as
     * sizeof(T) where T is the template argument type.
     *
-    * The array is used naively, with buffer[0] used as the
-    * highest order byte and buffer[sizeof(T) - 1] being the
+    * \details The array is used naively, with buffer[0] used as
+    * the highest order byte and buffer[sizeof(T) - 1] being the
     * lowest order byte.
     */
    void Set(char (&buffer)[sizeof(T)])
@@ -78,10 +77,7 @@ public:
       }
    }
 
-   /*!
-    * \brief Swap the bytes of the number so that it is expressed in
-    * the alternate endianness.
-    */
+   /// Swap the bytes of the number so that it is expressed in the alternate endianness.
    void ReverseEndian()
    {
       std::size_t midPoint = sizeof(T) / 2;

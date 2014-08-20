@@ -12,7 +12,7 @@
 
 #include <algorithm>
 
-#include <ctype.h>
+#include <cctype>
 
 namespace Locus
 {
@@ -30,12 +30,12 @@ void TrimString(std::string& str)
 
 void ToLower(std::string& str)
 {
-   std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+   std::transform(str.begin(), str.end(), str.begin(), std::tolower);
 }
 
 void ToUpper(std::string& str)
 {
-   std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+   std::transform(str.begin(), str.end(), str.begin(), std::toupper);
 }
 
 }

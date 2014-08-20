@@ -177,43 +177,43 @@ void CollisionScene::InitializeCollidableMeshes()
       whichMesh = (whichMesh + 1) % Num_Templates;
 
       //randomize direction
-      float xDirection = static_cast<float>(random.randomDouble(-1, 1));
-      float yDirection = static_cast<float>(random.randomDouble(-1, 1));
-      float zDirection = static_cast<float>(random.randomDouble(-1, 1));
+      float xDirection = static_cast<float>(random.RandomDouble(-1, 1));
+      float yDirection = static_cast<float>(random.RandomDouble(-1, 1));
+      float zDirection = static_cast<float>(random.RandomDouble(-1, 1));
 
       collidableMeshes[i].motionProperties.direction.set(xDirection, yDirection, zDirection);
       collidableMeshes[i].motionProperties.direction.normalize();
 
       //randomize speed
-      collidableMeshes[i].motionProperties.speed = static_cast<float>(random.randomDouble(MIN_MESH_SPEED, MAX_MESH_SPEED));
+      collidableMeshes[i].motionProperties.speed = static_cast<float>(random.RandomDouble(MIN_MESH_SPEED, MAX_MESH_SPEED));
 
       //randomize rotation direction
-      xDirection = static_cast<float>(random.randomDouble(-1, 1));
-      yDirection = static_cast<float>(random.randomDouble(-1, 1));
-      zDirection = static_cast<float>(random.randomDouble(-1, 1));
+      xDirection = static_cast<float>(random.RandomDouble(-1, 1));
+      yDirection = static_cast<float>(random.RandomDouble(-1, 1));
+      zDirection = static_cast<float>(random.RandomDouble(-1, 1));
 
       collidableMeshes[i].motionProperties.rotation.set(xDirection, yDirection, zDirection);
 
       //randomize rotation speed
-      collidableMeshes[i].motionProperties.angularSpeed = static_cast<float>(random.randomDouble(MIN_MESH_ROTATION_SPEED, MAX_MESH_ROTATION_SPEED));
+      collidableMeshes[i].motionProperties.angularSpeed = static_cast<float>(random.RandomDouble(MIN_MESH_ROTATION_SPEED, MAX_MESH_ROTATION_SPEED));
 
       //randomize size
-      float scale = static_cast<float>(random.randomDouble(MIN_MESH_SCALE, MAX_MESH_SCALE));
+      float scale = static_cast<float>(random.RandomDouble(MIN_MESH_SCALE, MAX_MESH_SCALE));
 
       collidableMeshes[i].Scale( Locus::Vector3(scale, scale, scale) );
 
       //randomize position (centroid)
       Locus::Vector3 position;
 
-      position.x = static_cast<float>(random.randomDouble(-maxDistance, maxDistance));
-      position.y = static_cast<float>(random.randomDouble(-maxDistance, maxDistance));
-      position.z = static_cast<float>(random.randomDouble(-maxDistance, maxDistance));
+      position.x = static_cast<float>(random.RandomDouble(-maxDistance, maxDistance));
+      position.y = static_cast<float>(random.RandomDouble(-maxDistance, maxDistance));
+      position.z = static_cast<float>(random.RandomDouble(-maxDistance, maxDistance));
 
       collidableMeshes[i].Translate(position);
 
       //randomize color
 
-      int colorIndex = random.randomInt(0, (Num_Colors - 1));
+      int colorIndex = random.RandomInt(0, (Num_Colors - 1));
 
       collidableMeshes[i].SetColor(colors[colorIndex]);
 

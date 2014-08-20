@@ -19,18 +19,10 @@ namespace Locus
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
-/*!
- * Base class of all things thrown by Locus.
- */
+/// Base class of all things thrown by Locus.
 class LOCUS_COMMON_API Exception
 {
 public:
-   /*!
-    * \brief Initialize with the std::string to be returned with the
-    * Message() method.
-    *
-    * \sa Message
-    */
    Exception(const std::string& message);
 
    /// Describes what this Exception is.

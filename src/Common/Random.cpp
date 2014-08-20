@@ -18,24 +18,21 @@ Random::Random()
 {
 }
 
-//these functions get a random number in a given interval (between "begin" and "end" inclusively)
-double Random::randomDouble(double begin, double end)
+double Random::RandomDouble(double begin, double end)
 {
    std::uniform_real_distribution<> realDistribution(begin, end);
    return realDistribution(generator);
 }
 
-int Random::randomInt(int begin, int end)
+int Random::RandomInt(int begin, int end)
 {
    std::uniform_int_distribution<> intDistribution(begin, end);
    return intDistribution(generator);
 }
 
-//this function flips a coin that lands heads with probability p.
-//true = heads, false = tails...or vice-versa
-bool Random::flipCoin(double p)
+bool Random::FlipCoin(double probability)
 {
-   return (randomDouble(0, 1) <= p);
+   return (RandomDouble(0, 1) <= probability);
 }
 
 }

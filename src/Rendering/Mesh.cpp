@@ -93,8 +93,8 @@ void Mesh::Construct(const std::vector<std::vector<MeshVertex>>& faceTriangles, 
    }
 
    //get unique texture coordinates
-   std::unordered_map<std::size_t, std::size_t> sortedTexCoordMap;
-   Util::GetUniqueItems<TextureCoordinate>(vertTexCoords, textureCoordinates, sortedTexCoordMap);
+   std::vector<std::size_t> sortedTexCoordIndices;
+   Util::GetUniqueItems<TextureCoordinate>(vertTexCoords, textureCoordinates, sortedTexCoordIndices);
 
    //fill faces
 
@@ -103,7 +103,7 @@ void Mesh::Construct(const std::vector<std::vector<MeshVertex>>& faceTriangles, 
    {
       for (std::size_t vertexIndex = 0; vertexIndex < Triangle3D_t::NumPointsOnATriangle; ++vertexIndex)
       {
-         faces[faceIndex][vertexIndex].textureCoordinateID = sortedTexCoordMap[numVertices];
+         faces[faceIndex][vertexIndex].textureCoordinateID = sortedTexCoordIndices[numVertices];
          ++numVertices;
       }
    }
