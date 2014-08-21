@@ -24,21 +24,38 @@ struct FileOnDisk_Impl;
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
+/// A plain old file.
 class LOCUS_FILE_SYSTEM_API FileOnDisk : public DataStream
 {
 public:
+   /*!
+    * \param[in] filePath The full path to the file.
+    * \param[in] openOperation The permissions required for opening the file.
+    *
+    * \sa DataStream::OpenOperation
+    */
    FileOnDisk(const std::string& filePath, DataStream::OpenOperation openOperation);
+
    FileOnDisk(const FileOnDisk&) = delete;
    FileOnDisk& operator=(const FileOnDisk&) = delete;
    ~FileOnDisk();
 
+   /// \sa DataStream::IsEndOfStream
    virtual bool IsEndOfStream() const override;
+
+   /// \sa DataStream::CurrentPosition
    virtual std::size_t CurrentPosition() const override;
+
+   /// \sa DataStream::SizeInBytes
    virtual std::size_t SizeInBytes() const override;
 
+   /// \sa File::ReadWholeFile
    void ReadWholeFile(std::vector<char>& bytes);
+
+   /// \sa DataStream::Read
    virtual std::size_t Read(char* bytes, std::size_t numBytesToRead) override;
 
+   /// \sa DataStream::Seek
    virtual bool Seek(std::size_t offset, DataStream::SeekType seekType) override;
 
 private:
