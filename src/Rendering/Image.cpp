@@ -49,7 +49,7 @@ Image::Image(const MountedFilePath& mountedFilePath)
    unsigned char* pixels = nullptr;
 
    {
-      File file(mountedFilePath, DataStream::OpenOperation::Read);
+      File file(mountedFilePath, DataStream::OpenMode::Read);
 
       std::vector<char> bytes;
       file.ReadWholeFile(bytes);

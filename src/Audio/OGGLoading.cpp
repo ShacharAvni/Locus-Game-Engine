@@ -29,14 +29,14 @@ namespace Locus
 
 bool LoadOGG(const std::string& fullFilePath, SoundData& soundData)
 {
-   FileOnDisk fileOnDisk(fullFilePath, DataStream::OpenOperation::Read);
+   FileOnDisk fileOnDisk(fullFilePath, DataStream::OpenMode::Read);
 
    return LoadOGG(fileOnDisk, soundData);
 }
 
 bool LoadOGG(const MountedFilePath& mountedFilePath, SoundData& soundData)
 {
-   File file(mountedFilePath, DataStream::OpenOperation::Read);
+   File file(mountedFilePath, DataStream::OpenMode::Read);
 
    return LoadOGG(file, soundData);
 }

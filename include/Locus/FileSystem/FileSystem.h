@@ -60,13 +60,13 @@ public:
  *       Locus::MountDirectoryOrArchive("path_to/foo");
  *
  *       //Open the file "bar.txt" which must be in the directory path_to/foo.
- *       Locus::File file1( Locus::MountedFilePath("bar.txt"), Locus::DataStream::OpenOperation::Read );
+ *       Locus::File file1( Locus::MountedFilePath("bar.txt"), Locus::DataStream::OpenMode::Read );
  *
  *       //Add the archive "path_to/zipFile.zip". Now MountedFilePaths can be relative to path_to/zipFile.zip
  *       Locus::MountDirectoryOrArchive("path_to/zipFile.zip");
  *
  *       //Open the file "baz.jpg" which must be either in the directory path_to/foo or in the archive path_to/zipFile.zip.
- *       Locus::File file2( Locus::MountedFilePath("baz.jpg"), Locus::DataStream::OpenOperation::Read );
+ *       Locus::File file2( Locus::MountedFilePath("baz.jpg"), Locus::DataStream::OpenMode::Read );
  *    }
  *    catch (Locus::Exception& locusException)
  *    {
@@ -85,4 +85,4 @@ public:
  */
 LOCUS_FILE_SYSTEM_API void MountDirectoryOrArchive(const std::string& fullPath);
 
-}
+} // namespace Locus

@@ -29,7 +29,6 @@ public:
    const std::string& Message() const;
 
 private:
-   /// The underlying message (simply passed through and not modified by this class).
    std::string message;
 };
 

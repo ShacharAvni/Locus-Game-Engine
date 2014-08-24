@@ -27,7 +27,7 @@ struct File_Impl
    PHYSFS_File* physfsFileHandle;
 };
 
-File::File(const MountedFilePath& mountedFilePath, DataStream::OpenOperation openOperation)
+File::File(const MountedFilePath& mountedFilePath, DataStream::OpenMode openMode)
    : impl(std::make_unique<File_Impl>()), mountedFilePath(mountedFilePath)
 {
    const char* path = mountedFilePath.path.c_str();
@@ -39,17 +39,17 @@ File::File(const MountedFilePath& mountedFilePath, DataStream::OpenOperation ope
       throw Exception(std::string("File ") + path + " does not exist in the search path");
    }
 
-   switch (openOperation)
+   switch (openMode)
    {
-   case OpenOperation::Read:
+   case OpenMode::Read:
       impl->physfsFileHandle = PHYSFS_openRead(path);
       break;
 
-   case OpenOperation::Write:
+   case OpenMode::Write:
       impl->physfsFileHandle = PHYSFS_openWrite(path);
       break;
 
-   case OpenOperation::Append:
+   case OpenMode::Append:
       impl->physfsFileHandle = PHYSFS_openAppend(path);
       break;
    }

@@ -99,7 +99,7 @@ void GetUniqueItems(const std::vector<T>& items, std::vector<T>& uniqueItems, st
  * template type.
  *
  * \sa template <class T>
-*      void GetUniqueItems(const std::vector<T>& items, std::vector<T>& uniqueItems, std::function<bool(const T&, const T&)> compare, std::vector<std::size_t>& uniqueIndices)
+ *     void GetUniqueItems(const std::vector<T>& items, std::vector<T>& uniqueItems, std::function<bool(const T&, const T&)> compare, std::vector<std::size_t>& uniqueIndices)
  */
 template <class T>
 void GetUniqueItems(const std::vector<T>& items, std::vector<T>& uniqueItems, std::vector<std::size_t>& uniqueIndices)

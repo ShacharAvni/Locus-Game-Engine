@@ -24,27 +24,27 @@ struct FileOnDisk_Impl
    std::FILE* fileHandle;
 };
 
-FileOnDisk::FileOnDisk(const std::string& filePath, DataStream::OpenOperation openOperation)
+FileOnDisk::FileOnDisk(const std::string& filePath, DataStream::OpenMode openMode)
    : impl(std::make_unique<FileOnDisk_Impl>()), filePath(filePath)
 {
    const char* mode = "";
 
-   switch (openOperation)
+   switch (openMode)
    {
-   case OpenOperation::Append:
+   case OpenMode::Append:
       mode = "ab";
       break;
 
-   case OpenOperation::Read:
+   case OpenMode::Read:
       mode = "rb";
       break;
 
-   case OpenOperation::Write:
+   case OpenMode::Write:
       mode = "wb";
       break;
 
    default:
-      throw Exception("Unknown File Open Operation");
+      throw Exception("Unknown File Open Mode");
    }
 
    impl->fileHandle = nullptr;

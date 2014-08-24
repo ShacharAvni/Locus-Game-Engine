@@ -90,7 +90,6 @@ public:
       }
    }
 
-   /// The underlying integral number.
    T num;
 };
 

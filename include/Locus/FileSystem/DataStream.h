@@ -54,13 +54,13 @@ public:
     */
    std::size_t Read(std::vector<char>& bytes, std::size_t numBytesToRead, std::size_t offsetIntoBytesVector);
 
-   /// Returns true if the end of stream has been reached.
+   /// \return true if the end of stream has been reached.
    virtual bool IsEndOfStream() const = 0;
 
-   /// Returns the current read position (zero-based offset).
+   /// \return The current read position (zero-based offset).
    virtual std::size_t CurrentPosition() const = 0;
 
-   /// Returns the size in bytes of the underlying stream.
+   /// \return The size in bytes of the underlying stream.
    virtual std::size_t SizeInBytes() const = 0;
 
    /// How to interpret the offset of the seek operation.
@@ -84,8 +84,8 @@ public:
     */
    virtual bool Seek(std::size_t offset, SeekType seekType) = 0;
 
-   /// The permissions required when opening the File or FileOnDisk.
-   enum class OpenOperation
+   /// The usage pattern required when opening the File or FileOnDisk.
+   enum class OpenMode
    {
       Read,
       Write,

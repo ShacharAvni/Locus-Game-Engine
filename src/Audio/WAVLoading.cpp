@@ -26,14 +26,14 @@ namespace Locus
 
 bool LoadWAV(const std::string& fullFilePath, SoundData& soundData)
 {
-   FileOnDisk fileOnDisk(fullFilePath, DataStream::OpenOperation::Read);
+   FileOnDisk fileOnDisk(fullFilePath, DataStream::OpenMode::Read);
 
    return LoadWAV(fileOnDisk, soundData);
 }
 
 bool LoadWAV(const MountedFilePath& mountedFilePath, SoundData& soundData)
 {
-   File file(mountedFilePath, DataStream::OpenOperation::Read);
+   File file(mountedFilePath, DataStream::OpenMode::Read);
 
    return LoadWAV(file, soundData);
 }

@@ -43,14 +43,14 @@ static bool ParseSAPFile(rapidxml::xml_document<>& xmlDocument, std::vector<Mesh
 
 bool ParseSAPFile(const std::string& fullFilePath, std::vector<Mesh>& meshes)
 {
-   FileOnDisk fileOnDisk(fullFilePath, DataStream::OpenOperation::Read);
+   FileOnDisk fileOnDisk(fullFilePath, DataStream::OpenMode::Read);
 
    return ParseSAPFile(fileOnDisk, meshes);
 }
 
 bool ParseSAPFile(const MountedFilePath& mountedFilePath, std::vector<Mesh>& meshes)
 {
-   File file(mountedFilePath, DataStream::OpenOperation::Read);
+   File file(mountedFilePath, DataStream::OpenMode::Read);
 
    return ParseSAPFile(file, meshes);
 }

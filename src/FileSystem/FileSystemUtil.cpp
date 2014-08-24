@@ -122,14 +122,14 @@ std::string GetExePath()
 
 void ReadWholeFile(const std::string& filePath, std::vector<char>& data)
 {
-   FileOnDisk fileOnDisk(filePath, DataStream::OpenOperation::Read);
+   FileOnDisk fileOnDisk(filePath, DataStream::OpenMode::Read);
 
    fileOnDisk.ReadWholeFile(data);
 }
 
 void ReadWholeFile(const MountedFilePath& mountedFilePath, std::vector<char>& data)
 {
-   File file(mountedFilePath, DataStream::OpenOperation::Read);
+   File file(mountedFilePath, DataStream::OpenMode::Read);
 
    file.ReadWholeFile(data);
 }

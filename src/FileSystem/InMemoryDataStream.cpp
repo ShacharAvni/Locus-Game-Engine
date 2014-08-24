@@ -48,49 +48,28 @@ bool InMemoryDataStream::Seek(std::size_t offset, SeekType seekType)
    switch (seekType)
    {
    case SeekType::Beginning:
-      return SeekFromBeginning(offset);
+      if (offset <= SizeInBytes())
+      {
+         streamPosition = offset;
+         return true;
+      }
       break;
 
    case SeekType::Current:
-      return SeekFromCurrentPosition(offset);
+      if (offset <= BytesRemaining())
+      {
+         streamPosition += offset;
+         return true;
+      }
       break;
 
    case SeekType::End:
-      return SeekFromEnd(offset);
+      if (offset <= SizeInBytes())
+      {
+         streamPosition = (data.size() - offset);
+         return true;
+      }
       break;
-   }
-
-   return false;
-}
-
-bool InMemoryDataStream::SeekFromBeginning(std::size_t offset)
-{
-   if (offset <= SizeInBytes())
-   {
-      streamPosition = offset;
-      return true;
-   }
-
-   return false;
-}
-
-bool InMemoryDataStream::SeekFromCurrentPosition(std::size_t offset)
-{
-   if (offset <= BytesRemaining())
-   {
-      streamPosition += offset;
-      return true;
-   }
-
-   return false;
-}
-
-bool InMemoryDataStream::SeekFromEnd(std::size_t offset)
-{
-   if (offset <= SizeInBytes())
-   {
-      streamPosition = (data.size() - offset);
-      return true;
    }
 
    return false;

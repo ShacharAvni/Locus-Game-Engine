@@ -28,15 +28,8 @@ struct File_Impl;
 class LOCUS_FILE_SYSTEM_API File : public DataStream
 {
 public:
-   /*!
-    * \details The MountedFilePath provided must be relative
-    * to a path that was passed to MountDirectoryOrArchive.
-    *
-    * \throws Exception
-    *
-    * \sa MountDirectoryOrArchive DataStream::OpenOperation
-    */
-   File(const MountedFilePath& mountedFilePath, DataStream::OpenOperation openOperation);
+   /// \throws Exception
+   File(const MountedFilePath& mountedFilePath, DataStream::OpenMode openMode);
 
    File(const File&) = delete;
    File& operator=(const File&) = delete;
@@ -52,10 +45,14 @@ public:
    virtual std::size_t SizeInBytes() const override;
 
    /*!
-    * \brief Reads the whole file into the provided std::vector.
+    * \brief Reads the whole file in binary format.
     *
     * \param[in,out] bytes The data read from the file. This vector
-    * does not need to be the correct size at call time.
+    * will be sized appropriately by this function.
+    *
+    * \details The seek position does not need to be at the beginning
+    * when calling this function. The seek position will be at the end
+    * of the file after calling this function.
     *
     * \throws Exception
     */

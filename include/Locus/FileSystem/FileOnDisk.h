@@ -30,11 +30,9 @@ class LOCUS_FILE_SYSTEM_API FileOnDisk : public DataStream
 public:
    /*!
     * \param[in] filePath The full path to the file.
-    * \param[in] openOperation The permissions required for opening the file.
-    *
-    * \sa DataStream::OpenOperation
+    * \param[in] openMode The usage pattern required for opening the file.
     */
-   FileOnDisk(const std::string& filePath, DataStream::OpenOperation openOperation);
+   FileOnDisk(const std::string& filePath, DataStream::OpenMode openMode);
 
    FileOnDisk(const FileOnDisk&) = delete;
    FileOnDisk& operator=(const FileOnDisk&) = delete;
@@ -65,4 +63,4 @@ private:
 
 #include "Locus/Preprocessor/EndSilenceDLLInterfaceWarnings"
 
-}
+} // namespace Locus
