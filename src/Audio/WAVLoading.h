@@ -10,22 +10,17 @@
 
 #pragma once
 
-#include "LocusAudioAPI.h"
-
-#include <vector>
+#include <string>
 
 namespace Locus
 {
 
-#include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
+struct SoundData;
+class DataStream;
+struct MountedFilePath;
 
-struct LOCUS_AUDIO_API SoundData
-{
-   unsigned int format;
-   int sampleRate;
-   std::vector<char> rawData;
-};
-
-#include "Locus/Preprocessor/EndSilenceDLLInterfaceWarnings"
+bool LoadWAV(const std::string& fullFilePath, SoundData& soundData);
+bool LoadWAV(const MountedFilePath& mountedFilePath, SoundData& soundData);
+bool LoadWAV(DataStream& wavDataStream, SoundData& soundData);
 
 }

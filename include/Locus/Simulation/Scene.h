@@ -23,9 +23,10 @@ class LOCUS_SIMULATION_API Scene
 {
 public:
    Scene(SceneManager& sceneManager);
+   virtual ~Scene();
+
    Scene(const Scene&) = delete;
    Scene& operator=(const Scene&) = delete;
-   virtual ~Scene();
 
    virtual void Activate();
 

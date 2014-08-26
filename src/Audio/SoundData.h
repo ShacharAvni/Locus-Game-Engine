@@ -10,21 +10,16 @@
 
 #pragma once
 
-#include "LocusAudioAPI.h"
-
-#include "Locus/FileSystem/MountedFilePath.h"
-
-#include <string>
 #include <vector>
 
 namespace Locus
 {
 
-struct SoundData;
-class DataStream;
-
-LOCUS_AUDIO_API bool LoadWAV(const std::string& fullFilePath, SoundData& soundData);
-LOCUS_AUDIO_API bool LoadWAV(const MountedFilePath& mountedFilePath, SoundData& soundData);
-LOCUS_AUDIO_API bool LoadWAV(DataStream& wavDataStream, SoundData& soundData);
+struct SoundData
+{
+   unsigned int format;
+   int sampleRate;
+   std::vector<char> rawData;
+};
 
 }

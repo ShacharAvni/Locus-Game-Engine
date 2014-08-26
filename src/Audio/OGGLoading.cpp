@@ -8,8 +8,8 @@
  *                                                                                                        *
  \********************************************************************************************************/
 
-#include "Locus/Audio/OGGLoading.h"
-#include "Locus/Audio/SoundData.h"
+#include "OGGLoading.h"
+#include "SoundData.h"
 
 #include "Locus/Common/Endian.h"
 #include "Locus/Common/Casts.h"

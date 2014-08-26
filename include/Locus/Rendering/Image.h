@@ -12,13 +12,13 @@
 
 #include "LocusRenderingAPI.h"
 
-#include "Locus/FileSystem/MountedFilePath.h"
-
 #include <string>
 #include <vector>
 
 namespace Locus
 {
+
+struct MountedFilePath;
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 

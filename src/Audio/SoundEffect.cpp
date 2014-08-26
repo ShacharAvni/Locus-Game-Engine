@@ -9,27 +9,40 @@
 \********************************************************************************************************/
 
 #include "Locus/Audio/SoundEffect.h"
-#include "Locus/Audio/WAVLoading.h"
-#include "Locus/Audio/OGGLoading.h"
+
+#include "WAVLoading.h"
+#include "OGGLoading.h"
+#include "SoundData.h"
 
 #include "Locus/Common/Parsing.h"
 #include "Locus/Common/Casts.h"
 
 #include "Locus/FileSystem/DataStream.h"
+#include "Locus/FileSystem/MountedFilePath.h"
 
 #include <AL/al.h>
 #include <AL/alc.h>
 
-#include <vector>
 #include <string>
 
 namespace Locus
 {
 
-SoundEffect::SoundEffect()
+struct SoundEffectInternal
 {
-   alGenBuffers(1, &bufferID);
-   alGenSources(1, &sourceID);
+   SoundData data;
+
+   int size;
+
+   unsigned int bufferID;
+   unsigned int sourceID;
+};
+
+SoundEffect::SoundEffect()
+   : soundEffectInternal(std::make_unique<SoundEffectInternal>())
+{
+   alGenBuffers(1, &soundEffectInternal->bufferID);
+   alGenSources(1, &soundEffectInternal->sourceID);
 
    Clear();
 
@@ -38,17 +51,17 @@ SoundEffect::SoundEffect()
 
 SoundEffect::~SoundEffect()
 {
-   alDeleteSources(1, &sourceID);
-   alDeleteBuffers(1, &bufferID);
+   alDeleteSources(1, &soundEffectInternal->sourceID);
+   alDeleteBuffers(1, &soundEffectInternal->bufferID);
 }
 
 void SoundEffect::Clear()
 {
-   soundData.format = 0;
-   soundData.sampleRate = 0;
-   soundData.rawData.clear();
+   soundEffectInternal->data.format = 0;
+   soundEffectInternal->data.sampleRate = 0;
+   soundEffectInternal->data.rawData.clear();
 
-   size = 0;
+   soundEffectInternal->size = 0;
 }
 
 bool SoundEffect::DeduceSoundFileTypeFromExtension(const std::string& filePath, SoundEffect::SoundFileType& soundFileType)
@@ -118,18 +131,18 @@ bool SoundEffect::DoLoad(LoadSource& loadSource, SoundFileType soundFileType)
    switch (soundFileType)
    {
    case SoundFileType::WAV:
-      loaded = LoadWAV(loadSource, soundData);
+      loaded = LoadWAV(loadSource, soundEffectInternal->data);
       break;
 
    case SoundFileType::OGG:
-      loaded = LoadOGG(loadSource, soundData);
+      loaded = LoadOGG(loadSource, soundEffectInternal->data);
       break;
    }
 
    if (loaded)
    {
       BufferData();
-      soundData.rawData.clear();
+      soundEffectInternal->data.rawData.clear();
    }
    else
    {
@@ -156,27 +169,29 @@ bool SoundEffect::Load(DataStream& dataStream, SoundFileType soundFileType)
 
 void SoundEffect::BufferData()
 {
-   size = LossyCast<std::size_t, int>(soundData.rawData.size());
+   const SoundData& soundData = soundEffectInternal->data;
 
-   alBufferData(bufferID, soundData.format, soundData.rawData.data(), size, soundData.sampleRate);
-   alSourcei(sourceID, AL_BUFFER, bufferID);
+   soundEffectInternal->size = LossyCast<std::size_t, int>(soundData.rawData.size());
+
+   alBufferData(soundEffectInternal->bufferID, soundData.format, soundData.rawData.data(), soundEffectInternal->size, soundData.sampleRate);
+   alSourcei(soundEffectInternal->sourceID, AL_BUFFER, soundEffectInternal->bufferID);
 }
 
 void SoundEffect::SetPosition(float x, float y, float z) const
 {
-   alSource3f(sourceID, AL_POSITION, x, y, z);
+   alSource3f(soundEffectInternal->sourceID, AL_POSITION, x, y, z);
 }
 
 bool SoundEffect::IsLoaded() const
 {
-   return (size > 0);
+   return (soundEffectInternal->size > 0);
 }
 
 void SoundEffect::Play() const
 {
    if (IsLoaded())
    {
-      alSourcePlay(sourceID);
+      alSourcePlay(soundEffectInternal->sourceID);
    }
 }
 

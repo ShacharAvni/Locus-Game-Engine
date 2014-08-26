@@ -28,9 +28,10 @@ class LOCUS_GEOMETRY_API CollisionManager
 {
 public:
    CollisionManager();
+   ~CollisionManager();
+
    CollisionManager(const CollisionManager&) = delete;
    CollisionManager& operator=(const CollisionManager&) = delete;
-   ~CollisionManager();
 
    void Add(Collidable* collidable);
    void Update(Collidable* collidable);

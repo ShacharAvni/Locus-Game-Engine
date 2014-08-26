@@ -16,8 +16,6 @@
 #include "ShaderController.h"
 #include "GLInfo.h"
 
-#include <vector>
-
 namespace Locus
 {
 
@@ -25,6 +23,7 @@ class LOCUS_RENDERING_API RenderingState
 {
 public:
    RenderingState(GLInfo::GLSLVersion requiredGLSLVersion, bool useHighestSupportedGLSLVersion);
+
    RenderingState(const RenderingState&) = delete;
    RenderingState& operator=(const RenderingState&) = delete;
 

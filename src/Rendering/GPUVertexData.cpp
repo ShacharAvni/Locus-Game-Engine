@@ -15,7 +15,6 @@
 
 #include <Locus/Rendering/Locus_glew.h>
 
-#include <vector>
 #include <algorithm>
 
 #include <cstring>

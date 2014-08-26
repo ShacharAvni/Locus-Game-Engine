@@ -26,9 +26,10 @@ class LOCUS_RENDERING_API GPUVertexData
 {
 public:
    GPUVertexData();
+   ~GPUVertexData();
+
    GPUVertexData(const GPUVertexData&) = delete;
    GPUVertexData& operator=(const GPUVertexData&) = delete;
-   ~GPUVertexData();
 
    void Bind() const;
 

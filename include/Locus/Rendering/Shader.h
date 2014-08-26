@@ -29,9 +29,10 @@ public:
    };
 
    Shader(ShaderType type, const std::string& source);
+   ~Shader();
+
    Shader(const Shader&) = delete;
    Shader& operator=(const Shader&) = delete;
-   ~Shader();
 
    const GLuint id;
 };

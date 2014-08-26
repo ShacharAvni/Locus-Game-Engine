@@ -37,20 +37,22 @@ SoundState::SoundState()
 
    alcMakeContextCurrent(context);
 
-   float orientation[] = {1, 0, 0, 0, 1, 0};
-   SetListenerOrientation(orientation);
+   SetListenerOrientation(0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f);
 
-   float position[] = {0.0f, 0.0f, 0.0f};
-   SetListenerPosition(position);
+   SetListenerPosition(0.0f, 0.0f, 0.0f);
 }
 
-void SoundState::SetListenerOrientation(float* orientation)
+void SoundState::SetListenerOrientation(float xForward, float yForward, float zForward, float xUp, float yUp, float zUp)
 {
+   float orientation[] = {xForward, yForward, zForward, xUp, yUp, zUp};
+
    alListenerfv(AL_ORIENTATION, orientation);
 }
 
-void SoundState::SetListenerPosition(float* position)
+void SoundState::SetListenerPosition(float x, float y, float z)
 {
+   float position[] = {x, y, z};
+
    alListenerfv(AL_POSITION, position);
 }
 

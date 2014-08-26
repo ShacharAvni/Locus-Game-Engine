@@ -31,9 +31,10 @@ public:
    /// \throws Exception
    File(const MountedFilePath& mountedFilePath, DataStream::OpenMode openMode);
 
+   ~File();
+
    File(const File&) = delete;
    File& operator=(const File&) = delete;
-   ~File();
 
    /// \sa DataStream::IsEndOfStream
    virtual bool IsEndOfStream() const override;

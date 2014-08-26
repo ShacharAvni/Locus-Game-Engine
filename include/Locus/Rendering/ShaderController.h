@@ -29,6 +29,7 @@ class LOCUS_RENDERING_API ShaderController
 {
 public:
    ShaderController(const GLInfo& glInfo, GLInfo::GLSLVersion requiredGLSLVersion, bool useHighestSupportedGLSLVersion);
+
    ShaderController(const ShaderController&) = delete;
    ShaderController& operator=(const ShaderController&) = delete;
 

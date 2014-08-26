@@ -27,9 +27,10 @@ class LOCUS_RENDERING_API ShaderProgram
 {
 public:
    ShaderProgram(const Shader& shader1, const Shader& shader2, bool doesTexturing, bool doesLighting);
+   ~ShaderProgram();
+
    ShaderProgram(const ShaderProgram&) = delete;
    ShaderProgram& operator=(const ShaderProgram&) = delete;
-   ~ShaderProgram();
 
    void Use() const;
 

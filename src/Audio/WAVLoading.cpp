@@ -8,8 +8,8 @@
 *                                                                                                        *
 \********************************************************************************************************/
 
-#include "Locus/Audio/WAVLoading.h"
-#include "Locus/Audio/SoundData.h"
+#include "WAVLoading.h"
+#include "SoundData.h"
 
 #include "Locus/Common/Endian.h"
 

@@ -37,9 +37,10 @@ class LOCUS_SIMULATION_API Window
 {
 public:
    Window(WindowContext& windowContext, int width, int height, const std::string& name, bool fullScreen, int* targetRefreshRate);
+   ~Window();
+
    Window(const Window&) = delete;
    Window& operator=(const Window&) = delete;
-   ~Window();
 
    void RegisterEventListener(WindowEventListener* windowEventListener);
 

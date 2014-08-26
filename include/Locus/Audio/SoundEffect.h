@@ -11,23 +11,26 @@
 #pragma once
 
 #include "LocusAudioAPI.h"
-#include "SoundData.h"
-
-#include "Locus/FileSystem/MountedFilePath.h"
 
 #include <string>
-#include <vector>
+#include <memory>
 
 namespace Locus
 {
 
 class DataStream;
+struct MountedFilePath;
+
+struct SoundEffectInternal;
 
 class LOCUS_AUDIO_API SoundEffect
 {
 public:
    SoundEffect();
    ~SoundEffect();
+
+   SoundEffect(const SoundEffect&) = delete;
+   SoundEffect& operator=(const SoundEffect&) = delete;
 
    enum class SoundFileType
    {
@@ -49,11 +52,7 @@ public:
    bool IsLoaded() const;
 
 private:
-   SoundData soundData;
-   int size;
-
-   unsigned int bufferID;
-   unsigned int sourceID;
+   std::unique_ptr<SoundEffectInternal> soundEffectInternal;
 
    void BufferData();
 

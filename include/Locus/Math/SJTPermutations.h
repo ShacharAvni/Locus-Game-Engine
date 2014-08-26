@@ -28,6 +28,7 @@ class LOCUS_MATH_API SJTPermutations
 {
 public:
    SJTPermutations(int numElements);
+
    SJTPermutations(const SJTPermutations&) = delete;
    SJTPermutations& operator=(const SJTPermutations&) = delete;
 

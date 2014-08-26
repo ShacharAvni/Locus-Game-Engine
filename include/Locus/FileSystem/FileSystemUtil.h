@@ -10,13 +10,13 @@
 
 #include "LocusFileSystemAPI.h"
 
-#include "Locus/FileSystem/MountedFilePath.h"
-
 #include <string>
 #include <vector>
 
 namespace Locus
 {
+
+struct MountedFilePath;
 
 /// \return The full path to the current running executable.
 LOCUS_FILE_SYSTEM_API std::string GetExePath();

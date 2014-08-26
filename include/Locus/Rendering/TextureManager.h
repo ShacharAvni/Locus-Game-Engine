@@ -14,8 +14,6 @@
 
 #include "GLCommonTypes.h"
 
-#include "Locus/FileSystem/MountedFilePath.h"
-
 #include <string>
 #include <unordered_map>
 #include <memory>
@@ -25,6 +23,7 @@ namespace Locus
 
 class GLInfo;
 class Texture;
+struct MountedFilePath;
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
@@ -32,9 +31,10 @@ class LOCUS_RENDERING_API TextureManager
 {
 public:
    TextureManager(const GLInfo& glInfo);
+   virtual ~TextureManager();
+
    TextureManager(const TextureManager&) = delete;
    TextureManager& operator=(const TextureManager&) = delete;
-   virtual ~TextureManager();
 
    void Load(const std::string& textureName, const std::string& textureLocation, bool clamp);
    void Load(const std::string& textureName, const MountedFilePath& textureLocation, bool clamp);

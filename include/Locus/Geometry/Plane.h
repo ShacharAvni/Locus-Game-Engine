@@ -18,8 +18,6 @@
 #include "LineFwd.h"
 #include "LineSegmentFwd.h"
 
-#include <vector>
-
 namespace Locus
 {
 

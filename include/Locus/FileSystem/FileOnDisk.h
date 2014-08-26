@@ -34,9 +34,10 @@ public:
     */
    FileOnDisk(const std::string& filePath, DataStream::OpenMode openMode);
 
+   ~FileOnDisk();
+
    FileOnDisk(const FileOnDisk&) = delete;
    FileOnDisk& operator=(const FileOnDisk&) = delete;
-   ~FileOnDisk();
 
    /// \sa DataStream::IsEndOfStream
    virtual bool IsEndOfStream() const override;

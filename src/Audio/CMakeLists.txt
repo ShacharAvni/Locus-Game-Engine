@@ -40,16 +40,16 @@ set(LOCUS_AUDIO_INCLUDE ${LOCUS_INCLUDE}/Locus/Audio)
 include_directories(${LOCUS_INCLUDE} ${THIRD_PARTY_DIR}/OpenAL/include ${THIRD_PARTY_DIR}/OGG/include ${THIRD_PARTY_DIR}/Vorbis/include)
 
 add_library(Locus_Audio
+            OGGLoading.h
             OGGLoading.cpp
+            SoundData.h
             SoundEffect.cpp
-			SoundState.cpp
-			WAVLoading.cpp
-			${LOCUS_AUDIO_INCLUDE}/LocusAudioAPI.h
-			${LOCUS_AUDIO_INCLUDE}/OGGLoading.h
-			${LOCUS_AUDIO_INCLUDE}/SoundData.h
-			${LOCUS_AUDIO_INCLUDE}/SoundEffect.h
-			${LOCUS_AUDIO_INCLUDE}/SoundState.h
-			${LOCUS_AUDIO_INCLUDE}/WAVLoading.h)
+            SoundState.cpp
+            WAVLoading.h
+            WAVLoading.cpp
+            ${LOCUS_AUDIO_INCLUDE}/LocusAudioAPI.h
+            ${LOCUS_AUDIO_INCLUDE}/SoundEffect.h
+            ${LOCUS_AUDIO_INCLUDE}/SoundState.h)
 
 target_link_libraries(Locus_Audio ${OPENAL_LIBRARY})
 target_link_libraries(Locus_Audio ogg)

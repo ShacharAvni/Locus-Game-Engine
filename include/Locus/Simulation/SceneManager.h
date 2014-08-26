@@ -30,6 +30,7 @@ class LOCUS_SIMULATION_API SceneManager : public WindowEventListener
 {
 public:
    SceneManager(Window& window);
+
    SceneManager(const SceneManager&) = delete;
    SceneManager& operator=(const SceneManager&) = delete;
 

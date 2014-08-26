@@ -15,23 +15,23 @@
 #include "Image.h"
 #include "GLCommonTypes.h"
 
-#include "Locus/FileSystem/MountedFilePath.h"
-
 #include <string>
 
 namespace Locus
 {
 
 class GLInfo;
+struct MountedFilePath;
 
 class LOCUS_RENDERING_API Texture : public Image
 {
 public:
    Texture(const std::string& filePath, bool clamp, const GLInfo& glInfo);
    Texture(const MountedFilePath& mountedFilePath, bool clamp, const GLInfo& glInfo);
+   ~Texture();
+
    Texture(const Texture&) = delete;
    Texture& operator=(const Texture&) = delete;
-   ~Texture();
 
    void Bind();
 
