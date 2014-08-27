@@ -31,6 +31,8 @@ public:
    /*!
     * \param[in] filePath The full path to the file.
     * \param[in] openMode The usage pattern required for opening the file.
+    *
+    * \throws Exception
     */
    FileOnDisk(const std::string& filePath, DataStream::OpenMode openMode);
 
