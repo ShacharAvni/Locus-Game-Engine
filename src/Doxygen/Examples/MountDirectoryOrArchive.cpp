@@ -1,5 +1,9 @@
+//This example shows how to use the Locus FileSystem for
+//reading files in archives or on disk.
+
 #include "Locus/FileSystem/FileSystem.h"
 #include "Locus/FileSystem/File.h"
+
 #include "Locus/Common/Exception.h"
 
 #include <iostream>
@@ -8,7 +12,7 @@ int main(int argc, char** argv)
 {
    try
    {
-      //Must be done before other Locus file operations
+      //This initializes PHYSFS which must be done before other Locus File operations
       Locus::FileSystem fileSystem(argv[0]);
 
       //Add the directory "path_to/foo". Now MountedFilePaths can be relative to path_to/foo

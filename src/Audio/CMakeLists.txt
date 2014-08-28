@@ -42,6 +42,8 @@ include_directories(${LOCUS_INCLUDE} ${THIRD_PARTY_DIR}/OpenAL/include ${THIRD_P
 add_library(Locus_Audio
             OGGLoading.h
             OGGLoading.cpp
+            OpenALUtil.h
+            OpenALUtil.cpp
             SoundData.h
             SoundEffect.cpp
             SoundState.cpp

@@ -18,10 +18,16 @@ namespace Locus
 {
 
 /*!
- * \details This class must be instantiated before using the File
- * class or anything that uses MountedFilePaths. It is suggested
- * to instantiate this in main. It is an error to instantiate this
- * class more than once.
+ * \details This class initializes PHYSFS on instantiation and
+ * deinitializes PHYSFS on destruction. If PHYSFS is used by
+ * some other means then instantiating this class is not
+ * necessary. PHYSFS must be initialized somehow before using
+ * the File class or anything that uses MountedFilePaths. It is
+ * suggested to instantiate this class in main. It is an error to
+ * instantiate this class more than once or to instantiate it if
+ * PHYSFS is already initialized.
+ *
+ * \example MountDirectoryOrArchive.cpp
  */
 class LOCUS_FILE_SYSTEM_API FileSystem
 {
@@ -32,7 +38,8 @@ public:
     * not passed in to main, you can pass the full path to the executable
     * instead.
     * 
-    * \throws Exception
+    * \throws Exception if the FileSystem can't be initialized or if it has
+    * already been initialized or if PHYSFS has already been initialized.
     */
    FileSystem(const char* argv0);
    ~FileSystem();

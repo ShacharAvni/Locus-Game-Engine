@@ -15,6 +15,8 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 
+#include <cassert>
+
 namespace Locus
 {
 
@@ -35,11 +37,16 @@ SoundState::SoundState()
       throw Exception("Could not create sound context");
    }
 
-   alcMakeContextCurrent(context);
+   MakeOpenALContextCurrent();
 
    SetListenerOrientation(0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f);
 
    SetListenerPosition(0.0f, 0.0f, 0.0f);
+}
+
+void SoundState::MakeOpenALContextCurrent()
+{
+   alcMakeContextCurrent(context);
 }
 
 void SoundState::SetListenerOrientation(float xForward, float yForward, float zForward, float xUp, float yUp, float zUp)
@@ -59,7 +66,16 @@ void SoundState::SetListenerPosition(float x, float y, float z)
 SoundState::~SoundState()
 {
    alcDestroyContext(context);
+
+   ALenum error = alGetError();
+
+   assert(error != AL_NO_ERROR);
+
    alcCloseDevice(device);
+
+   error = alGetError();
+
+   assert(error != AL_NO_ERROR);
 }
 
 }

@@ -24,15 +24,25 @@ struct MountedFilePath;
 struct SoundEffectInternal;
 
 /*!
- * \details SoundEffects may only be instantiated
- * and used during the lifetime of a SoundState
- * instance.
+ * \details SoundEffects become attached to
+ * the OpenAL context that is current when they
+ * are instantiated. That same OpenAL context should
+ * also be current when the SoundEffect is destroyed.
+ * The easiest use of Locus SoundEffects is to
+ * instantiate a Locus SoundState in main and to NOT
+ * use OpenAL through any means besides Locus. This avoids
+ * the headache of any OpenAL context management that
+ * would be necessary when using SoundEffects or the
+ * SoundState.
+ * 
+ * \example SoundEffects.cpp
  *
  * \sa SoundState
  */
 class LOCUS_AUDIO_API SoundEffect
 {
 public:
+   /// \throws Exception
    SoundEffect();
    ~SoundEffect();
 
@@ -113,6 +123,9 @@ public:
     * \note This call is asynchronous.
     */
    void Play() const;
+
+   /// \return true if this sound effect is currently playing.
+   bool IsPlaying() const;
 
    /// \return true if the last call to Load was successful.
    bool IsLoaded() const;

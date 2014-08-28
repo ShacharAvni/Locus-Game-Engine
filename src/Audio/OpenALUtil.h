@@ -8,43 +8,13 @@
 *                                                                                                        *
 \********************************************************************************************************/
 
-#include "Locus/FileSystem/FileSystem.h"
+#include <AL/al.h>
 
-#include "Locus/Common/Exception.h"
-
-#include "physfs.h"
-
-#include <cassert>
+#include <string>
 
 namespace Locus
 {
 
-FileSystem::FileSystem(const char* argv0)
-{
-   if (PHYSFS_isInit())
-   {
-      throw Exception("PHYSFS has already been initialized");
-   }
-
-   if (PHYSFS_init(argv0) == 0)
-   {
-      throw Exception("Failed to initialize PHYSFS");
-   }
-}
-
-FileSystem::~FileSystem()
-{
-   #ifndef NDEBUG
-   int physfsDeinitialized = 
-   #endif
-   PHYSFS_deinit();
-
-   assert(physfsDeinitialized != 0);
-}
-
-void MountDirectoryOrArchive(const std::string& fullPath)
-{
-   PHYSFS_mount(fullPath.c_str(), NULL, 1);
-}
+std::string OpenALErrorToString(ALenum openALError);
 
 }

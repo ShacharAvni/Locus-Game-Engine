@@ -13,9 +13,11 @@
 #include "WAVLoading.h"
 #include "OGGLoading.h"
 #include "SoundData.h"
+#include "OpenALUtil.h"
 
 #include "Locus/Common/Parsing.h"
 #include "Locus/Common/Casts.h"
+#include "Locus/Common/Exception.h"
 
 #include "Locus/FileSystem/DataStream.h"
 #include "Locus/FileSystem/MountedFilePath.h"
@@ -24,6 +26,8 @@
 #include <AL/alc.h>
 
 #include <string>
+
+#include <cassert>
 
 namespace Locus
 {
@@ -42,7 +46,22 @@ SoundEffect::SoundEffect()
    : soundEffectInternal(std::make_unique<SoundEffectInternal>())
 {
    alGenBuffers(1, &soundEffectInternal->bufferID);
+
+   ALenum error = alGetError();
+
+   if (error != AL_NO_ERROR)
+   {
+      throw Exception(std::string("An OpenAL error occurred while generating buffers: ") + OpenALErrorToString(error));
+   }
+
    alGenSources(1, &soundEffectInternal->sourceID);
+
+   error = alGetError();
+
+   if (error != AL_NO_ERROR)
+   {
+      throw Exception(std::string("An OpenAL error occurred while generating sources: ") + OpenALErrorToString(error));
+   }
 
    Clear();
 
@@ -52,7 +71,16 @@ SoundEffect::SoundEffect()
 SoundEffect::~SoundEffect()
 {
    alDeleteSources(1, &soundEffectInternal->sourceID);
+
+   ALenum error = alGetError();
+
+   assert(error != AL_NO_ERROR);
+
    alDeleteBuffers(1, &soundEffectInternal->bufferID);
+
+   error = alGetError();
+
+   assert(error != AL_NO_ERROR);
 }
 
 void SoundEffect::Clear()
@@ -193,6 +221,15 @@ void SoundEffect::Play() const
    {
       alSourcePlay(soundEffectInternal->sourceID);
    }
+}
+
+bool SoundEffect::IsPlaying() const
+{
+   ALint sourceStateValue = 0;
+
+   alGetSourcei(soundEffectInternal->sourceID, AL_SOURCE_STATE, &sourceStateValue);
+
+   return (sourceStateValue == AL_PLAYING);
 }
 
 }
