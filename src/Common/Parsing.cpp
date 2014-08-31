@@ -30,12 +30,12 @@ void TrimString(std::string& str)
 
 void ToLower(std::string& str)
 {
-   std::transform(str.begin(), str.end(), str.begin(), std::tolower);
+   std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 }
 
 void ToUpper(std::string& str)
 {
-   std::transform(str.begin(), str.end(), str.begin(), std::toupper);
+   std::transform(str.begin(), str.end(), str.begin(), ::toupper);
 }
 
 }

@@ -67,15 +67,17 @@ SoundState::~SoundState()
 {
    alcDestroyContext(context);
 
-   ALenum error = alGetError();
-
-   assert(error != AL_NO_ERROR);
+   #ifndef NDEBUG
+      ALenum error = alGetError();
+      assert(error != AL_NO_ERROR);
+   #endif
 
    alcCloseDevice(device);
 
-   error = alGetError();
-
-   assert(error != AL_NO_ERROR);
+   #ifndef NDEBUG
+      error = alGetError();
+      assert(error != AL_NO_ERROR);
+   #endif
 }
 
 }

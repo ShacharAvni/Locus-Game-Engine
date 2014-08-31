@@ -72,15 +72,17 @@ SoundEffect::~SoundEffect()
 {
    alDeleteSources(1, &soundEffectInternal->sourceID);
 
-   ALenum error = alGetError();
-
-   assert(error != AL_NO_ERROR);
+   #ifndef NDEBUG
+      ALenum error = alGetError();
+      assert(error != AL_NO_ERROR);
+   #endif
 
    alDeleteBuffers(1, &soundEffectInternal->bufferID);
 
-   error = alGetError();
-
-   assert(error != AL_NO_ERROR);
+   #ifndef NDEBUG
+      error = alGetError();
+      assert(error != AL_NO_ERROR);
+   #endif
 }
 
 void SoundEffect::Clear()
