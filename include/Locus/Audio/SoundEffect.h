@@ -18,6 +18,8 @@
 namespace Locus
 {
 
+#include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
+
 class DataStream;
 struct MountedFilePath;
 
@@ -146,5 +148,7 @@ private:
 
    void Clear();
 };
+
+#include "Locus/Preprocessor/EndSilenceDLLInterfaceWarnings"
 
 }
