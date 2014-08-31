@@ -23,9 +23,7 @@ namespace Locus
  * some other means then instantiating this class is not
  * necessary. PHYSFS must be initialized somehow before using
  * the File class or anything that uses MountedFilePaths. It is
- * suggested to instantiate this class in main. It is an error to
- * instantiate this class more than once or to instantiate it if
- * PHYSFS is already initialized.
+ * suggested to instantiate this class in main.
  *
  * \example MountDirectoryOrArchive.cpp
  */
@@ -38,8 +36,7 @@ public:
     * not passed in to main, you can pass the full path to the executable
     * instead.
     * 
-    * \throws Exception if the FileSystem can't be initialized or if it has
-    * already been initialized or if PHYSFS has already been initialized.
+    * \throws Exception if the FileSystem can't be initialized.
     */
    FileSystem(const char* argv0);
    ~FileSystem();

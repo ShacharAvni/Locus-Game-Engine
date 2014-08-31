@@ -21,25 +21,26 @@ namespace Locus
 
 FileSystem::FileSystem(const char* argv0)
 {
-   if (PHYSFS_isInit())
+   if (!PHYSFS_isInit())
    {
-      throw Exception("PHYSFS has already been initialized");
-   }
-
-   if (PHYSFS_init(argv0) == 0)
-   {
-      throw Exception("Failed to initialize PHYSFS");
+      if (PHYSFS_init(argv0) == 0)
+      {
+         throw Exception("Failed to initialize PHYSFS");
+      }
    }
 }
 
 FileSystem::~FileSystem()
 {
-   #ifndef NDEBUG
-   int physfsDeinitialized = 
-   #endif
-   PHYSFS_deinit();
+   if (PHYSFS_isInit())
+   {
+      #ifndef NDEBUG
+      int physfsDeinitialized = 
+      #endif
+      PHYSFS_deinit();
 
-   assert(physfsDeinitialized != 0);
+      assert(physfsDeinitialized != 0);
+   }
 }
 
 void MountDirectoryOrArchive(const std::string& fullPath)

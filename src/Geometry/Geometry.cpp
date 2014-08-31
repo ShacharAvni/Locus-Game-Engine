@@ -14,7 +14,7 @@
 
 #include "Locus/Common/Float.h"
 
-#include "Locus/Math/SquareMatrix.h"
+#include "Locus/Math/Matrix.h"
 
 #include <algorithm>
 
@@ -65,7 +65,7 @@ void ResolveCollision(float coefficientOfRestitution,
 
    float masses[2] = { boundingSpheres[0].Volume(), boundingSpheres[1].Volume() }; //assume density of asteroid is 1 Kg per cubic metre
 
-   SquareMatrix<float> inertiaTensorInverses[2] = {SquareMatrix<float>(3), SquareMatrix<float>(3)};
+   Matrix<float> inertiaTensorInverses[2] = {Matrix<float>(3, 3), Matrix<float>(3, 3)};
 
    for (int asteroidIndex = 0; asteroidIndex < 2; ++asteroidIndex)
    {

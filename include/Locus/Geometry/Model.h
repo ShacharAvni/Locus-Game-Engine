@@ -572,7 +572,7 @@ public:
 
    void ScaleModel(float scale)
    {
-      if (Float::NotEqual<float>(scale, 1.0f))
+      if (FNotEqual<float>(scale, 1.0f))
       {
          for (Vector3& position : positions)
          {

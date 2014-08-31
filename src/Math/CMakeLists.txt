@@ -37,17 +37,15 @@ set(LOCUS_MATH_INCLUDE "${LOCUS_INCLUDE}/Locus/Math")
 include_directories(${LOCUS_INCLUDE})
 
 add_library(Locus_Math
-			Matrix.cpp
-			MByNIterations.cpp
-			Polynomial.cpp
-			SJTPermutations.cpp
-			SquareMatrix.cpp
-			${LOCUS_MATH_INCLUDE}/ComplexUtil.h
-			${LOCUS_MATH_INCLUDE}/Matrix.h
-			${LOCUS_MATH_INCLUDE}/MByNIterations.h
-			${LOCUS_MATH_INCLUDE}/Polynomial.h
-			${LOCUS_MATH_INCLUDE}/SJTPermutations.h
-			${LOCUS_MATH_INCLUDE}/SquareMatrix.h
-			${LOCUS_MATH_INCLUDE}/LocusMathAPI.h)
+			   Matrix.cpp
+			   MByNIterations.cpp
+			   Polynomial.cpp
+			   SJTPermutations.cpp
+			   ${LOCUS_MATH_INCLUDE}/ComplexUtil.h
+			   ${LOCUS_MATH_INCLUDE}/Matrix.h
+			   ${LOCUS_MATH_INCLUDE}/MByNIterations.h
+			   ${LOCUS_MATH_INCLUDE}/Polynomial.h
+			   ${LOCUS_MATH_INCLUDE}/SJTPermutations.h
+			   ${LOCUS_MATH_INCLUDE}/LocusMathAPI.h)
 
 target_link_libraries(Locus_Math Locus_Common)

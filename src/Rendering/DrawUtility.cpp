@@ -54,7 +54,7 @@ bool DrawUtility::Unproject(
    int resolutionY,
    Vector3& worldCoordinate)
 {
-   Locus::SquareMatrix<float> modelViewProjectionInverted = projection * modelView;
+   Locus::Matrix<float> modelViewProjectionInverted = projection * modelView;
 
    if (!modelViewProjectionInverted.Invert())
    {

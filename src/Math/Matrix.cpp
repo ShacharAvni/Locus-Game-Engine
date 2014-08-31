@@ -9,9 +9,12 @@
 \********************************************************************************************************/
 
 #include "Locus/Math/Matrix.h"
+#include "Locus/Math/MByNIterations.h"
+#include "Locus/Math/SJTPermutations.h"
 
 #include "Locus/Common/Float.h"
 
+#include <set>
 #include <algorithm>
 
 #include <cassert>
@@ -21,20 +24,33 @@ namespace Locus
 
 template <typename ScalarType>
 Matrix<ScalarType>::Matrix(unsigned int rows, unsigned int columns)
-   : Rows(rows), Columns(columns), values(rows * columns)
+   : rows(rows), columns(columns), values(rows * columns)
 {
-   assert((Rows > 0) && (Columns > 0));
+   assert((rows > 0) && (columns > 0));
 }
 
 template <typename ScalarType>
-Matrix<ScalarType>::~Matrix()
+Matrix<ScalarType>::Matrix(unsigned int rows, unsigned int columns, std::initializer_list<ScalarType> rowMajorElements)
+   : Matrix<ScalarType>(rows, columns)
 {
+   assert(rowMajorElements.size() == (rows * columns));
+
+   const ScalarType* inputElement = rowMajorElements.begin();
+
+   for (unsigned int row = 0; row < this->rows; ++row)
+   {
+      for (unsigned int col = 0; col < this->columns; ++col)
+      {
+         this->At(row, col) = *inputElement;
+         ++inputElement;
+      }
+   }
 }
 
 #define MATRIX_ACCESS_FUNCTION(row, col)\
-   assert(row < Rows);\
-   assert(col < Columns);\
-   return values[(col * Rows) + row];
+   assert(row < rows);\
+   assert(col < columns);\
+   return values[(col * rows) + row];
 
 template <typename ScalarType>
 ScalarType& Matrix<ScalarType>::At(unsigned int row, unsigned int col)
@@ -63,62 +79,49 @@ const ScalarType& Matrix<ScalarType>::operator()(unsigned int row, unsigned int 
 #undef MATRIX_ACCESS_FUNCTION
 
 template <typename ScalarType>
-unsigned int Matrix<ScalarType>::NumRows() const
+unsigned int Matrix<ScalarType>::Rows() const
 {
-   return Rows;
+   return rows;
 }
 
 template <typename ScalarType>
-unsigned int Matrix<ScalarType>::NumColumns() const
+unsigned int Matrix<ScalarType>::Columns() const
 {
-   return Columns;
+   return columns;
 }
 
 template <typename ScalarType>
-std::vector<ScalarType> Matrix<ScalarType>::operator*(const std::vector<ScalarType>& v) const
+bool Matrix<ScalarType>::IsSquare() const
 {
-   assert(v.size() == Columns);
+   return (rows == columns);
+}
 
-   std::vector<ScalarType> multiplied(Rows);
+template <typename ScalarType>
+const std::vector<ScalarType>& Matrix<ScalarType>::GetElements() const
+{
+   return values;
+}
 
-   for (unsigned int row = 0; row < Rows; ++row)
+template <typename ScalarType>
+const ScalarType* const Matrix<ScalarType>::Elements() const
+{
+   return values.data();
+}
+
+template <typename ScalarType>
+void Matrix<ScalarType>::SetMainDiagonal(ScalarType value)
+{
+   for (unsigned int dimensionIndex = 0; dimensionIndex < this->rows; ++dimensionIndex)
    {
-      ScalarType multipliedValue = 0;
-
-      for (unsigned int col = 0; col < Columns; ++col)
-      {
-         multipliedValue += At(row, col) * v[col];
-      }
-
-      multiplied[row] = multipliedValue;
+      this->At(dimensionIndex, dimensionIndex) = value;
    }
-
-   return multiplied;
 }
 
 template <typename ScalarType>
-Matrix<ScalarType> Matrix<ScalarType>::operator*(const Matrix<ScalarType>& matrix) const
+void Matrix<ScalarType>::SetToIdentity()
 {
-   assert(Columns == matrix.Rows);
-
-   Matrix<ScalarType> multiplied(Rows, matrix.Columns);
-
-   for (unsigned int rowInResult = 0; rowInResult < Rows; ++rowInResult)
-   {
-      for (unsigned int columnInResult = 0; columnInResult < matrix.Columns; ++columnInResult)
-      {
-         ScalarType multipliedValue = 0;
-
-         for (unsigned int commonDimensionIndex = 0; commonDimensionIndex < Columns; ++commonDimensionIndex)
-         {
-            multipliedValue += At(rowInResult, commonDimensionIndex) * matrix(commonDimensionIndex, columnInResult);
-         }
-
-         multiplied(rowInResult, columnInResult) = multipliedValue;
-      }
-   }
-
-   return multiplied;
+   this->Fill(0);
+   SetMainDiagonal(1);
 }
 
 template <typename ScalarType>
@@ -128,51 +131,51 @@ void Matrix<ScalarType>::Fill(ScalarType value)
 }
 
 template <typename ScalarType>
-void Matrix<ScalarType>::AddDimensions(unsigned int rows, unsigned int columns)
+void Matrix<ScalarType>::AddDimensions(unsigned int rowsToAdd, unsigned int columnsToAdd)
 {
-   ReDimension(Rows + rows, Columns + columns);
+   ReDimension(rows + rowsToAdd, columns + columnsToAdd);
 }
 
 template <typename ScalarType>
-void Matrix<ScalarType>::AddRows(unsigned int rows)
+void Matrix<ScalarType>::AddRows(unsigned int rowsToAdd)
 {
-   ReDimension(Rows + rows, Columns);
+   ReDimension(rows + rowsToAdd, columns);
 }
 
 template <typename ScalarType>
-void Matrix<ScalarType>::AddColumns(unsigned int columns)
+void Matrix<ScalarType>::AddColumns(unsigned int columnsToAdd)
 {
-   ReDimension(Rows, Columns + columns);
+   ReDimension(rows, columns + columnsToAdd);
 }
 
 template <typename ScalarType>
-void Matrix<ScalarType>::RemoveDimensions(unsigned int rows, unsigned int columns)
+void Matrix<ScalarType>::RemoveDimensions(unsigned int rowsToRemove, unsigned int columnsToRemove)
 {
-   assert((rows < Rows) && (columns < Columns));
+   assert((rowsToRemove < rows) && (columnsToRemove < columns));
 
-   ReDimension(Rows - rows, Columns - columns);
+   ReDimension(rows - rowsToRemove, columns - columnsToRemove);
 }
 
 template <typename ScalarType>
-void Matrix<ScalarType>::RemoveRows(unsigned int rows)
+void Matrix<ScalarType>::RemoveRows(unsigned int rowsToRemove)
 {
-   assert(rows < Rows);
+   assert(rowsToRemove < rows);
 
-   ReDimension(Rows - rows, Columns);
+   ReDimension(rows - rowsToRemove, columns);
 }
 
 template <typename ScalarType>
-void Matrix<ScalarType>::RemoveColumns(unsigned int columns)
+void Matrix<ScalarType>::RemoveColumns(unsigned int columnsToRemove)
 {
-   assert(columns < Columns);
+   assert(columnsToRemove < columns);
 
-   ReDimension(Rows, Columns - columns);
+   ReDimension(rows, columns - columnsToRemove);
 }
 
 template <typename ScalarType>
 bool Matrix<ScalarType>::IsRowAllZero(unsigned int row, unsigned int upToColumn) const
 {
-   assert(row < Rows);
+   assert(row < rows);
 
    for (unsigned int col = 0; col <= upToColumn; ++col)
    {
@@ -188,15 +191,15 @@ bool Matrix<ScalarType>::IsRowAllZero(unsigned int row, unsigned int upToColumn)
 template <typename ScalarType>
 bool Matrix<ScalarType>::IsRowAllZero(unsigned int row) const
 {
-   return IsRowAllZero(row, Columns - 1);
+   return IsRowAllZero(row, columns - 1);
 }
 
 template <typename ScalarType>
 bool Matrix<ScalarType>::IsZeroMatrix() const
 {
-   for (unsigned int row = 0; row < Rows; ++row)
+   for (unsigned int row = 0; row < rows; ++row)
    {
-      for (unsigned int col = 0; col < Columns; ++col)
+      for (unsigned int col = 0; col < columns; ++col)
       {
          if (FNotZero<ScalarType>(At(row, col)))
          {
@@ -221,13 +224,13 @@ Matrix<ScalarType> Matrix<ScalarType>::TransposedMatrix() const
 template <typename ScalarType>
 void Matrix<ScalarType>::Transpose()
 {
-   std::vector<ScalarType> newValues(Rows * Columns);
+   std::vector<ScalarType> newValues(rows * columns);
 
    std::size_t valueIndex = 0;
 
-   for (unsigned int row = 0; row < Rows; ++row)
+   for (unsigned int row = 0; row < rows; ++row)
    {
-      for (unsigned int col = 0; col < Columns; ++col)
+      for (unsigned int col = 0; col < columns; ++col)
       {
          newValues[valueIndex] = At(row, col);
          ++valueIndex;
@@ -235,24 +238,24 @@ void Matrix<ScalarType>::Transpose()
    }
 
    values = std::move(newValues);
-   std::swap(Rows, Columns);
+   std::swap(rows, columns);
 }
 
 template <typename ScalarType>
 Matrix<ScalarType> Matrix<ScalarType>::SubMatrix(unsigned int row, unsigned int col) const
 {
-   assert((row < Rows) && (col < Columns));
-   assert((Rows > 1) && (Columns > 1));
+   assert((row < rows) && (col < columns));
+   assert((rows > 1) && (columns > 1));
 
-   Matrix<ScalarType> subMatrix(Rows - 1, Columns - 1);
+   Matrix<ScalarType> subMatrix(rows - 1, columns - 1);
 
    unsigned int subRowIndex = 0;
-   for (unsigned int rowIndex = 0; rowIndex < Rows; ++rowIndex)
+   for (unsigned int rowIndex = 0; rowIndex < rows; ++rowIndex)
    {
       if (rowIndex != row)
       {
          unsigned int subColumnIndex = 0;
-         for (unsigned int columnIndex = 0; columnIndex < Columns; ++columnIndex)
+         for (unsigned int columnIndex = 0; columnIndex < columns; ++columnIndex)
          {
             if (columnIndex != col)
             {
@@ -272,22 +275,22 @@ Matrix<ScalarType> Matrix<ScalarType>::SubMatrix(unsigned int row, unsigned int 
 template <typename ScalarType>
 void Matrix<ScalarType>::MultMatrix(const Matrix<ScalarType>& otherMatrix)
 {
-   assert((otherMatrix.Rows == Columns) && (otherMatrix.Columns == Columns));
+   assert((otherMatrix.rows == columns) && (otherMatrix.columns == columns));
 
-   std::vector<ScalarType> newValues(Rows * Columns);
+   std::vector<ScalarType> newValues(rows * columns);
 
-   for (unsigned int rowInResult = 0; rowInResult < Rows; ++rowInResult)
+   for (unsigned int rowInResult = 0; rowInResult < rows; ++rowInResult)
    {
-      for (unsigned int columnInResult = 0; columnInResult < Columns; ++columnInResult)
+      for (unsigned int columnInResult = 0; columnInResult < columns; ++columnInResult)
       {
          ScalarType multipliedValue = 0;
 
-         for (unsigned int commonDimensionIndex = 0; commonDimensionIndex < Columns; ++commonDimensionIndex)
+         for (unsigned int commonDimensionIndex = 0; commonDimensionIndex < columns; ++commonDimensionIndex)
          {
             multipliedValue += At(rowInResult, commonDimensionIndex) * otherMatrix.At(commonDimensionIndex, columnInResult);
          }
 
-         newValues[(columnInResult * Rows) + rowInResult] = multipliedValue;
+         newValues[(columnInResult * rows) + rowInResult] = multipliedValue;
       }
    }
 
@@ -297,10 +300,10 @@ void Matrix<ScalarType>::MultMatrix(const Matrix<ScalarType>& otherMatrix)
 template <typename ScalarType>
 void Matrix<ScalarType>::SwapRows(unsigned int row1, unsigned int row2)
 {
-   assert(row1 < Rows);
-   assert(row2 < Rows);
+   assert(row1 < rows);
+   assert(row2 < rows);
 
-   for (unsigned int col = 0; col < Columns; ++col)
+   for (unsigned int col = 0; col < columns; ++col)
    {
       std::swap( At(row1, col), At(row2, col) );
    }
@@ -309,10 +312,10 @@ void Matrix<ScalarType>::SwapRows(unsigned int row1, unsigned int row2)
 template <typename ScalarType>
 void Matrix<ScalarType>::OperateOnRow(unsigned int rowToChange, ScalarType multipleOnRowToChange, unsigned int rowToUse, ScalarType multipleOnRowToUse)
 {
-   assert(rowToChange < Rows);
-   assert(rowToUse < Rows);
+   assert(rowToChange < rows);
+   assert(rowToUse < rows);
 
-   for (unsigned int col = 0; col < Columns; ++col)
+   for (unsigned int col = 0; col < columns; ++col)
    {
       At(rowToChange, col) = (multipleOnRowToChange * At(rowToChange, col)) + (multipleOnRowToUse * At(rowToUse, col));
    }
@@ -321,9 +324,9 @@ void Matrix<ScalarType>::OperateOnRow(unsigned int rowToChange, ScalarType multi
 template <typename ScalarType>
 void Matrix<ScalarType>::ScalarMultiplyRow(unsigned int rowToChange, ScalarType multipleOnRowToChange)
 {
-   assert(rowToChange < Rows);
+   assert(rowToChange < rows);
 
-   for (unsigned int col = 0; col < Columns; ++col)
+   for (unsigned int col = 0; col < columns; ++col)
    {
       At(rowToChange, col) *= multipleOnRowToChange;
    }
@@ -333,7 +336,7 @@ void Matrix<ScalarType>::ScalarMultiplyRow(unsigned int rowToChange, ScalarType 
 template <typename ScalarType>
 void Matrix<ScalarType>::MakeRowEchelon(bool reduce)
 {
-   unsigned int lastColumn = std::min(Rows, Columns) - 1;
+   unsigned int lastColumn = std::min(rows, columns) - 1;
 
    for (unsigned int col = 0; col <= lastColumn; ++col)
    {
@@ -349,18 +352,6 @@ void Matrix<ScalarType>::MakeRowEchelon(bool reduce)
    }
 }
 
-template <typename ScalarType>
-const std::vector<ScalarType>& Matrix<ScalarType>::GetElements() const
-{
-   return values;
-}
-
-template <typename ScalarType>
-const ScalarType* const Matrix<ScalarType>::Elements() const
-{
-   return values.data();
-}
-
 //{CodeReview:RowReduction}
 template <typename ScalarType>
 void Matrix<ScalarType>::MakeRowEchelon(unsigned int col, bool reduce)
@@ -369,7 +360,7 @@ void Matrix<ScalarType>::MakeRowEchelon(unsigned int col, bool reduce)
 
    if (!pivotInPlace)
    {
-      for (unsigned int row = col + 1; row < Rows; ++row)
+      for (unsigned int row = col + 1; row < rows; ++row)
       {
          if (FNotZero<ScalarType>(At(row, col)))
          {
@@ -400,7 +391,7 @@ void Matrix<ScalarType>::MakeRowEchelon(unsigned int col, bool reduce)
          }
       }
 
-      for (unsigned int row = rowOfPivot + 1; row < Rows; ++row)
+      for (unsigned int row = rowOfPivot + 1; row < rows; ++row)
       {
          ScalarType valueToMakeZero = At(row, col);
 
@@ -424,12 +415,350 @@ void Matrix<ScalarType>::ReducePivot(unsigned int col)
 }
 
 template <typename ScalarType>
+bool Matrix<ScalarType>::IsDiagonal() const
+{
+   for (unsigned int row = 0; row < this->rows; ++row)
+   {
+      for (unsigned int col = 0; col < this->columns; ++col)
+      {
+         if (row != col)
+         {
+            if (FNotZero<ScalarType>(this->At(row, col)))
+            {
+               return false;
+            }
+         }
+      }
+   }
+
+   return true;
+}
+
+template <typename ScalarType>
+ScalarType Matrix<ScalarType>::Determinant() const
+{
+   assert(IsSquare());
+
+   ScalarType determinant = 0;
+
+   SJTPermutations permutations(this->rows);
+
+   char signOfPermutation = 1;
+
+   do
+   {
+      ScalarType determinantSubProduct = signOfPermutation;
+
+      for (unsigned int dimensionIndex = 0; dimensionIndex < this->rows; ++dimensionIndex)
+      {
+         determinantSubProduct *= this->At(dimensionIndex, permutations.GetElement(dimensionIndex));
+      }
+
+      determinant += determinantSubProduct;
+
+      signOfPermutation *= -1;
+   } while (permutations.GenerateNext());
+
+   return determinant;
+}
+
+template <typename ScalarType>
+bool Matrix<ScalarType>::IsInvertible() const
+{
+   return ( IsSquare() && FNotZero<ScalarType>(Determinant()) );
+}
+
+template <typename ScalarType>
+Matrix<ScalarType> Matrix<ScalarType>::GetInverse() const
+{
+   assert(IsSquare());
+
+   Matrix<ScalarType> inverse(*this);
+
+   if (!inverse.Invert())
+   {
+      inverse.Fill(0);
+   }
+         
+   return inverse;
+}
+
+template <typename ScalarType>
+bool Matrix<ScalarType>::Invert()
+{
+   assert(IsSquare());
+
+   Matrix<ScalarType> augmentedMatrix = *this;
+
+   augmentedMatrix.AddColumns(this->columns);
+
+   for (unsigned int col = this->columns; col < (2 * this->columns); ++col)
+   {
+      augmentedMatrix(col - this->columns, col) = 1;
+   }
+
+   augmentedMatrix.MakeRowEchelon(true);
+
+   for (unsigned int col = 0; col < this->columns; ++col)
+   {
+      if (FNotEqual<ScalarType>(augmentedMatrix(col, col), 1))
+      {
+         return false;
+      }
+   }
+
+   for (unsigned int row = 0; row < this->rows; ++row)
+   {
+      for (unsigned int col = 0; col < this->columns; ++col)
+      {
+         this->At(row, col) = augmentedMatrix(row, this->columns + col);
+      }
+   }
+
+   return true;
+}
+
+template <typename ScalarType>
+ScalarType Matrix<ScalarType>::Trace() const
+{
+   assert(IsSquare());
+
+   ScalarType trace = 0;
+
+   for (unsigned int dimensionIndex = 0; dimensionIndex < this->rows; ++dimensionIndex)
+   {
+      trace += this->At(dimensionIndex, dimensionIndex);
+   }
+
+   return trace;
+}
+
+template <typename ScalarType>
+Polynomial<ScalarType> Matrix<ScalarType>::CharacteristicPolynomial() const
+{
+   assert(IsSquare());
+
+   const unsigned int Degree = this->rows;
+
+   Polynomial<ScalarType> characteristicPolynomial(Degree);
+
+   if (Degree >= 2)
+   {
+      characteristicPolynomial[0] = Determinant();
+
+      std::vector<ScalarType> traces(Degree);
+
+      Matrix<ScalarType> multipliedMatrix = *this;
+
+      for (unsigned int traceIndex = 0; traceIndex < Degree; ++traceIndex)
+      {
+         traces[traceIndex] = multipliedMatrix.Trace();
+         multipliedMatrix.MultMatrix(*this);
+      }
+
+      const ScalarType minusOneToTheN = static_cast<ScalarType>( (Degree % 2 == 0) ? 1 : -1 );
+
+      for (unsigned int coefficientIndex = Degree - 2; coefficientIndex >= 1; --coefficientIndex)
+      {
+         const unsigned int M = Degree - coefficientIndex;
+
+         characteristicPolynomial[coefficientIndex] = -traces[M - 1] / M;
+
+         unsigned int denominator = 1;
+         int sign = -1;
+         for (unsigned int subTerm = 2; subTerm < M; ++subTerm)
+         {
+            denominator *= subTerm;
+            sign *= -1;
+
+            characteristicPolynomial[coefficientIndex] += ( (sign * CharacteristicPolynomialCoefficientSubTerm(subTerm, M, traces)) / denominator );
+         }
+
+         denominator *= M;
+         sign *= -1;
+
+         characteristicPolynomial[coefficientIndex] += ( (sign * static_cast<ScalarType>(pow(traces[0], M))) / denominator );
+
+         characteristicPolynomial[coefficientIndex] *= minusOneToTheN;
+      }
+
+      characteristicPolynomial[Degree - 1] = (minusOneToTheN * -1) * traces[0];
+      characteristicPolynomial[Degree] = minusOneToTheN;
+   }
+
+   return characteristicPolynomial;
+}
+
+template <typename ScalarType>
+bool Matrix<ScalarType>::SolveEigenvalues(std::vector<ScalarType>& eigenValues) const
+{
+   assert(IsSquare());
+
+   if (IsDiagonal())
+   {
+      eigenValues.resize(this->rows);
+
+      for (unsigned int dimensionIndex = 0; dimensionIndex < this->rows; ++dimensionIndex)
+      {
+         eigenValues[dimensionIndex] = this->At(dimensionIndex, dimensionIndex);
+      }
+
+      std::sort(eigenValues.begin(), eigenValues.end());
+
+      return true;
+   }
+   else if (CharacteristicPolynomial().Solve(eigenValues))
+   {
+      std::sort(eigenValues.begin(), eigenValues.end());
+
+      return true;
+   }
+
+   return false;
+}
+
+template <typename ScalarType>
+bool Matrix<ScalarType>::SolveEigenvectors(std::vector<std::vector<ScalarType>>& eigenVectors) const
+{
+   assert(IsSquare());
+
+   std::vector<ScalarType> eigenvalues(this->rows);
+
+   if (SolveEigenvalues(eigenvalues))
+   {
+      eigenVectors.clear();
+      eigenVectors.reserve(eigenvalues.size());
+
+      std::set<ScalarType> uniqueEigenvalues;
+      uniqueEigenvalues.insert(eigenvalues.begin(), eigenvalues.end());
+
+      std::vector<unsigned int> nonZeroRows;
+      nonZeroRows.reserve(this->rows);
+
+      std::vector<unsigned int> freeRows;
+      freeRows.reserve(this->rows);
+
+      for (ScalarType eigenvalue : uniqueEigenvalues)
+      {
+         Matrix<ScalarType> augmentedMatrix = *this;
+
+         augmentedMatrix.AddColumns(1);
+
+         unsigned int numColumnsInAugmentedMatrix = augmentedMatrix.Columns();
+
+         for (unsigned int row = 0; row < this->rows; ++row)
+         {
+            augmentedMatrix(row, row) -= eigenvalue;
+         }
+
+         augmentedMatrix.MakeRowEchelon(false);
+
+         nonZeroRows.clear();
+         freeRows.clear();
+
+         for (unsigned int row = 0; row < this->rows; ++row)
+         {
+            if (augmentedMatrix.IsRowAllZero(row, numColumnsInAugmentedMatrix - 2))
+            {
+               if (FNotZero<ScalarType>(augmentedMatrix(row, numColumnsInAugmentedMatrix - 1)))
+               {
+                  //Here we have zero = (something not zero) so we have no solutions
+                  return false;
+               }
+
+               freeRows.push_back(row);
+            }
+            else
+            {
+               nonZeroRows.push_back(row);
+            }
+         }
+
+         std::vector<ScalarType> singleEigenvector(this->rows);
+
+         std::size_t numFreeRows = freeRows.size();
+
+         if (numFreeRows > 0)
+         {
+            for (std::size_t newEigenvectorIndex = 0; newEigenvectorIndex < numFreeRows; ++newEigenvectorIndex)
+            {
+               for (unsigned int freeRow : freeRows)
+               {
+                  singleEigenvector[freeRow] = 1;
+               }
+
+               if (newEigenvectorIndex > 0)
+               {
+                  singleEigenvector[freeRows[newEigenvectorIndex - 1]] = -1;
+               }
+
+               eigenVectors.push_back(singleEigenvector);
+            }
+         }
+         else
+         {
+            singleEigenvector[this->rows - 1] = 1;
+
+            for (int row = this->rows - 2; row >= 0; --row)
+            {
+               ScalarType eigenVectorTerm = augmentedMatrix(row, this->columns);
+
+               for (int col = this->columns - 1; col > row; --col)
+               {
+                  eigenVectorTerm -= augmentedMatrix(row, col) * singleEigenvector[col];
+               }
+
+               singleEigenvector[row] = eigenVectorTerm / augmentedMatrix(row, row);
+            }
+
+            eigenVectors.push_back(singleEigenvector);
+         }
+      }
+
+      return true;
+   }
+
+   return false;
+}
+
+template <typename ScalarType>
+ScalarType Matrix<ScalarType>::CharacteristicPolynomialCoefficientSubTerm(unsigned int subTerm, unsigned int M, const std::vector<ScalarType>& traces)
+{
+   ScalarType coefficientSubTerm = 0;
+
+   MByNIterations iterations(subTerm, M - subTerm + 1);
+
+   do
+   {
+      std::size_t oneBasedIndexSum = 0;
+      std::size_t oneBasedIndexProduct = 1;
+      ScalarType traceProduct = 1;
+
+      for (unsigned int elementIndex = 0; elementIndex < subTerm; ++elementIndex)
+      {
+         std::size_t element = iterations.GetElement(elementIndex);
+
+         oneBasedIndexSum += (element + 1);
+         oneBasedIndexProduct *= (element + 1);
+         traceProduct *= traces[element];
+      }
+
+      if (oneBasedIndexSum == M)
+      {
+         coefficientSubTerm += (traceProduct / oneBasedIndexProduct);
+      }
+   } while (iterations.GenerateNext());
+
+   return coefficientSubTerm;
+}
+
+template <typename ScalarType>
 void Matrix<ScalarType>::ReDimension(unsigned int newRows, unsigned int newColumns)
 {
    Matrix<ScalarType>::ReDimensionFrom(values, *this, newRows, newColumns);
 
-   Rows = newRows;
-   Columns = newColumns;
+   rows = newRows;
+   columns = newColumns;
 }
 
 template <typename ScalarType>
@@ -443,7 +772,7 @@ void Matrix<ScalarType>::ReDimensionFrom(std::vector<ScalarType>& matrixValues, 
    {
       for (unsigned int rowIndex = 0; rowIndex < newRows; ++rowIndex)
       {
-         if ((columnIndex < matrix.Columns) && (rowIndex < matrix.Rows))
+         if ((columnIndex < matrix.columns) && (rowIndex < matrix.rows))
          {
             newValues[valueIndex] = matrix.At(rowIndex, columnIndex);
          }
@@ -456,12 +785,67 @@ void Matrix<ScalarType>::ReDimensionFrom(std::vector<ScalarType>& matrixValues, 
 }
 
 template <typename ScalarType>
+Matrix<ScalarType> operator*(const Matrix<ScalarType>& matrixLeft, const Matrix<ScalarType>& matrixRight)
+{
+   assert(matrixLeft.Columns() == matrixRight.Rows());
+
+   unsigned int numRowsLeft = matrixLeft.Rows();
+   unsigned int numColumnsLeft = matrixLeft.Columns();
+
+   unsigned int numColumnsRight = matrixRight.Columns();
+
+   Matrix<ScalarType> multiplied(numRowsLeft, numColumnsRight);
+
+   for (unsigned int rowInResult = 0; rowInResult < numRowsLeft; ++rowInResult)
+   {
+      for (unsigned int columnInResult = 0; columnInResult < numColumnsRight; ++columnInResult)
+      {
+         ScalarType multipliedValue = 0;
+
+         for (unsigned int commonDimensionIndex = 0; commonDimensionIndex < numColumnsLeft; ++commonDimensionIndex)
+         {
+            multipliedValue += matrixLeft(rowInResult, commonDimensionIndex) * matrixRight(commonDimensionIndex, columnInResult);
+         }
+
+         multiplied(rowInResult, columnInResult) = multipliedValue;
+      }
+   }
+
+   return multiplied;
+}
+
+template <typename ScalarType>
+std::vector<ScalarType> operator*(const Matrix<ScalarType>& matrix, const std::vector<ScalarType>& v)
+{
+   assert(v.size() == matrix.Columns());
+
+   unsigned int numRows = matrix.Rows();
+   unsigned int numColumns = matrix.Columns();
+
+   std::vector<ScalarType> multiplied(numRows);
+
+   for (unsigned int row = 0; row < numRows; ++row)
+   {
+      ScalarType multipliedValue = 0;
+
+      for (unsigned int col = 0; col < numColumns; ++col)
+      {
+         multipliedValue += matrix(row, col) * v[col];
+      }
+
+      multiplied[row] = multipliedValue;
+   }
+
+   return multiplied;
+}
+
+template <typename ScalarType>
 std::vector<ScalarType> operator*(const std::vector<ScalarType>& v, const Matrix<ScalarType>& matrix)
 {
-   assert(v.size() == matrix.NumRows());
+   assert(v.size() == matrix.Rows());
 
-   unsigned int numRows = matrix.NumRows();
-   unsigned int numColumns = matrix.NumColumns();
+   unsigned int numRows = matrix.Rows();
+   unsigned int numColumns = matrix.Columns();
 
    std::vector<ScalarType> multiplied(numColumns);
 
@@ -480,16 +864,16 @@ std::vector<ScalarType> operator*(const std::vector<ScalarType>& v, const Matrix
    return multiplied;
 }
 
-#ifdef LOCUS_MATH_DLL
+#define LOCUS_MATRIX_TEMPLATE_INSTANTION(Type) \
+template class LOCUS_MATH_API Matrix<Type>;\
+template LOCUS_MATH_API Matrix<Type> operator*<Type>(const Matrix<Type>& matrixLeft, const Matrix<Type>& matrixRight);\
+template LOCUS_MATH_API std::vector<Type> operator*<Type>(const Matrix<Type>& matrix, const std::vector<Type>& v);\
+template LOCUS_MATH_API std::vector<Type> operator*<Type>(const std::vector<Type>& v, const Matrix<Type>& matrix);
 
-template LOCUS_MATH_API std::vector<float> operator*<float>(const std::vector<float>& v, const Matrix<float>& matrix);
-template LOCUS_MATH_API std::vector<double> operator*<double>(const std::vector<double>& v, const Matrix<double>& matrix);
-template LOCUS_MATH_API std::vector<long double> operator*<long double>(const std::vector<long double>& v, const Matrix<long double>& matrix);
+LOCUS_MATRIX_TEMPLATE_INSTANTION(float);
+LOCUS_MATRIX_TEMPLATE_INSTANTION(double);
+LOCUS_MATRIX_TEMPLATE_INSTANTION(long double);
 
-#endif
-
-template class LOCUS_MATH_API Matrix<float>;
-template class LOCUS_MATH_API Matrix<double>;
-template class LOCUS_MATH_API Matrix<long double>;
+#undef LOCUS_MATRIX_TEMPLATE_INSTANTION
 
 }

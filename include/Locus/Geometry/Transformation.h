@@ -12,7 +12,7 @@
 
 #include "LocusGeometryAPI.h"
 
-#include "Locus/Math/SquareMatrix.h"
+#include "Locus/Math/Matrix.h"
 
 #include "Vector3.h"
 
@@ -21,7 +21,7 @@ namespace Locus
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
-class LOCUS_GEOMETRY_API Transformation : public SquareMatrix<float>
+class LOCUS_GEOMETRY_API Transformation : public Matrix<float>
 {
 public:
    Transformation();
@@ -35,6 +35,7 @@ public:
    static const Vector3& IdentityScale();
 
    static const Transformation& Identity();
+
    static Transformation Translation(const Vector3& t);
    static Transformation XRotation(float radians);
    static Transformation YRotation(float radians);

@@ -72,9 +72,9 @@ OrientedBox::OrientedBox(const std::vector<Vector3>& points)
       float xzEntry = xzExpectedValue - (centroid.x * centroid.z);
       float yzEntry = yzExpectedValue - (centroid.y * centroid.z);
 
-      SquareMatrix<float> covarianceMatrix(3, { xxEntry, xyEntry, xzEntry,
-                                                xyEntry, yyEntry, yzEntry,
-                                                xzEntry, yzEntry, zzEntry });
+      Matrix<float> covarianceMatrix(3, 3, { xxEntry, xyEntry, xzEntry,
+                                             xyEntry, yyEntry, yzEntry,
+                                             xzEntry, yzEntry, zzEntry });
 
       Transformation rotation;
 
