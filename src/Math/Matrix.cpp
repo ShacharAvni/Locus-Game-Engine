@@ -47,6 +47,24 @@ Matrix<ScalarType>::Matrix(unsigned int rows, unsigned int columns, std::initial
    }
 }
 
+template <typename ScalarType>
+const std::vector<ScalarType>& Matrix<ScalarType>::GetElements() const
+{
+   return values;
+}
+
+template <typename ScalarType>
+unsigned int Matrix<ScalarType>::Rows() const
+{
+   return rows;
+}
+
+template <typename ScalarType>
+unsigned int Matrix<ScalarType>::Columns() const
+{
+   return columns;
+}
+
 #define MATRIX_ACCESS_FUNCTION(row, col)\
    assert(row < rows);\
    assert(col < columns);\
@@ -79,27 +97,9 @@ const ScalarType& Matrix<ScalarType>::operator()(unsigned int rowIndex, unsigned
 #undef MATRIX_ACCESS_FUNCTION
 
 template <typename ScalarType>
-unsigned int Matrix<ScalarType>::Rows() const
-{
-   return rows;
-}
-
-template <typename ScalarType>
-unsigned int Matrix<ScalarType>::Columns() const
-{
-   return columns;
-}
-
-template <typename ScalarType>
 bool Matrix<ScalarType>::IsSquare() const
 {
    return (rows == columns);
-}
-
-template <typename ScalarType>
-const std::vector<ScalarType>& Matrix<ScalarType>::GetElements() const
-{
-   return values;
 }
 
 template <typename ScalarType>

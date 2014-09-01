@@ -23,7 +23,6 @@ namespace Locus
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
 //{CodeReview:RowReduction}
-
 /*!
  * \brief A mathematical matrix.
  *
@@ -36,6 +35,7 @@ class LOCUS_MATH_API Matrix
 public:
    static_assert(std::is_floating_point<ScalarType>::value, "ScalarType must be floating point");
 
+   /// \details the matrix is zero filled.
    Matrix(unsigned int rows, unsigned int columns);
 
    /*!
@@ -58,27 +58,6 @@ public:
     */
    Matrix(unsigned int rows, unsigned int columns, std::initializer_list<ScalarType> rowMajorElements);
 
-   /// \return the element at row rowIndex and column colIndex.
-   ScalarType& At(unsigned int rowIndex, unsigned int colIndex);
-
-   /// \return the element at row rowIndex and column colIndex.
-   const ScalarType& At(unsigned int rowIndex, unsigned int colIndex) const;
-
-   /// \return the element at row rowIndex and column colIndex.
-   ScalarType& operator()(unsigned int rowIndex, unsigned int colIndex);
-
-   /// \return the element at row rowIndex and column colIndex.
-   const ScalarType& operator()(unsigned int rowIndex, unsigned int colIndex) const;
-
-   /// \return the number of rows in the matrix.
-   unsigned int Rows() const;
-
-   /// \return the number of columns in the matrix.
-   unsigned int Columns() const;
-
-   /// \return true if the matrix is square.
-   bool IsSquare() const;
-
    /*!
     * \brief gets the elements of the matrix as a single
     * dimensional vector.
@@ -93,6 +72,27 @@ public:
     * elements[5] would be at row 1 column 2.
     */
    const std::vector<ScalarType>& GetElements() const;
+
+   /// \return the number of rows in the matrix.
+   unsigned int Rows() const;
+
+   /// \return the number of columns in the matrix.
+   unsigned int Columns() const;
+
+   /// \return the element at row rowIndex and column colIndex.
+   ScalarType& At(unsigned int rowIndex, unsigned int colIndex);
+
+   /// \return the element at row rowIndex and column colIndex.
+   const ScalarType& At(unsigned int rowIndex, unsigned int colIndex) const;
+
+   /// \return the element at row rowIndex and column colIndex.
+   ScalarType& operator()(unsigned int rowIndex, unsigned int colIndex);
+
+   /// \return the element at row rowIndex and column colIndex.
+   const ScalarType& operator()(unsigned int rowIndex, unsigned int colIndex) const;
+
+   /// \return true if the matrix is square.
+   bool IsSquare() const;
 
    /// Sets all the elements on the main diagonal to have the given value.
    void SetMainDiagonal(ScalarType value);
@@ -153,9 +153,16 @@ public:
    /// Multiplies the current matrix by the given matrix.
    void MultMatrix(const Matrix<ScalarType>& otherMatrix);
 
+   /// Swaps the given rows of the matrix.
    void SwapRows(unsigned int rowIndex1, unsigned int rowIndex2);
 
    //{CodeReview:RowReduction}
+   /*!
+    * \brief changes the matrix into row echelon form.
+    *
+    * \param reduce if true, then the matrix is changed
+    * into reduced row echelon form.
+    */
    void MakeRowEchelon(bool reduce);
 
    /*!
@@ -167,16 +174,71 @@ public:
     */
    bool IsDiagonal() const;
 
+   /*!
+    * \return the determinant of the matrix.
+    *
+    * \details asserts if the matrix is rectangular.
+    */
    ScalarType Determinant() const;
+
+   /*!
+    * \return true if the matrix is invertible.
+    *
+    * \details rectangular matrices are considered to
+    * never be invertible.
+    */
    bool IsInvertible() const;
+
+   /*!
+    * \return the inverse of the matrix.
+    *
+    * \details asserts if the matrix is rectangular.
+    * If the matrix is not invertible, then the zero
+    * matrix is returned.
+    *
+    * \sa IsInvertible
+    */
    Matrix<ScalarType> GetInverse() const;
+
+   /*!
+    * \brief Inverts the matrix.
+    *
+    * \return true if the matrix is invertible.
+    *
+    * \sa IsInvertible
+    */
    bool Invert();
 
+   /*!
+    * \return the trace of the matrix.
+    *
+    * \details asserts if the matrix is rectangular.
+    */
    ScalarType Trace() const;
 
+   /*!
+    * \return the characteristic polynomial of the matrix.
+    *
+    * \details asserts if the matrix is rectangular.
+    */
    Polynomial<ScalarType> CharacteristicPolynomial() const;
 
+   /*!
+    * \brief solves for the eigenvalues of the matrix.
+    *
+    * \return true on success.
+    *
+    * \details asserts if the matrix is rectangular.
+    */
    bool SolveEigenvalues(std::vector<ScalarType>& eigenValues) const;
+
+   /*!
+    * \brief solves for the eigenvectors of the matrix.
+    *
+    * \return true on success.
+    *
+    * \details asserts if the matrix is rectangular.
+    */
    bool SolveEigenvectors(std::vector<std::vector<ScalarType>>& eigenVectors) const;
 
 private:
