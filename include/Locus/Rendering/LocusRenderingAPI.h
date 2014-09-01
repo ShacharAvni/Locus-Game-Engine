@@ -12,12 +12,12 @@
 
 #include "Locus/Preprocessor/CompilerDefinitions.h"
 
-#if defined(LOCUS_RENDERING_DLL)
+#if defined(LOCUS_RENDERING_SHARED)
 
     #define LOCUS_RENDERING_API LOCUS_SHARED_EXPORTS
     #define LOCUS_RENDERING_API_AT_DEFINITION LOCUS_SHARED_EXPORTS_AT_DEFINITION
 
-#elif defined(LOCUS_DLL)
+#elif defined(LOCUS_SHARED)
 
    #define LOCUS_RENDERING_API LOCUS_SHARED_IMPORTS
    #define LOCUS_RENDERING_API_AT_DEFINITION
@@ -30,6 +30,8 @@
 #endif
 
 
-#if defined(LOCUS_DLL) && !defined(LOCUS_RENDERING_DLL)
+#if defined(LOCUS_SHARED) && !defined(LOCUS_RENDERING_SHARED)
+
    #define LOCUS_RENDERING_SHARED_IMPORTS
+
 #endif

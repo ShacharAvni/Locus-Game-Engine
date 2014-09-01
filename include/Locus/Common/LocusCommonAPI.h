@@ -12,11 +12,11 @@
 
 #include "Locus/Preprocessor/CompilerDefinitions.h"
 
-#if defined(LOCUS_COMMON_DLL)
+#if defined(LOCUS_COMMON_SHARED)
 
     #define LOCUS_COMMON_API LOCUS_SHARED_EXPORTS
 
-#elif defined(LOCUS_DLL)
+#elif defined(LOCUS_SHARED)
 
    #define LOCUS_COMMON_API LOCUS_SHARED_IMPORTS
 
@@ -27,6 +27,8 @@
 #endif
 
 
-#if defined(LOCUS_DLL) && !defined(LOCUS_COMMON_DLL)
+#if defined(LOCUS_SHARED) && !defined(LOCUS_COMMON_SHARED)
+
    #define LOCUS_COMMON_SHARED_IMPORTS
+
 #endif

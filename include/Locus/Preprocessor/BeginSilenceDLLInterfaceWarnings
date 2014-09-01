@@ -1,4 +1,4 @@
-#if defined(LOCUS_WINDOWS) && defined(_MSC_VER) && defined(LOCUS_DLL)
+#if defined(LOCUS_WINDOWS) && defined(_MSC_VER) && defined(LOCUS_SHARED)
 
 	#pragma warning( push )
 	#pragma warning( disable: 4251 )

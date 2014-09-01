@@ -17,8 +17,8 @@ if (MSVC)
 endif()
 
 if(BUILD_SHARED_LIBS)
-	add_definitions(-DLOCUS_MATH_DLL)
-	add_definitions(-DLOCUS_DLL)
+	add_definitions(-DLOCUS_MATH_SHARED)
+	add_definitions(-DLOCUS_SHARED)
 endif()
 
 #--------------------------------------------------------------------

@@ -12,11 +12,11 @@
 
 #include "Locus/Preprocessor/CompilerDefinitions.h"
 
-#if defined(LOCUS_MATH_DLL)
+#if defined(LOCUS_MATH_SHARED)
 
     #define LOCUS_MATH_API LOCUS_SHARED_EXPORTS
 
-#elif defined(LOCUS_DLL)
+#elif defined(LOCUS_SHARED)
 
    #define LOCUS_MATH_API LOCUS_SHARED_IMPORTS
 
@@ -27,6 +27,8 @@
 #endif
 
 
-#if defined(LOCUS_DLL) && !defined(LOCUS_MATH_DLL)
+#if defined(LOCUS_SHARED) && !defined(LOCUS_MATH_SHARED)
+
    #define LOCUS_MATH_SHARED_IMPORTS
+
 #endif

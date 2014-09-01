@@ -17,8 +17,8 @@ if (MSVC)
 endif()
 
 if(BUILD_SHARED_LIBS)
-	add_definitions(-DLOCUS_AUDIO_DLL)
-	add_definitions(-DLOCUS_DLL)
+	add_definitions(-DLOCUS_AUDIO_SHARED)
+	add_definitions(-DLOCUS_SHARED)
 endif()
 
 include(${PROJECT_SOURCE_DIR}/cmake/UnixOptions.cmake)

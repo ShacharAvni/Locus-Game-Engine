@@ -19,7 +19,7 @@ if (MSVC)
 endif()
 
 if(BUILD_SHARED_LIBS)
-	add_definitions(-DLOCUS_DLL)
+	add_definitions(-DLOCUS_SHARED)
 endif()
 
 add_definitions(-DGLEW_MX)
