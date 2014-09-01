@@ -53,27 +53,27 @@ Matrix<ScalarType>::Matrix(unsigned int rows, unsigned int columns, std::initial
    return values[(col * rows) + row];
 
 template <typename ScalarType>
-ScalarType& Matrix<ScalarType>::At(unsigned int row, unsigned int col)
+ScalarType& Matrix<ScalarType>::At(unsigned int rowIndex, unsigned int colIndex)
 {
-   MATRIX_ACCESS_FUNCTION(row, col)
+   MATRIX_ACCESS_FUNCTION(rowIndex, colIndex)
 }
 
 template <typename ScalarType>
-const ScalarType& Matrix<ScalarType>::At(unsigned int row, unsigned int col) const
+const ScalarType& Matrix<ScalarType>::At(unsigned int rowIndex, unsigned int colIndex) const
 {
-   MATRIX_ACCESS_FUNCTION(row, col)
+   MATRIX_ACCESS_FUNCTION(rowIndex, colIndex)
 }
 
 template <typename ScalarType>
-ScalarType& Matrix<ScalarType>::operator()(unsigned int row, unsigned int col)
+ScalarType& Matrix<ScalarType>::operator()(unsigned int rowIndex, unsigned int colIndex)
 {
-   MATRIX_ACCESS_FUNCTION(row, col)
+   MATRIX_ACCESS_FUNCTION(rowIndex, colIndex)
 }
 
 template <typename ScalarType>
-const ScalarType& Matrix<ScalarType>::operator()(unsigned int row, unsigned int col) const
+const ScalarType& Matrix<ScalarType>::operator()(unsigned int rowIndex, unsigned int colIndex) const
 {
-   MATRIX_ACCESS_FUNCTION(row, col)
+   MATRIX_ACCESS_FUNCTION(rowIndex, colIndex)
 }
 
 #undef MATRIX_ACCESS_FUNCTION
@@ -100,12 +100,6 @@ template <typename ScalarType>
 const std::vector<ScalarType>& Matrix<ScalarType>::GetElements() const
 {
    return values;
-}
-
-template <typename ScalarType>
-const ScalarType* const Matrix<ScalarType>::Elements() const
-{
-   return values.data();
 }
 
 template <typename ScalarType>
@@ -173,13 +167,13 @@ void Matrix<ScalarType>::RemoveColumns(unsigned int columnsToRemove)
 }
 
 template <typename ScalarType>
-bool Matrix<ScalarType>::IsRowAllZero(unsigned int row, unsigned int upToColumn) const
+bool Matrix<ScalarType>::IsRowAllZero(unsigned int rowIndex, unsigned int upToColumnIndex) const
 {
-   assert(row < rows);
+   assert(rowIndex < rows);
 
-   for (unsigned int col = 0; col <= upToColumn; ++col)
+   for (unsigned int col = 0; col <= upToColumnIndex; ++col)
    {
-      if (FNotZero<ScalarType>(At(row, col)))
+      if (FNotZero<ScalarType>(At(rowIndex, col)))
       {
          return false;
       }
@@ -189,9 +183,9 @@ bool Matrix<ScalarType>::IsRowAllZero(unsigned int row, unsigned int upToColumn)
 }
 
 template <typename ScalarType>
-bool Matrix<ScalarType>::IsRowAllZero(unsigned int row) const
+bool Matrix<ScalarType>::IsRowAllZero(unsigned int rowIndex) const
 {
-   return IsRowAllZero(row, columns - 1);
+   return IsRowAllZero(rowIndex, columns - 1);
 }
 
 template <typename ScalarType>
@@ -242,7 +236,7 @@ void Matrix<ScalarType>::Transpose()
 }
 
 template <typename ScalarType>
-Matrix<ScalarType> Matrix<ScalarType>::SubMatrix(unsigned int row, unsigned int col) const
+Matrix<ScalarType> Matrix<ScalarType>::SubMatrix(unsigned int rowIndexToRemove, unsigned int colIndexToRemove) const
 {
    assert((row < rows) && (col < columns));
    assert((rows > 1) && (columns > 1));
@@ -252,12 +246,12 @@ Matrix<ScalarType> Matrix<ScalarType>::SubMatrix(unsigned int row, unsigned int 
    unsigned int subRowIndex = 0;
    for (unsigned int rowIndex = 0; rowIndex < rows; ++rowIndex)
    {
-      if (rowIndex != row)
+      if (rowIndex != rowIndexToRemove)
       {
          unsigned int subColumnIndex = 0;
          for (unsigned int columnIndex = 0; columnIndex < columns; ++columnIndex)
          {
-            if (columnIndex != col)
+            if (columnIndex != colIndexToRemove)
             {
                subMatrix(subRowIndex, subColumnIndex) = At(rowIndex, columnIndex);
 
@@ -298,14 +292,14 @@ void Matrix<ScalarType>::MultMatrix(const Matrix<ScalarType>& otherMatrix)
 }
 
 template <typename ScalarType>
-void Matrix<ScalarType>::SwapRows(unsigned int row1, unsigned int row2)
+void Matrix<ScalarType>::SwapRows(unsigned int rowIndex1, unsigned int rowIndex2)
 {
-   assert(row1 < rows);
-   assert(row2 < rows);
+   assert(rowIndex1 < rows);
+   assert(rowIndex2 < rows);
 
    for (unsigned int col = 0; col < columns; ++col)
    {
-      std::swap( At(row1, col), At(row2, col) );
+      std::swap( At(rowIndex1, col), At(rowIndex2, col) );
    }
 }
 

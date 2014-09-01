@@ -163,7 +163,8 @@ BoundingVolumeHierarchy<BoundingVolume>::Node::Node(const TriangleInputMap_t& tr
          const std::array<Plane, 3> splitPlanes = { Plane(center, Vector3::XAxis()), Plane(center, Vector3::YAxis()), Plane(center, Vector3::ZAxis()) };
          std::array<Plane::IntersectionQuery, 3> intersectionQueries;
 
-         std::array<bool, Num_Tree_Children> inOctants = {true};
+         std::array<bool, Num_Tree_Children> inOctants;
+         std::fill(inOctants.begin(), inOctants.end(), true);
 
          for (const std::unordered_map<std::size_t, Triangle3D_t>::value_type& containedTriangle : triangles)
          {

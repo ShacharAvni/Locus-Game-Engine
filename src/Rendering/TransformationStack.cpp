@@ -114,7 +114,7 @@ Transformation& TransformationStack::TopTransformation(TransformationMode mode)
 
 void TransformationStack::UploadLegacyMatrix(const Transformation& transformation)
 {
-   glLoadMatrixf( transformation.Elements() );
+   glLoadMatrixf( transformation.GetElements().data() );
 }
 
 void TransformationStack::UploadLegacyMatrices(const Transformation* modelTransformation)
@@ -146,7 +146,7 @@ void TransformationStack::UploadMatricesToShader(ShaderController& shaderControl
       modelViewProjectionMatrix.MultMatrix(*modelTransformation);
    }
 
-   shaderController.SetMatrix4Uniform(ShaderSource::Mat_MVP, modelViewProjectionMatrix.Elements());
+   shaderController.SetMatrix4Uniform(ShaderSource::Mat_MVP, modelViewProjectionMatrix.GetElements().data());
 
    if (shaderController.CurrentProgramDoesLighting())
    {
@@ -157,12 +157,12 @@ void TransformationStack::UploadMatricesToShader(ShaderController& shaderControl
          modelViewMatrix.MultMatrix(*modelTransformation);
       }
 
-      shaderController.SetMatrix4Uniform(ShaderSource::Mat_MV, modelViewMatrix.Elements());
+      shaderController.SetMatrix4Uniform(ShaderSource::Mat_MV, modelViewMatrix.GetElements().data());
 
       //for now, assume that only rotations, translations, and homogeneous scales have been done.
       //Therefore, the normal matrix would be the same as the top left sub matrix of the model view matrix
       //(Otherwise, we would have to use the transpose of the inverse of the top left sub matrix)
-      shaderController.SetMatrix3Uniform(ShaderSource::Mat_Normal, modelViewMatrix.SubMatrix(3, 3).Elements());
+      shaderController.SetMatrix3Uniform(ShaderSource::Mat_Normal, modelViewMatrix.SubMatrix(3, 3).GetElements().data());
    }
 }
 

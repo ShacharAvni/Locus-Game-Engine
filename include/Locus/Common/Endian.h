@@ -58,7 +58,7 @@ public:
    }
 
    /*!
-    * \brief Set the number using the given array of bytes.
+    * \brief Sets the number using the given array of bytes.
     *
     * \param buffer array of bytes with length the same as
     * sizeof(T) where T is the template argument type.
@@ -77,7 +77,7 @@ public:
       }
    }
 
-   /// Swap the bytes of the number so that it is expressed in the alternate endianness.
+   /// Swaps the bytes of the number so that it is expressed in the alternate endianness.
    void ReverseEndian()
    {
       std::size_t midPoint = sizeof(T) / 2;

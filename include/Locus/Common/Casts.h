@@ -65,7 +65,7 @@ void LossyCastAssertHelper(From valueToCast, std::true_type, std::true_type)
 
 #endif
 
-/// Cast from one integral type to another, asserting when data is lost.
+/// Casts from one integral type to another, asserting when data is lost.
 template <typename From, typename To>
 To LossyCast(From valueToCast)
 {

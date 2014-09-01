@@ -14,6 +14,8 @@
 
 #include "Locus/Common/Float.h"
 
+#include <cassert>
+
 namespace Locus
 {
 
@@ -36,10 +38,9 @@ Transformation::Transformation(float m0, float m4, float m8,  float m12,
 
 Transformation& Transformation::operator=(const Matrix<float>& matrix)
 {
-   if ((matrix.Columns() == 4) && (matrix.Rows() == 4))
-   {
-      values = matrix.GetElements();
-   }
+   assert((matrix.Rows() == 4) && (matrix.Columns() == 4));
+
+   Matrix<float>::operator=(matrix);
 
    return *this;
 }
@@ -130,16 +131,20 @@ Transformation Transformation::Orthographic(float left, float right, float botto
 
 Vector3 Transformation::MultVector(const Vector3& v) const
 {
-   return Vector3(values[0] * v.x + values[4] * v.y + values[8]  * v.z,
-                  values[1] * v.x + values[5] * v.y + values[9]  * v.z,
-                  values[2] * v.x + values[6] * v.y + values[10] * v.z);
+   const std::vector<float>& columnMajorValues = GetElements();
+
+   return Vector3(columnMajorValues[0] * v.x + columnMajorValues[4] * v.y + columnMajorValues[8]  * v.z,
+                  columnMajorValues[1] * v.x + columnMajorValues[5] * v.y + columnMajorValues[9]  * v.z,
+                  columnMajorValues[2] * v.x + columnMajorValues[6] * v.y + columnMajorValues[10] * v.z);
 }
 
 Vector3 Transformation::MultVertex(const Vector3& v) const
 {
-   return Vector3(values[0] * v.x + values[4] * v.y + values[8]  * v.z + values[12],
-                  values[1] * v.x + values[5] * v.y + values[9]  * v.z + values[13],
-                  values[2] * v.x + values[6] * v.y + values[10] * v.z + values[14]);
+   const std::vector<float>& columnMajorValues = GetElements();
+
+   return Vector3(columnMajorValues[0] * v.x + columnMajorValues[4] * v.y + columnMajorValues[8]  * v.z + columnMajorValues[12],
+                  columnMajorValues[1] * v.x + columnMajorValues[5] * v.y + columnMajorValues[9]  * v.z + columnMajorValues[13],
+                  columnMajorValues[2] * v.x + columnMajorValues[6] * v.y + columnMajorValues[10] * v.z + columnMajorValues[14]);
 }
 
 void Transformation::TranslateBy(const Vector3& t)

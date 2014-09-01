@@ -23,6 +23,13 @@ namespace Locus
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
 //{CodeReview:RowReduction}
+
+/*!
+ * \brief A mathematical matrix.
+ *
+ * \details supported types are float, double, and
+ * long double.
+ */
 template <typename ScalarType>
 class LOCUS_MATH_API Matrix
 {
@@ -30,50 +37,134 @@ public:
    static_assert(std::is_floating_point<ScalarType>::value, "ScalarType must be floating point");
 
    Matrix(unsigned int rows, unsigned int columns);
+
+   /*!
+    * \brief constructs the matrix given all the elements in
+    * row major order
+    *
+    * \code{.cpp}
+    * //the following constructs a 2 x 3 float matrix with the
+    * //following values:
+    * //1 in row 0 column 0
+    * //2 in row 0 column 1
+    * //3 in row 0 column 2
+    * //4 in row 1 column 0
+    * //5 in row 1 column 1
+    * //6 in row 1 column 2
+    *
+    * Matrix<float> matrix(2, 3, { 1, 2, 3,
+    *                              4, 5, 6 });
+    * \endcode
+    */
    Matrix(unsigned int rows, unsigned int columns, std::initializer_list<ScalarType> rowMajorElements);
 
-   ScalarType& At(unsigned int row, unsigned int col);
-   const ScalarType& At(unsigned int row, unsigned int col) const;
-   ScalarType& operator()(unsigned int row, unsigned int col);
-   const ScalarType& operator()(unsigned int row, unsigned int col) const;
+   /// \return the element at row rowIndex and column colIndex.
+   ScalarType& At(unsigned int rowIndex, unsigned int colIndex);
 
+   /// \return the element at row rowIndex and column colIndex.
+   const ScalarType& At(unsigned int rowIndex, unsigned int colIndex) const;
+
+   /// \return the element at row rowIndex and column colIndex.
+   ScalarType& operator()(unsigned int rowIndex, unsigned int colIndex);
+
+   /// \return the element at row rowIndex and column colIndex.
+   const ScalarType& operator()(unsigned int rowIndex, unsigned int colIndex) const;
+
+   /// \return the number of rows in the matrix.
    unsigned int Rows() const;
+
+   /// \return the number of columns in the matrix.
    unsigned int Columns() const;
 
+   /// \return true if the matrix is square.
    bool IsSquare() const;
 
+   /*!
+    * \brief gets the elements of the matrix as a single
+    * dimensional vector.
+    *
+    * \details the elements are returned in column major
+    * format. For example, say the matrix has two rows
+    * and three columns. Then elements[0] would be at
+    * row 0 and column 0, elements[1] would be at row
+    * 1 column 0, elements[2] would be at row 0 column
+    * 1, elements[3] would be at row 1 column 1,
+    * elements[4] would be at row 0 column 2, and
+    * elements[5] would be at row 1 column 2.
+    */
    const std::vector<ScalarType>& GetElements() const;
 
-   const ScalarType* const Elements() const;
-
+   /// Sets all the elements on the main diagonal to have the given value.
    void SetMainDiagonal(ScalarType value);
+
+   /*!
+    * \brief Sets the matrix to be the identity matrix.
+    *
+    * \details For rectangular matrices, all elements
+    * on the main diagonal are set to one and all other
+    * elements are set to zero.
+    */
    void SetToIdentity();
 
+   /// Sets all elements to the given value.
    void Fill(ScalarType value);
 
+   /// Adds rows at the bottom and columns at the right of the current matrix, filled with zeroes.
    void AddDimensions(unsigned int rowsToAdd, unsigned int columnsToAdd);
+
+   /// Adds rows at the bottom of the current matrix, filled with zeroes.
    void AddRows(unsigned int rowsToAdd);
+
+   /// Adds columns at the right of the current matrix, filled with zeroes.
    void AddColumns(unsigned int columnsToAdd);
 
+   /// Removes rows from the bottom and columns from the right of the current matrix.
    void RemoveDimensions(unsigned int rowsToRemove, unsigned int columnsToRemove);
+
+   /// Removes rows from the bottom of the current matrix.
    void RemoveRows(unsigned int rowsToRemove);
+
+   /// Removes columns from the right of the current matrix.
    void RemoveColumns(unsigned int columnsToRemove);
 
-   bool IsRowAllZero(unsigned int row, unsigned int upToColumn) const;
-   bool IsRowAllZero(unsigned int row) const;
+   /*!
+    * \return true if the elements in the given row are zero
+    *
+    * \details the columns checked are from zero up to and
+    * including upToColumnIndex.
+    */
+   bool IsRowAllZero(unsigned int rowIndex, unsigned int upToColumnIndex) const;
+
+   /// \return true if all the elements in the given row are zero.
+   bool IsRowAllZero(unsigned int rowIndex) const;
+
+   /// \return true if all the elements in the matrix are zero.
    bool IsZeroMatrix() const;
 
+   /// \return the transpose of the current matrix.
    Matrix<ScalarType> TransposedMatrix() const;
+
+   /// Transposes the current matrix.
    void Transpose();
 
-   Matrix<ScalarType> SubMatrix(unsigned int row, unsigned int col) const;
+   /// \return the current matrix with the given row and column removed.
+   Matrix<ScalarType> SubMatrix(unsigned int rowIndexToRemove, unsigned int colIndexToRemove) const;
 
+   /// Multiplies the current matrix by the given matrix.
    void MultMatrix(const Matrix<ScalarType>& otherMatrix);
 
-   void SwapRows(unsigned int row1, unsigned int row2);
+   void SwapRows(unsigned int rowIndex1, unsigned int rowIndex2);
 
+   //{CodeReview:RowReduction}
    void MakeRowEchelon(bool reduce);
 
+   /*!
+    * \return true if the matrix is diagonal.
+    *
+    * \details A rectangular matrix is considered
+    * diagonal if all the elements not on its main
+    * diagonal are zero.
+    */
    bool IsDiagonal() const;
 
    ScalarType Determinant() const;
@@ -88,20 +179,19 @@ public:
    bool SolveEigenvalues(std::vector<ScalarType>& eigenValues) const;
    bool SolveEigenvectors(std::vector<std::vector<ScalarType>>& eigenVectors) const;
 
-protected:
+private:
    unsigned int rows;
    unsigned int columns;
    std::vector<ScalarType> values;
 
-   void ReDimension(unsigned int newRows, unsigned int newColumns);
-
-   static void ReDimensionFrom(std::vector<ScalarType>& matrixValues, const Matrix& matrix, unsigned int newRows, unsigned int newColumns);
-
-private:
    void MakeRowEchelon(unsigned int col, bool reduce);
    void ReducePivot(unsigned int col);
    void OperateOnRow(unsigned int rowToChange, ScalarType multipleOnRowToChange, unsigned int rowToUse, ScalarType multipleOnRowToUse);
    void ScalarMultiplyRow(unsigned int rowToChange, ScalarType multipleOnRowToChange);
+
+   void ReDimension(unsigned int newRows, unsigned int newColumns);
+
+   static void ReDimensionFrom(std::vector<ScalarType>& matrixValues, const Matrix& matrix, unsigned int newRows, unsigned int newColumns);
 
    static ScalarType CharacteristicPolynomialCoefficientSubTerm(unsigned int subTerm, unsigned int M, const std::vector<ScalarType>& traces);
 };
