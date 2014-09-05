@@ -29,14 +29,14 @@ Polynomial<ScalarType>::Polynomial(unsigned int degree)
 template <typename ScalarType>
 const ScalarType& Polynomial<ScalarType>::operator[](unsigned int index) const
 {
-   assert(index < degree + 1);
+   assert(index <= degree);
    return values[index];
 }
 
 template <typename ScalarType>
 ScalarType& Polynomial<ScalarType>::operator[](unsigned int index)
 {
-   assert(index < degree + 1);
+   assert(index <= degree);
    return values[index];
 }
 
@@ -62,7 +62,7 @@ void Polynomial<ScalarType>::ForceDegree(unsigned int newDegree)
 template <typename ScalarType>
 bool Polynomial<ScalarType>::IsNull() const
 {
-   for (unsigned int termIndex = 0; termIndex < degree + 1; ++termIndex)
+   for (unsigned int termIndex = 0; termIndex <= degree; ++termIndex)
    {
       if (FNotZero<ScalarType>(values[termIndex]))
       {

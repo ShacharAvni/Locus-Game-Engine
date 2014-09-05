@@ -285,4 +285,4 @@ LOCUS_MATRIX_EXTERN_TEMPLATE(long double);
 
 #undef LOCUS_MATRIX_EXTERN_TEMPLATE
 
-}
+} // namespace Locus

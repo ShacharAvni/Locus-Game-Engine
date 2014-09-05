@@ -37,7 +37,7 @@ struct SoundEffectInternal;
  * would be necessary when using SoundEffects or the
  * SoundState.
  * 
- * \example SoundEffects.cpp
+ * \example SoundEffectsExample.cpp
  *
  * \sa SoundState
  */

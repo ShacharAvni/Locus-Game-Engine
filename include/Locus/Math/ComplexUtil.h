@@ -91,4 +91,4 @@ inline bool NotZero(const std::complex<T>& x, T toleranceFactor = DEFAULT_TOLERA
    return ( FNotZero<T>(x.real(), toleranceFactor) || FNotZero<T>(x.imag(), toleranceFactor) );
 }
 
-}
+} // namespace Locus

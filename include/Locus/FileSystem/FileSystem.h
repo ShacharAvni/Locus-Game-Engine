@@ -25,7 +25,7 @@ namespace Locus
  * the File class or anything that uses MountedFilePaths. It is
  * suggested to instantiate this class in main.
  *
- * \example MountDirectoryOrArchive.cpp
+ * \example MountDirectoryOrArchiveExample.cpp
  */
 class LOCUS_FILE_SYSTEM_API FileSystem
 {
@@ -46,7 +46,7 @@ public:
  * \brief Adds a directory or archive to be used for operations involving
  * MountedFilePaths.
  *
- * \example MountDirectoryOrArchive.cpp
+ * \example MountDirectoryOrArchiveExample.cpp
  */
 LOCUS_FILE_SYSTEM_API void MountDirectoryOrArchive(const std::string& fullPath);
 

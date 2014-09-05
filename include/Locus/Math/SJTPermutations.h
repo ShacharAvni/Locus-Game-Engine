@@ -21,9 +21,16 @@ namespace Locus
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
 //{CodeReview:SJTPermutations}
-
-//implementation of the Steinhaus–Johnson–Trotter algorithm for
-//generating permutations of alternating parity with Even's Speedup
+/*!
+ * \brief An implementation of the Steinhaus-Johnson-Trotter
+ * algorithm for generating permutations of alternating parity
+ * with Even's Speedup.
+ *
+ * \details The elements are stored as the integers [0, N-1]
+ * and are initially in the following order: {0, 1, 2, ..., N - 1}.
+ *
+ * \example SJTPermutationsExample.cpp
+ */
 class LOCUS_MATH_API SJTPermutations
 {
 public:
@@ -32,9 +39,19 @@ public:
    SJTPermutations(const SJTPermutations&) = delete;
    SJTPermutations& operator=(const SJTPermutations&) = delete;
 
+   /// \return The number of integers in the permutations.
    std::size_t NumElements() const;
+
+   /// \return The integer at the given index.
    int GetElement(unsigned int index) const;
 
+   //{CodeReview:SJTPermutations}
+   /*!
+    * \brief Generates the next permutation.
+    *
+    * \return false if there are no more
+    * permutations.
+    */
    bool GenerateNext();
 
 private:
@@ -60,4 +77,4 @@ private:
 
 #include "Locus/Preprocessor/EndSilenceDLLInterfaceWarnings"
 
-}
+} // namespace Locus

@@ -33,7 +33,7 @@ namespace Locus
  * in tandem with Locus requires great care as using the SoundState
  * class can interfere with other OpenAL contexts and vice versa.
  * 
- * \example SoundEffects.cpp
+ * \example SoundEffectsExample.cpp
  *
  * \sa SoundEffect
  */
@@ -62,7 +62,7 @@ public:
     * instance or any Locus SoundEffects that were instantiated
     * while the OpenAL context of this instance was current.
     *
-    * \example SoundEffects.cpp
+    * \example SoundEffectsExample.cpp
     */
    void MakeOpenALContextCurrent();
 
