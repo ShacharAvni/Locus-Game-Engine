@@ -238,7 +238,7 @@ void Matrix<ScalarType>::Transpose()
 template <typename ScalarType>
 Matrix<ScalarType> Matrix<ScalarType>::SubMatrix(unsigned int rowIndexToRemove, unsigned int colIndexToRemove) const
 {
-   assert((row < rows) && (col < columns));
+   assert((rowIndexToRemove < rows) && (colIndexToRemove < columns));
    assert((rows > 1) && (columns > 1));
 
    Matrix<ScalarType> subMatrix(rows - 1, columns - 1);
