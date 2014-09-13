@@ -18,6 +18,8 @@
 #include <limits>
 #include <algorithm>
 
+#include <cassert>
+
 namespace Locus
 {
 
@@ -29,6 +31,7 @@ AxisAlignedBox::AxisAlignedBox()
 AxisAlignedBox::AxisAlignedBox(const Vector3& min, const Vector3& max)
    : min(min), max(max)
 {
+   assert((min.x <= max.x) && (min.y <= max.y) && (min.z <= max.z));
 }
 
 AxisAlignedBox::AxisAlignedBox(const Vector3& center, float diagonalLength)
@@ -65,10 +68,6 @@ AxisAlignedBox::AxisAlignedBox(const std::vector<Vector3>& points, bool tight)
       min = sphere.center - (sphere.radius * Vector3::Diagonal());
       max = sphere.center + (sphere.radius * Vector3::Diagonal());
    }
-}
-
-AxisAlignedBox::~AxisAlignedBox()
-{
 }
 
 bool AxisAlignedBox::Contains(const Vector3& point) const
@@ -140,9 +139,9 @@ bool AxisAlignedBox::Intersects(const Triangle3D_t& triangle) const
 
 bool AxisAlignedBox::Intersects(const AxisAlignedBox& box) const
 {
-   return (! ( (max.x < box.min.x) || (min.x > box.max.x) ||
-               (max.y < box.min.y) || (min.y > box.max.y) ||
-               (max.z < box.min.z) || (min.z > box.max.z) ) );
+   return ( (max.x >= box.min.x) && (min.x <= box.max.x) &&
+            (max.y >= box.min.y) && (min.y <= box.max.y) &&
+            (max.z >= box.min.z) && (min.z <= box.max.z) );
 }
 
 bool AxisAlignedBox::Intersects(const Moveable& thisMoveable, const AxisAlignedBox& other, const Moveable& otherMoveable) const
