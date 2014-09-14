@@ -142,7 +142,7 @@ static BoundingVolume InstantiateBoundingVolumeFromPoints(const std::vector<Vect
 }
 
 template <>
-static AxisAlignedBox InstantiateBoundingVolumeFromPoints(const std::vector<Vector3>& points)
+AxisAlignedBox InstantiateBoundingVolumeFromPoints(const std::vector<Vector3>& points)
 {
    return AxisAlignedBox(points, false);
 }

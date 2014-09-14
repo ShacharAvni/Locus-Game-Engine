@@ -40,7 +40,7 @@
 
 #elif defined(LOCUS_LINUX)
 
-   #ifdef (__GNUC__)
+   #ifdef __GNUC__
 
       #define LOCUS_SHARED_IMPORTS
       #define LOCUS_SHARED_EXPORTS __attribute__ ((visibility ("default")))
