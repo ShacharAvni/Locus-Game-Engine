@@ -74,9 +74,9 @@ public:
    /*!
     * \brief Changes the current read position.
     *
-    * \param[in] offset A zero-based index interpreted differently depending on the seekType
-    * provided.
-    * \param[in] seekType how to interpret the offset provided.
+    * \param[in] offset A zero-based index interpreted differently
+    * depending on the seekType provided.
+    * \param[in] seekType How to interpret the offset provided.
     *
     * \return true if the operation has succeeded.
     *

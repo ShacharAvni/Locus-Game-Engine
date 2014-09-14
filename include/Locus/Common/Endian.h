@@ -60,7 +60,7 @@ public:
    /*!
     * \brief Sets the number using the given array of bytes.
     *
-    * \param buffer array of bytes with length the same as
+    * \param[in] buffer Array of bytes with length the same as
     * sizeof(T) where T is the template argument type.
     *
     * \details The array is used naively, with buffer[0] used as

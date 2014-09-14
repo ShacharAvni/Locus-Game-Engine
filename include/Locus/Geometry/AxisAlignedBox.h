@@ -35,9 +35,9 @@ public:
    AxisAlignedBox();
 
    /*!
-    * \param min the absolute coordinates of the corner
+    * \param[in] min The coordinates of the corner
     * of the box with minimum x, y, and z.
-    * \param max the absolute coordinates of the corner
+    * \param[in] max The coordinates of the corner
     * of the box with maximum x, y, and z.
     */
    AxisAlignedBox(const Vector3& min, const Vector3& max);
@@ -45,9 +45,9 @@ public:
    /*!
     * \brief Constructs an axis-aligned cube.
     *
-    * \param center the absolute coordinates of the center
-    * of the box.
-    * \param diagonalLength the length of a space diagonal
+    * \param[in] center The coordinates of the center of the
+    * box.
+    * \param[in] diagonalLength The length of a space diagonal
     * of the box.
     *
     * \sa DiagonalLength
@@ -55,10 +55,10 @@ public:
    AxisAlignedBox(const Vector3& center, float diagonalLength);
 
    /*!
-    * \param points the points in absolute coordinates whose
-    * bounding box will be used to create the box.
-    * \param tight if true, then the box will be constructed as the
-    * axis-aligned bounding box of the input points. If false,
+    * \param[in] points The points whose bounding box will be
+    * used to create the box.
+    * \param[in] tight If true, then the box will be constructed as
+    * the axis-aligned bounding box of the input points. If false,
     * then the center of the box will be the centroid of the input
     * points and the length of the space diagonal will be the diameter
     * of the smallest sphere that encloses all the input points and is
@@ -82,11 +82,11 @@ public:
     * \brief Determines if this box intersects another box fully or partially
     * after transformations are applied to both boxes.
     *
-    * \param thisMoveable contains the model transformation that will be applied
+    * \param[in] thisMoveable Contains the model transformation that will be applied
     * to this box.
-    * \param other the box that we're querying for potential intersection with
+    * \param[in] other The box that we're querying for potential intersection with
     * this box.
-    * \param otherMoveable contains the model transformation that will be applied
+    * \param[in] otherMoveable Contains the model transformation that will be applied
     * to the other box.
     *
     * \sa TransformBy
@@ -113,11 +113,11 @@ public:
     * \brief Gets the two halves of this axis-aligned box that would
     * be made after cutting this box in two.
     *
-    * \param minBox the axis-aligned box on the side that contains
+    * \param[out] minBox The axis-aligned box on the side that contains
     * the minimum corner of this box.
-    * \param maxBox the axis-aligned box on the side that contains
+    * \param[out] maxBox The axis-aligned box on the side that contains
     * the maximum corner of this box.
-    * \param whichCoordinate the coordinate that will be split. For
+    * \param[in] whichCoordinate The coordinate that will be split. For
     * instance, say that this box goes from -2 to +4 along X and that
     * X is passed as whichCoordinate. Then, minBox would be this box
     * between X = -2 and X = 1 inclusively, and maxBox would be this

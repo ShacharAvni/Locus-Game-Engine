@@ -36,9 +36,9 @@ public:
    int RandomInt(int begin, int end);
 
    /*!
-    * \brief Returns true with the given probability.
+    * \return true with the given probability.
     *
-    * \param probability must be between zero and one inclusively.
+    * \param[in] probability Must be between zero and one inclusively.
     */
    bool FlipCoin(double probability);
 

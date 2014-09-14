@@ -160,7 +160,7 @@ public:
    /*!
     * \brief changes the matrix into row echelon form.
     *
-    * \param reduce if true, then the matrix is changed
+    * \param[in] reduce If true, then the matrix is changed
     * into reduced row echelon form.
     */
    void MakeRowEchelon(bool reduce);

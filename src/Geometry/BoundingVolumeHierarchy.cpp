@@ -63,7 +63,7 @@ static void DetermineOctants(Plane::IntersectionQuery intersectionQueryX, Plane:
    }
 }
 
-std::vector<Vector3> GetUniquePointsFromTriangles(const std::vector<Triangle3D_t>& triangles)
+static std::vector<Vector3> GetUniquePointsFromTriangles(const std::vector<Triangle3D_t>& triangles)
 {
    std::vector<Vector3> uniquePoints;
 
@@ -93,7 +93,7 @@ std::vector<Vector3> GetUniquePointsFromTriangles(const std::vector<Triangle3D_t
    return uniquePoints;
 }
 
-std::vector<Vector3> GetUniquePointsFromTriangles(const TriangleInputMap_t& triangles)
+static std::vector<Vector3> GetUniquePointsFromTriangles(const TriangleInputMap_t& triangles)
 {
    std::vector<Triangle3D_t> trianglesAsVector;
    trianglesAsVector.reserve(triangles.size());
@@ -106,7 +106,7 @@ std::vector<Vector3> GetUniquePointsFromTriangles(const TriangleInputMap_t& tria
    return GetUniquePointsFromTriangles(trianglesAsVector);
 }
 
-TriangleInputMap_t MakeTriangleInputMap(const std::vector<Triangle3D_t>& triangles)
+static TriangleInputMap_t MakeTriangleInputMap(const std::vector<Triangle3D_t>& triangles)
 {
    TriangleInputMap_t triangleInputMap;
 
@@ -133,6 +133,18 @@ static Vector3 GetCenterOfBoundingVolume(const AxisAlignedBox& boundingVolume)
 static Vector3 GetCenterOfBoundingVolume(const OrientedBox& boundingVolume)
 {
    return boundingVolume.centroid;
+}
+
+template <class BoundingVolume>
+static BoundingVolume InstantiateBoundingVolumeFromPoints(const std::vector<Vector3>& points)
+{
+   return BoundingVolume(points);
+}
+
+template <>
+static AxisAlignedBox InstantiateBoundingVolumeFromPoints(const std::vector<Vector3>& points)
+{
+   return AxisAlignedBox(points, false);
 }
 
 //{CodeReview:NarrowPhaseCollisions}
@@ -163,7 +175,7 @@ BoundingVolumeHierarchy<BoundingVolume>::Node::Node(const TriangleInputMap_t& tr
          const std::array<Plane, 3> splitPlanes = { Plane(center, Vector3::XAxis()), Plane(center, Vector3::YAxis()), Plane(center, Vector3::ZAxis()) };
          std::array<Plane::IntersectionQuery, 3> intersectionQueries;
 
-         std::array<bool, Num_Tree_Children> inOctants;
+         std::array<bool, NUM_TREE_CHILDREN> inOctants;
          std::fill(inOctants.begin(), inOctants.end(), true);
 
          for (const std::unordered_map<std::size_t, Triangle3D_t>::value_type& containedTriangle : triangles)
@@ -175,7 +187,7 @@ BoundingVolumeHierarchy<BoundingVolume>::Node::Node(const TriangleInputMap_t& tr
 
             DetermineOctants(intersectionQueries[Vector3::Coordinate_X], intersectionQueries[Vector3::Coordinate_Y], intersectionQueries[Vector3::Coordinate_Z], inOctants);
 
-            for (std::size_t childIndex = 0; childIndex < Num_Tree_Children; ++childIndex)
+            for (std::size_t childIndex = 0; childIndex < NUM_TREE_CHILDREN; ++childIndex)
             {
                if (inOctants[childIndex])
                {
@@ -185,11 +197,11 @@ BoundingVolumeHierarchy<BoundingVolume>::Node::Node(const TriangleInputMap_t& tr
             }
          }
 
-         for (std::size_t childIndex = 0; childIndex < Num_Tree_Children; ++childIndex)
+         for (std::size_t childIndex = 0; childIndex < NUM_TREE_CHILDREN; ++childIndex)
          {
-            if (trianglesInOctants[childIndex].size() > 0)
+            if (!trianglesInOctants[childIndex].empty())
             {
-               children[childIndex] = std::make_unique<Node>(trianglesInOctants[childIndex], BoundingVolumeHierarchy::InstantiateBoundingVolumeFromPoints(GetUniquePointsFromTriangles(trianglesInOctants[childIndex])), leafTriangles, currentDepth + 1, maxDepth);
+               children[childIndex] = std::make_unique<Node>(trianglesInOctants[childIndex], InstantiateBoundingVolumeFromPoints<BoundingVolume>(GetUniquePointsFromTriangles(trianglesInOctants[childIndex])), leafTriangles, currentDepth + 1, maxDepth);
             }
          }
       }  
@@ -197,14 +209,14 @@ BoundingVolumeHierarchy<BoundingVolume>::Node::Node(const TriangleInputMap_t& tr
 }
 
 template <class BoundingVolume>
-BoundingVolumeHierarchy<BoundingVolume>::Node::Node(const typename BoundingVolumeHierarchy<BoundingVolume>::Node& boundingVolumeHierarchyNode)
-   : boundingVolume(boundingVolumeHierarchyNode.boundingVolume), isLeaf(boundingVolumeHierarchyNode.isLeaf), containedTriangles(boundingVolumeHierarchyNode.containedTriangles), children()
+BoundingVolumeHierarchy<BoundingVolume>::Node::Node(const typename BoundingVolumeHierarchy<BoundingVolume>::Node& otherNode)
+      : boundingVolume(otherNode.boundingVolume), isLeaf(otherNode.isLeaf), containedTriangles(otherNode.containedTriangles)
 {
-   for (std::size_t octantIndex = 0; octantIndex < Num_Tree_Children; ++octantIndex)
+   for (std::size_t octantIndex = 0; octantIndex < NUM_TREE_CHILDREN; ++octantIndex)
    {
-      if (boundingVolumeHierarchyNode.children[octantIndex] != nullptr)
+      if (otherNode.children[octantIndex] != nullptr)
       {
-         children[octantIndex] = std::make_unique<Node>(*boundingVolumeHierarchyNode.children[octantIndex]);
+         children[octantIndex] = std::make_unique<Node>(*otherNode.children[octantIndex]);
       }
    }
 }
@@ -212,10 +224,7 @@ BoundingVolumeHierarchy<BoundingVolume>::Node::Node(const typename BoundingVolum
 template <class BoundingVolume>
 BoundingVolumeHierarchy<BoundingVolume>::BoundingVolumeHierarchy(const std::vector<Triangle3D_t>& triangles, std::size_t leafTriangles, std::size_t maxDepth)
 {
-   TriangleInputMap_t triangleInputMap = MakeTriangleInputMap(triangles);
-   std::vector<Vector3> rootPoints = GetUniquePointsFromTriangles(triangles);
-
-   root = std::make_unique<Node>(triangleInputMap, BoundingVolumeHierarchy::InstantiateBoundingVolumeFromPoints(rootPoints), leafTriangles, 0, maxDepth);
+   ConstructFromTriangles(triangles, leafTriangles, maxDepth);
 }
 
 template <class BoundingVolume>
@@ -225,15 +234,12 @@ BoundingVolumeHierarchy<BoundingVolume>::BoundingVolumeHierarchy(const BoundingV
 }
 
 template <class BoundingVolume>
-BoundingVolume BoundingVolumeHierarchy<BoundingVolume>::InstantiateBoundingVolumeFromPoints(const std::vector<Vector3>& points)
+void BoundingVolumeHierarchy<BoundingVolume>::ConstructFromTriangles(const std::vector<Triangle3D_t>& triangles, std::size_t leafTriangles, std::size_t maxDepth)
 {
-   return BoundingVolume(points);
-}
+   TriangleInputMap_t triangleInputMap = MakeTriangleInputMap(triangles);
+   std::vector<Vector3> rootPoints = GetUniquePointsFromTriangles(triangles);
 
-template <>
-AxisAlignedBox BoundingVolumeHierarchy<AxisAlignedBox>::InstantiateBoundingVolumeFromPoints(const std::vector<Vector3>& points)
-{
-   return AxisAlignedBox(points, false);
+   root = std::make_unique<Node>(triangleInputMap, InstantiateBoundingVolumeFromPoints<BoundingVolume>(rootPoints), leafTriangles, 0, maxDepth);
 }
 
 template <class BoundingVolume>
@@ -275,7 +281,7 @@ void BoundingVolumeHierarchy<BoundingVolume>::FinalizeIntersection(const Moveabl
             }
          }
       }
-   } while (remainingNodes.size() > 0);
+   } while (!remainingNodes.empty());
 }
 
 template <class BoundingVolume>
@@ -321,13 +327,13 @@ void BoundingVolumeHierarchy<BoundingVolume>::GetIntersection(const Moveable& th
       std::vector<Node*> thisHitList;
       std::vector<Node*> otherHitList;
 
-      while ((thisCurrentCheckList.size() > 0) && (otherCurrentCheckList.size() > 0))
+      while (!thisCurrentCheckList.empty() && !otherCurrentCheckList.empty())
       {
          thisHitList.clear();
-         thisHitList.reserve(thisCurrentCheckList.size() * Num_Tree_Children);
+         thisHitList.reserve(thisCurrentCheckList.size() * NUM_TREE_CHILDREN);
 
          otherHitList.clear();
-         otherHitList.reserve(otherCurrentCheckList.size() * Num_Tree_Children);
+         otherHitList.reserve(otherCurrentCheckList.size() * NUM_TREE_CHILDREN);
 
          for (const Node* node : thisCurrentCheckList)
          {
@@ -359,12 +365,12 @@ void BoundingVolumeHierarchy<BoundingVolume>::GetIntersection(const Moveable& th
             }
          }
 
-         if ((thisHitList.size() == 0) && (otherHitList.size() > 0))
+         if (thisHitList.empty() && !otherHitList.empty())
          {
             FinalizeIntersection(otherMoveable, thisMoveable, otherHitList, thisCurrentCheckList, otherIntersectionSet);
             break;
          }
-         else if ((otherHitList.size() == 0) && (thisHitList.size() > 0))
+         else if (otherHitList.empty() && !thisHitList.empty())
          {
             FinalizeIntersection(thisMoveable, otherMoveable, thisHitList, otherCurrentCheckList, thisIntersectionSet);
             break;
@@ -384,7 +390,7 @@ void BoundingVolumeHierarchy<BoundingVolume>::GetIntersection(const Moveable& th
    {
       std::vector<Node*> thisCurrentCheckList(1, root.get());
 
-      while (thisCurrentCheckList.size() > 0)
+      while (!thisCurrentCheckList.empty())
       {
          std::vector<Node*> thisHitList;
          thisHitList.reserve(thisCurrentCheckList.size() * 8);
