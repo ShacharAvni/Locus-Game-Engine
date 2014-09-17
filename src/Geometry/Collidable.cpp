@@ -14,6 +14,7 @@ namespace Locus
 {
 
 Collidable::Collidable()
+   : collidableType(0)
 {
 }
 
@@ -36,16 +37,16 @@ const Vector3& Collidable::GetBroadCollisionExtentMax() const
    return broadCollisionExtentMax;
 }
 
-void Collidable::UpdateBroadCollisionExtent(const Vector3& centroid, float radius)
+void Collidable::UpdateBroadCollisionExtent(const Vector3& centroid, float halfLength)
 {
-   broadCollisionExtentMin.x = centroid.x - radius;
-   broadCollisionExtentMax.x = centroid.x + radius;
+   broadCollisionExtentMin.x = centroid.x - halfLength;
+   broadCollisionExtentMax.x = centroid.x + halfLength;
 
-   broadCollisionExtentMin.y = centroid.y - radius;
-   broadCollisionExtentMax.y = centroid.y + radius;
+   broadCollisionExtentMin.y = centroid.y - halfLength;
+   broadCollisionExtentMax.y = centroid.y + halfLength;
 
-   broadCollisionExtentMin.z = centroid.z - radius;
-   broadCollisionExtentMax.z = centroid.z + radius;
+   broadCollisionExtentMin.z = centroid.z - halfLength;
+   broadCollisionExtentMax.z = centroid.z + halfLength;
 }
 
 bool Collidable::CollidesWith(Collidable& /*collidable*/) const
