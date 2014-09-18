@@ -104,20 +104,21 @@ CollisionManager::~CollisionManager()
 
 void CollisionManager::Add(Collidable* collidable)
 {
-   assert(impl->collidables.find(collidable) == impl->collidables.end());
+   bool inserted = impl->collidables.insert(collidable).second;
 
-   impl->collidables.insert(collidable);
-
-   const Vector3& broadCollisionExtentMin = collidable->GetBroadCollisionExtentMin();
-   const Vector3& broadCollisionExtentMax = collidable->GetBroadCollisionExtentMax();
-
-   impl->xIntervals[collidable] = std::make_unique<CollisionInterval>(collidable, broadCollisionExtentMin.x, broadCollisionExtentMax.x);
-   impl->yIntervals[collidable] = std::make_unique<CollisionInterval>(collidable, broadCollisionExtentMin.y, broadCollisionExtentMax.y);
-   impl->zIntervals[collidable] = std::make_unique<CollisionInterval>(collidable, broadCollisionExtentMin.z, broadCollisionExtentMax.z);
-
-   if (impl->doUpdateCollisionCollections)
+   if (inserted)
    {
-      impl->UpdateCollisionCollections();
+      const Vector3& broadCollisionExtentMin = collidable->GetBroadCollisionExtentMin();
+      const Vector3& broadCollisionExtentMax = collidable->GetBroadCollisionExtentMax();
+
+      impl->xIntervals[collidable] = std::make_unique<CollisionInterval>(collidable, broadCollisionExtentMin.x, broadCollisionExtentMax.x);
+      impl->yIntervals[collidable] = std::make_unique<CollisionInterval>(collidable, broadCollisionExtentMin.y, broadCollisionExtentMax.y);
+      impl->zIntervals[collidable] = std::make_unique<CollisionInterval>(collidable, broadCollisionExtentMin.z, broadCollisionExtentMax.z);
+
+      if (impl->doUpdateCollisionCollections)
+      {
+         impl->UpdateCollisionCollections();
+      }
    }
 }
 
@@ -211,17 +212,18 @@ void CollisionManager::Update(Collidable* collidable)
 
 void CollisionManager::Remove(Collidable* collidable)
 {
-   assert(impl->collidables.find(collidable) != impl->collidables.end());
+   bool erased = (impl->collidables.erase(collidable) == 1);
 
-   impl->collidables.erase(collidable);
-
-   impl->xIntervals.erase(collidable);
-   impl->yIntervals.erase(collidable);
-   impl->zIntervals.erase(collidable);
-
-   if (impl->doUpdateCollisionCollections)
+   if (erased)
    {
-      impl->UpdateCollisionCollections();
+      impl->xIntervals.erase(collidable);
+      impl->yIntervals.erase(collidable);
+      impl->zIntervals.erase(collidable);
+
+      if (impl->doUpdateCollisionCollections)
+      {
+         impl->UpdateCollisionCollections();
+      }
    }
 }
 
@@ -250,7 +252,7 @@ void CollisionManager::Clear()
 void CollisionManager::UpdateCollisions()
 {
    impl->collisionList.clear();
-      
+
    std::size_t numCollidables = impl->collidables.size();
 
    if (numCollidables > 0)
