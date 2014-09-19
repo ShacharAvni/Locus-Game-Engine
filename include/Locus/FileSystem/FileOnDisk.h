@@ -30,6 +30,7 @@ class LOCUS_FILE_SYSTEM_API FileOnDisk : public DataStream
 public:
    /*!
     * \param[in] filePath The full path to the file.
+    *
     * \param[in] openMode The usage pattern required for opening the file.
     *
     * \throws Exception

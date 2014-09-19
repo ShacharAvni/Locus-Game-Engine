@@ -8,11 +8,11 @@
 *                                                                                                        *
 \********************************************************************************************************/
 
-//Triangulation by Ear Clipping
-//David Eberly
-//Geometric Tools, LLC
-//http://www.geometrictools.com/
-//http://www.geometrictools.com/Documentation/TriangulationByEarClipping.pdf
+// Implementation of Triangulation by Ear Clipping
+// David Eberly
+// Geometric Tools, LLC
+// http://www.geometrictools.com/
+// http://www.geometrictools.com/Documentation/TriangulationByEarClipping.pdf
 
 #include "Locus/Geometry/PolygonFwd.h"
 #include "Locus/Geometry/PolygonWinding.h"
@@ -29,12 +29,37 @@ class Vector2;
 class Vector3;
 
 //{CodeReview:Triangulation}
+/// Internal class used by all overloads of Locus::Triangulate for triangulation via Ear Clipping.
 class EarClipper
 {
 public:
+   /// \param[in] polygon Should be planar and non self-intersecting.
    EarClipper(const Polygon2D_t& polygon);
+
+   /*!
+    * \param[in] polygon Should be planar and non self-intersecting.
+    *
+    * \param[in] innerPolygons Each inner polygon: (1) Should be completely
+    * inside the polygon given as the other parameter. (2) Should not
+    * intersect any other inner polygon. (3) Should not be inside any
+    * other inner polygon. (4) Should have a winding order opposite
+    * that of the polygon given as the other parameter. (5) Should be
+    * planar. (6) Should be non self-intersecting.
+    */
    EarClipper(const Polygon2D_t& polygon, const std::vector<const Polygon2D_t*>& innerPolygons);
 
+   /*!
+    * \brief Performs triangulation on the polygons given in the
+    * constructor.
+    *
+    * \note The result is in the same winding order as the
+    * outermost input polygon.
+    *
+    * \note The Vector2 pointers returned refer to points in the
+    * input polygons. Therefore, this method should be called and
+    * the result should be used before the input polygons go out
+    * of scope.
+    */ 
    void Triangulate(std::vector<const Vector2*>& triangles);
 
    static const float EXPERIMENTAL_TOLERANCE;

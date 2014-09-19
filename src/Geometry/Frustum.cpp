@@ -25,6 +25,8 @@ Frustum::Frustum(const Vector3& point, const Vector3& forward, const Vector3& up
    planes[Frustum::Near].set(viewPoint + nearDistance*forwardUnitVector, forwardUnitVector);
    planes[Frustum::Far].set(viewPoint + farDistance*forwardUnitVector, -forwardUnitVector);
 
+   //TODO: Fix fudging going on here
+
    Vector3 pointLeft = viewPoint + nearDistance*forwardUnitVector - rightUnitVector*10;
    Vector3 normalLeft = rightUnitVector;
    normalLeft.rotate(horizontalField/2, upUnitVector);

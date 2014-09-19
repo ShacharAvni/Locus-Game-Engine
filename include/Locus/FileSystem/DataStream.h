@@ -32,6 +32,7 @@ public:
     * \brief Reads bytes from the DataStream, starting at the current read location.
     *
     * \param[in,out] bytes The bytes to be read. Must be pre-allocated.
+    *
     * \param[in] numBytesToRead The number of bytes to read starting at the current
     * read location.
     *
@@ -45,8 +46,10 @@ public:
     *
     * \param[in,out] bytes The bytes to be read. It must be at least size
     * offsetIntoBytesVector + numBytesToRead. It is not resized by this method.
+    *
     * \param[in] numBytesToRead The number of bytes to read starting at the current
     * read location.
+    *
     * \param[in] offsetIntoBysteVector The zero-based index into the std::vector bytes
     * at which data read from this method will be placed.
     *
@@ -76,6 +79,7 @@ public:
     *
     * \param[in] offset A zero-based index interpreted differently
     * depending on the seekType provided.
+    *
     * \param[in] seekType How to interpret the offset provided.
     *
     * \return true if the operation has succeeded.

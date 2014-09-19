@@ -104,9 +104,10 @@ protected:
     * \brief Sets the axis-aligned cube used for broad
     * phase collision detection.
     *
-    * \param centroid The centroid of the axis-aligned
+    * \param[in] centroid The centroid of the axis-aligned
     * cube.
-    * \param halfLength Half the side length of the cube.
+    *
+    * \param[in] halfLength Half the side length of the cube.
     */
    void UpdateBroadCollisionExtent(const Vector3& centroid, float halfLength);
 

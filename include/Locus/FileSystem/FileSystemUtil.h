@@ -24,7 +24,8 @@ LOCUS_FILE_SYSTEM_API std::string GetExePath();
 /*!
  * \brief Reads the whole contents of the file in binary format.
  *
- * \param[in] filePath The full path of the file
+ * \param[in] filePath The full path of the file.
+ *
  * \param[in,out] data The data read from the file. This vector
  * will be sized appropriately by this function.
  *
@@ -37,6 +38,7 @@ LOCUS_FILE_SYSTEM_API void ReadWholeFile(const std::string& filePath, std::vecto
  *
  * \param[in] mountedFilePath Path to the file in an archive or
  * on disk, relative to a path passed to MountDirectoryOrArchive.
+ *
  * \param[in,out] data The data read from the file. This vector
  * will be sized appropriately by this function.
  *

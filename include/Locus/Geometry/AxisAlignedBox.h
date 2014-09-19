@@ -37,6 +37,7 @@ public:
    /*!
     * \param[in] min The coordinates of the corner
     * of the box with minimum x, y, and z.
+    *
     * \param[in] max The coordinates of the corner
     * of the box with maximum x, y, and z.
     */
@@ -47,6 +48,7 @@ public:
     *
     * \param[in] center The coordinates of the center of the
     * box.
+    *
     * \param[in] diagonalLength The length of a space diagonal
     * of the box.
     *
@@ -57,6 +59,7 @@ public:
    /*!
     * \param[in] points The points whose bounding box will be
     * used to create the box.
+    *
     * \param[in] tight If true, then the box will be constructed as
     * the axis-aligned bounding box of the input points. If false,
     * then the center of the box will be the centroid of the input
@@ -84,8 +87,10 @@ public:
     *
     * \param[in] thisMoveable Contains the model transformation that will be applied
     * to this box.
+    *
     * \param[in] other The box that we're querying for potential intersection with
     * this box.
+    *
     * \param[in] otherMoveable Contains the model transformation that will be applied
     * to the other box.
     *
@@ -115,8 +120,10 @@ public:
     *
     * \param[out] minBox The axis-aligned box on the side that contains
     * the minimum corner of this box.
+    *
     * \param[out] maxBox The axis-aligned box on the side that contains
     * the maximum corner of this box.
+    *
     * \param[in] whichCoordinate The coordinate that will be split. For
     * instance, say that this box goes from -2 to +4 along X and that
     * X is passed as whichCoordinate. Then, minBox would be this box

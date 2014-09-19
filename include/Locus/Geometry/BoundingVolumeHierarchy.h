@@ -121,11 +121,13 @@ public:
    /*!
     * \param[in] triangles The triangles to be contained in the
     * BoundingVolumeHierarchy.
+    *
     * \param[in] leafTriangles If a bounding volume is encountered
     * with a number of triangles less than or equal to this value,
     * then that bounding volume is considered to be a leaf of the
     * tree.
-    * \param[in] maxDepth  Bounding volumes are not subdivided
+    *
+    * \param[in] maxDepth Bounding volumes are not subdivided
     * further if the decomposition reaches this depth.
     *
     * \details First a bounding volume is placed centered around
@@ -142,6 +144,7 @@ public:
     * the depth of that branch is equal to the maxDepth parameter.
     *
     * \note There is no attempt at optimal balancing.
+    *
     * \note The resulting tree is not guaranteed to be a heap.
     */
    BoundingVolumeHierarchy(const std::vector<Triangle3D_t>& triangles, std::size_t leafTriangles, std::size_t maxDepth);
@@ -156,13 +159,17 @@ public:
     *
     * \param[in] thisMoveable Contains the model transformation that will be applied
     * to this BoundingVolumeHierarchy.
+    *
     * \param[in] otherBoundingVolumeHierarchy The box BoundingVolumeHierarchy that
     * we're querying for potential intersection with this BoundingVolumeHierarchy.
+    *
     * \param[in] otherMoveable Contains the model transformation that will be applied
     * to the other BoundingVolumeHierarchy.
+    *
     * \param[out] thisIntersectionSet The indices of the triangles in this
     * BoundingVolumeHierarchy that intersected with any triangle of the other
     * BoundingVolumeHierarchy.
+    *
     * \param[out] otherIntersectionSet The indices of the triangles in the other
     * BoundingVolumeHierarchy that intersected with any triangle of this
     * BoundingVolumeHierarchy.
@@ -186,8 +193,10 @@ public:
     *
     * \param[in] thisMoveable Contains the model transformation that will be applied
     * to this BoundingVolumeHierarchy.
+    *
     * \param[in] orientedBox The OrientedBox that we're querying for potential
     * intersection with this BoundingVolumeHierarchy.
+    *
     * \param[out] thisIntersectionSet The indices of the triangles in this
     * BoundingVolumeHierarchy that intersected with the given OrientedBox in
     * any fashion.

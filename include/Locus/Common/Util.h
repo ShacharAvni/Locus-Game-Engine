@@ -24,8 +24,11 @@ namespace Locus
  *
  * \param[in] items The input items. The class T must have a supporting operator < implementation.
  * Can be empty.
+ *
  * \param[out] uniqueItems The unique items in the items vector.
+ *
  * \param[in] compare The comparator to use. Should return true if the two values are considered equal.
+ *
  * \param[out] uniqueIndices An index mapping from the original indices to the indices in the unique
  * vector. uniqueIndices[i] will hold the index in the unique vector where items[i] maps to. i must
  * be between zero and items.size() - 1 inclusively.
@@ -111,6 +114,7 @@ void GetUniqueItems(const std::vector<T>& items, std::vector<T>& uniqueItems, st
  * \brief Sorts the input vector using Insertion Sort.
  *
  * \param[in,out] sortedInterval The vector to sort.
+ *
  * \param[in] comp The comparator to use. Must be compatible with the comparators
  * passed to standard library functions such as std::sort.
  */
