@@ -10,39 +10,17 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-if (MSVC)
-    option(USE_MSVC_RUNTIME_LIBRARY_DLL "Use MSVC runtime library DLL" OFF)
-endif()
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../../cmake/GlobalProjectOptions.cmake)
 
-if (BUILD_SHARED_LIBS)
+if(BUILD_SHARED_LIBS)
 	add_definitions(-DSTBI_BUILD_DLL)
 endif()
 
-#--------------------------------------------------------------------
-# Set compiler specific flags
-#--------------------------------------------------------------------
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../../cmake/UnixOptions.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../../cmake/MSVCOptions.cmake)
 
-SetUnixOptions(OFF OFF)
-
-if (MSVC)
-    if (NOT USE_MSVC_RUNTIME_LIBRARY_DLL)
-        foreach (flag CMAKE_C_FLAGS
-                      CMAKE_C_FLAGS_DEBUG
-                      CMAKE_C_FLAGS_RELEASE
-                      CMAKE_C_FLAGS_MINSIZEREL
-                      CMAKE_C_FLAGS_RELWITHDEBINFO)
-
-            if (${flag} MATCHES "/MD")
-                string(REGEX REPLACE "/MD" "/MT" ${flag} "${${flag}}")
-            endif()
-            if (${flag} MATCHES "/MDd")
-                string(REGEX REPLACE "/MDd" "/MTd" ${flag} "${${flag}}")
-            endif()
-
-        endforeach()
-    endif()
-endif()
+SetUnixOptions(FALSE FALSE)
+SetMSVCRuntimeLibrarySettings(FALSE)
 
 set(STB_IMAGE_INCLUDE ${PROJECT_SOURCE_DIR}/third-party/stb_image/include)
 

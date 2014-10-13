@@ -10,11 +10,7 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-
-if (MSVC)
-    option(USE_MSVC_RUNTIME_LIBRARY_DLL "Use MSVC runtime library DLL" OFF)
-endif()
+include(${PROJECT_SOURCE_DIR}/cmake/GlobalProjectOptions.cmake)
 
 if(BUILD_SHARED_LIBS)
 	add_definitions(-DLOCUS_AUDIO_SHARED)
@@ -22,14 +18,11 @@ if(BUILD_SHARED_LIBS)
 endif()
 
 include(${PROJECT_SOURCE_DIR}/cmake/UnixOptions.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/MSVCOptions.cmake)
 
-#--------------------------------------------------------------------
-# Set compiler specific flags
-#--------------------------------------------------------------------
-SetUnixOptions(ON ON)
-
-include(${PROJECT_SOURCE_DIR}/cmake/SetMSVCRuntimeLibrarySettings.cmake)
-include(${PROJECT_SOURCE_DIR}/cmake/SetMSVCWarningLevel4.cmake)
+SetUnixOptions(TRUE TRUE)
+SetMSVCRuntimeLibrarySettings(TRUE)
+SetMSVCWarningLevel4()
 
 find_package(OpenAL REQUIRED)
 
@@ -37,7 +30,10 @@ set(LOCUS_INCLUDE ${PROJECT_SOURCE_DIR}/include)
 set(THIRD_PARTY_DIR ${PROJECT_SOURCE_DIR}/third-party)
 set(LOCUS_AUDIO_INCLUDE ${LOCUS_INCLUDE}/Locus/Audio)
 
-include_directories(${LOCUS_INCLUDE} ${THIRD_PARTY_DIR}/OpenAL/include ${THIRD_PARTY_DIR}/OGG/include ${THIRD_PARTY_DIR}/Vorbis/include)
+include_directories(${LOCUS_INCLUDE}
+                    ${THIRD_PARTY_DIR}/OpenAL/include
+                    ${THIRD_PARTY_DIR}/OGG/include
+                    ${THIRD_PARTY_DIR}/Vorbis/include)
 
 add_library(Locus_Audio
             OGGLoading.h

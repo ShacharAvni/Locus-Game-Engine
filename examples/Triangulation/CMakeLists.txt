@@ -10,13 +10,11 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+set(LOCUS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../")
+
+include(${LOCUS_DIR}/cmake/GlobalProjectOptions.cmake)
 
 find_package(OpenGL REQUIRED)
-
-if (MSVC)
-    option(USE_MSVC_RUNTIME_LIBRARY_DLL "Use MSVC runtime library DLL" OFF)
-endif()
 
 if(BUILD_SHARED_LIBS)
 	add_definitions(-DLOCUS_SHARED)
@@ -25,26 +23,16 @@ endif()
 add_definitions(-DGLEW_MX)
 add_definitions(-DGLEW_NO_GLU)
 
-if (NOT BUILD_SHARED_LIBS)
+if(NOT BUILD_SHARED_LIBS)
 	add_definitions(-DGLEW_STATIC)
 endif()
 
-#--------------------------------------------------------------------
-# Set compiler specific flags
-#--------------------------------------------------------------------
-if (UNIX)
-    add_definitions(-Wall)
-    add_definitions(-std=c++1y)
+include(${LOCUS_DIR}/cmake/UnixOptions.cmake)
+include(${LOCUS_DIR}/cmake/MSVCOptions.cmake)
 
-    if (BUILD_SHARED_LIBS)
-        add_definitions(-fvisibility=hidden)
-    endif()
-endif()
-
-set(LOCUS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../")
-
-include(${LOCUS_DIR}/cmake/SetMSVCRuntimeLibrarySettings.cmake)
-include(${LOCUS_DIR}/cmake/SetMSVCWarningLevel4.cmake)
+SetUnixOptions(TRUE TRUE)
+SetMSVCRuntimeLibrarySettings(TRUE)
+SetMSVCWarningLevel4()
 
 set(LOCUS_INCLUDE ${LOCUS_DIR}/include)
 set(THIRD_PARTY_DIR ${LOCUS_DIR}/third-party)

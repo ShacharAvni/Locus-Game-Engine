@@ -36,28 +36,20 @@ INCLUDE_DIRECTORIES(.)
 #INCLUDE_DIRECTORIES(platform)
 #INCLUDE_DIRECTORIES(archivers)
 
+# Begin Locus Section
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/GlobalProjectOptions.cmake)
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/UnixOptions.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/MSVCOptions.cmake)
+
 if(BUILD_SHARED_LIBS)
 	add_definitions(-DPHYSFS_BUILD_SHARED)
 endif()
 
-if (MSVC)
-    if (NOT USE_MSVC_RUNTIME_LIBRARY_DLL)
-        foreach (flag CMAKE_C_FLAGS
-                      CMAKE_C_FLAGS_DEBUG
-                      CMAKE_C_FLAGS_RELEASE
-                      CMAKE_C_FLAGS_MINSIZEREL
-                      CMAKE_C_FLAGS_RELWITHDEBINFO)
+SetMSVCRuntimeLibrarySettings(FALSE)
 
-            if (${flag} MATCHES "/MD")
-                string(REGEX REPLACE "/MD" "/MT" ${flag} "${${flag}}")
-            endif()
-            if (${flag} MATCHES "/MDd")
-                string(REGEX REPLACE "/MDd" "/MTd" ${flag} "${${flag}}")
-            endif()
-
-        endforeach()
-    endif()
-endif()
+# End Locus Section
 
 IF(MACOSX)
     # Fallback to older OS X on PowerPC to support wider range of systems...
@@ -71,8 +63,6 @@ IF(MACOSX)
     SET(OTHER_LDFLAGS ${OTHER_LDFLAGS} " -framework Carbon -framework IOKit")
 ENDIF(MACOSX)
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/UnixOptions.cmake)
-
 # Add some gcc-specific command lines.
 IF(CMAKE_COMPILER_IS_GNUCC)
     # Always build with debug symbols...you can strip it later.
@@ -83,7 +73,11 @@ IF(CMAKE_COMPILER_IS_GNUCC)
         ADD_DEFINITIONS(-Wall)
     ENDIF(NOT BEOS)
 
+    # Begin Locus Section
+
     SetDefaultCMakeBuildType()
+
+    # End Locus Section
 
     CHECK_C_SOURCE_COMPILES("
         #if ((defined(__GNUC__)) && (__GNUC__ >= 4))
@@ -300,6 +294,8 @@ IF(PHYSFS_NEED_ZLIB)
     ENDIF(PHYSFS_INTERNAL_ZLIB)
 ENDIF(PHYSFS_NEED_ZLIB)
 
+# Begin Locus Section
+
 #OPTION(PHYSFS_BUILD_STATIC "Build static library" TRUE)
 IF(BUILD_SHARED_LIBS)
 	SET(PHYSFS_BUILD_SHARED TRUE)
@@ -308,6 +304,8 @@ ELSE(BUILD_SHARED_LIBS)
     SET(PHYSFS_BUILD_STATIC TRUE)
 	SET(PHYSFS_BUILD_SHARED FALSE)
 ENDIF(BUILD_SHARED_LIBS)
+
+# End Locus Section
 
 IF(PHYSFS_BUILD_STATIC)
     ADD_LIBRARY(physfs-static STATIC ${PHYSFS_SRCS})

@@ -12,7 +12,12 @@ set(GLFW_VERSION "${GLFW_VERSION_MAJOR}.${GLFW_VERSION_MINOR}")
 set(GLFW_VERSION_FULL "${GLFW_VERSION}.${GLFW_VERSION_PATCH}${GLFW_VERSION_EXTRA}")
 set(LIB_SUFFIX "" CACHE STRING "Takes an empty string or 64. Directory where lib will be installed: lib or lib64")
 
-option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+# Begin Locus Section
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/GlobalProjectOptions.cmake)
+
+# End Locus Section
+
 #option(GLFW_BUILD_EXAMPLES "Build the GLFW example programs" ON)
 #option(GLFW_BUILD_TESTS "Build the GLFW test programs" ON)
 #option(GLFW_INSTALL "Generate installation target" ON)
@@ -29,10 +34,6 @@ if (APPLE)
     option(GLFW_USE_MENUBAR "Populate the menu bar on first window creation" ON)
 else()
     option(GLFW_USE_EGL "Use EGL for context creation" OFF)
-endif()
-
-if (MSVC)
-    option(USE_MSVC_RUNTIME_LIBRARY_DLL "Use MSVC runtime library DLL" OFF)
 endif()
 
 if (BUILD_SHARED_LIBS)
@@ -82,33 +83,19 @@ find_package(Threads REQUIRED)
 #    set(GLFW_INTERNAL_DOCS "${GLFW_SOURCE_DIR}/src/internal.h ${GLFW_SOURCE_DIR}/docs/internal.dox")
 #endif()
 
-#--------------------------------------------------------------------
-# Set compiler specific flags
-#--------------------------------------------------------------------
+# Begin Locus Section
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/UnixOptions.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/MSVCOptions.cmake)
 
-SetUnixOptions(OFF ON)
+SetUnixOptions(FALSE TRUE)
+SetMSVCRuntimeLibrarySettings(FALSE)
 
-if (MSVC)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-
-    if (NOT USE_MSVC_RUNTIME_LIBRARY_DLL)
-        foreach (flag CMAKE_C_FLAGS
-                        CMAKE_C_FLAGS_DEBUG
-                        CMAKE_C_FLAGS_RELEASE
-                        CMAKE_C_FLAGS_MINSIZEREL
-                        CMAKE_C_FLAGS_RELWITHDEBINFO)
-
-            if (${flag} MATCHES "/MD")
-                string(REGEX REPLACE "/MD" "/MT" ${flag} "${${flag}}")
-            endif()
-            if (${flag} MATCHES "/MDd")
-                string(REGEX REPLACE "/MDd" "/MTd" ${flag} "${${flag}}")
-            endif()
-
-        endforeach()
-    endif()
+if(MSVC)
+   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
+
+# End Locus Section
 
 #--------------------------------------------------------------------
 # Detect and select backend APIs

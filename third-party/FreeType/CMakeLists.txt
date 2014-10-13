@@ -47,41 +47,21 @@ set(VERSION_MINOR "5")
 set(VERSION_PATCH "3")
 set(PROJECT_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
-option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+# Begin Locus Section
 
-if (MSVC)
-    option(USE_MSVC_RUNTIME_LIBRARY_DLL "Use MSVC runtime library DLL" OFF)
-endif()
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/GlobalProjectOptions.cmake)
 
 if(BUILD_SHARED_LIBS)
 	add_definitions(-DFREETYPE_BUILD_SHARED)
 endif()
 
-#--------------------------------------------------------------------
-# Set compiler specific flags
-#--------------------------------------------------------------------
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/UnixOptions.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/MSVCOptions.cmake)
 
-SetUnixOptions(OFF ON)
+SetUnixOptions(FALSE TRUE)
+SetMSVCRuntimeLibrarySettings(FALSE)
 
-if (MSVC)
-    if (NOT USE_MSVC_RUNTIME_LIBRARY_DLL)
-        foreach (flag CMAKE_C_FLAGS
-                      CMAKE_C_FLAGS_DEBUG
-                      CMAKE_C_FLAGS_RELEASE
-                      CMAKE_C_FLAGS_MINSIZEREL
-                      CMAKE_C_FLAGS_RELWITHDEBINFO)
-
-            if (${flag} MATCHES "/MD")
-                string(REGEX REPLACE "/MD" "/MT" ${flag} "${${flag}}")
-            endif()
-            if (${flag} MATCHES "/MDd")
-                string(REGEX REPLACE "/MDd" "/MTd" ${flag} "${${flag}}")
-            endif()
-
-        endforeach()
-    endif()
-endif()
+# End Locus Section
 
 # Compiler definitions for building the library
 add_definitions(-DFT2_BUILD_LIBRARY)
