@@ -63,21 +63,21 @@ IF(MACOSX)
     SET(OTHER_LDFLAGS ${OTHER_LDFLAGS} " -framework Carbon -framework IOKit")
 ENDIF(MACOSX)
 
+ # Begin Locus Section
+
+SetUnixOptions(FALSE, FALSE)
+
+ # End Locus Section
+
 # Add some gcc-specific command lines.
 IF(CMAKE_COMPILER_IS_GNUCC)
     # Always build with debug symbols...you can strip it later.
     ADD_DEFINITIONS(-g -pipe -Werror -fsigned-char)
 
     # Stupid BeOS generates warnings in the system headers.
-    IF(NOT BEOS)
-        ADD_DEFINITIONS(-Wall)
-    ENDIF(NOT BEOS)
-
-    # Begin Locus Section
-
-    SetDefaultCMakeBuildType()
-
-    # End Locus Section
+    #IF(NOT BEOS)
+    #    ADD_DEFINITIONS(-Wall)
+    #ENDIF(NOT BEOS)
 
     CHECK_C_SOURCE_COMPILES("
         #if ((defined(__GNUC__)) && (__GNUC__ >= 4))

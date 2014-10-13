@@ -12,8 +12,7 @@ project(Locus)
 
 cmake_minimum_required(VERSION 2.8)
 
-option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-option(STATIC_C_AND_CXX_RUNTIMES "Link C and C++ runtimes statically" OFF)
+include(${PROJECT_SOURCE_DIR}/cmake/GlobalProjectOptions.cmake)
 
 option(LOCUS_BUILD_EXAMPLES "Build Examples" ON)
 

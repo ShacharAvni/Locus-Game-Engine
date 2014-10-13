@@ -16,13 +16,6 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/UnixOptions.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/MSVCOptions.cmake)
 
 SetUnixOptions(FALSE FALSE)
-
-#--------------------------------------------------------------------
-# Set compiler specific flags
-#--------------------------------------------------------------------
-include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/UnixOptions.cmake)
-
-SetUnixOptions(OFF OFF)
 SetMSVCRuntimeLibrarySettings(FALSE)
 
 set(OGG_INCLUDE ${PROJECT_SOURCE_DIR}/third-party/OGG/include)

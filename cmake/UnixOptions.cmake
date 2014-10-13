@@ -43,8 +43,11 @@ if(UNIX)
    endif()
  
    if(STATIC_C_AND_CXX_RUNTIMES)
-      add_definitions(-static-libstdc++)
       add_definitions(-static-libgcc)
+
+      if(SetCpp11)
+         add_definitions(-static-libstdc++)
+      endif()
    endif()
 endif()
 endfunction()
