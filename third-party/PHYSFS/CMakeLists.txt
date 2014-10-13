@@ -65,7 +65,7 @@ ENDIF(MACOSX)
 
  # Begin Locus Section
 
-SetUnixOptions(FALSE, FALSE)
+SetUnixOptions(FALSE FALSE)
 
  # End Locus Section
 
