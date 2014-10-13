@@ -9,23 +9,25 @@
 ###########################################################################################################
 
 if(UNIX)
-   option(ARCH_32_BIT "Compile as 32 Bit" ON)
-endif()
+   if(NOT BUILD_ARCHITECTURE)
+        # Set default BUILD_ARCHITECTURE to CurrentPlatformArchitecture
+        set(BUILD_ARCHITECTURE CurrentPlatformArchitecture CACHE STRING "Architecture" FORCE)
 
-macro(SetDefaultCMakeBuildType)
-    if(NOT CMAKE_BUILD_TYPE)
-        # Set default build type to Release
+        # Set the possible values of BUILD_ARCHITECTURE
+        set_property(CACHE BUILD_ARCHITECTURE PROPERTY STRINGS "32 Bit" "64 Bit" "CurrentPlatformArchitecture")
+    endif()
+
+   if(NOT CMAKE_BUILD_TYPE)
+        # Set default CMAKE_BUILD_TYPE to Release
         set(CMAKE_BUILD_TYPE Release CACHE STRING "CMake Build Type" FORCE)
 
-        # Set the possible values of build type for cmake-gui
+        # Set the possible values of CMAKE_BUILD_TYPE
         set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
     endif()
-endmacro()
+endif()
 
 function(SetUnixOptions SetCpp11 SetVisibility)
 if(UNIX)
-   SetDefaultCMakeBuildType()
-
    add_definitions(-Wall)
 
    if(SetCpp11)
@@ -36,9 +38,9 @@ if(UNIX)
       add_definitions(-fvisibility=hidden)
    endif()
 
-   if(ARCH_32_BIT)
+   if(BUILD_ARCHITECTURE STREQUAL "32 Bit")
       add_definitions(-m32)
-   else()
+   elseif(BUILD_ARCHITECTURE STREQUAL "64 Bit")
       add_definitions(-m64)
    endif()
  
