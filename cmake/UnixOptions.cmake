@@ -8,7 +8,9 @@
 #                                                                                                         #
 ###########################################################################################################
 
-option(ARCH_32_BIT "Compile as 32 Bit" ON)
+if(UNIX)
+   option(ARCH_32_BIT "Compile as 32 Bit" ON)
+endif()
 
 macro(SetDefaultCMakeBuildType)
     if(NOT CMAKE_BUILD_TYPE)
@@ -21,7 +23,7 @@ macro(SetDefaultCMakeBuildType)
 endmacro()
 
 function(SetUnixOptions SetCpp11 SetVisibility)
-if (UNIX)
+if(UNIX)
    SetDefaultCMakeBuildType()
 
    add_definitions(-Wall)
