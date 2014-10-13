@@ -8,6 +8,8 @@
 #                                                                                                         #
 ###########################################################################################################
 
+option(ARCH_32_BIT "Compile as 32 Bit" ON)
+
 macro(SetDefaultCMakeBuildType)
     if(NOT CMAKE_BUILD_TYPE)
         # Set default build type to Release
@@ -32,6 +34,12 @@ if (UNIX)
       add_definitions(-fvisibility=hidden)
    endif()
 
+   if(ARCH_32_BIT)
+      add_definitions(-m32)
+   else()
+      add_definitions(-m64)
+   endif()
+ 
    if(STATIC_C_AND_CXX_RUNTIMES)
       add_definitions(-static-libstdc++)
       add_definitions(-static-libgcc)
