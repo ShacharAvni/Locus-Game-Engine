@@ -420,10 +420,10 @@ bool Polygon<PointType>::IsSelfIntersecting() const
          {
             if (intersectionType == IntersectionType::Point)
             {
-               bool exactlyOnSegment1EndPoint = (intersectionPoint1.PreciselyEqualTo(lineSegment1.P1) || intersectionPoint1.PreciselyEqualTo(lineSegment1.P2));
-               bool exactlyOnSegment2EndPoint = (intersectionPoint1.PreciselyEqualTo(lineSegment2.P1) || intersectionPoint1.PreciselyEqualTo(lineSegment2.P2));
+               bool onSegment1EndPoint = (intersectionPoint1.ApproximatelyEqualTo(lineSegment1.P1) || intersectionPoint1.ApproximatelyEqualTo(lineSegment1.P2));
+               bool onSegment2EndPoint = (intersectionPoint1.ApproximatelyEqualTo(lineSegment2.P1) || intersectionPoint1.ApproximatelyEqualTo(lineSegment2.P2));
 
-               if (!exactlyOnSegment1EndPoint || !exactlyOnSegment2EndPoint)
+               if (!onSegment1EndPoint || !onSegment2EndPoint)
                {
                   return true;
                }
