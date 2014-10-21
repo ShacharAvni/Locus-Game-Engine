@@ -39,6 +39,7 @@ public:
    void RunSimulation(std::unique_ptr<Scene> scene);
 
    void HideMouse();
+   void ShowMouse();
    void CenterMouse();
    void GetMousePosition(int& x, int &y);
    void SetMousePosition(int x, int y);
