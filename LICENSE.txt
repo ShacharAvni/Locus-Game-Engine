@@ -930,30 +930,42 @@ IN THE SOFTWARE.
 
 ===============================================================================
 
-8. stb_image 1.33
-   http://nothings.org/stb_image.c
+8. stb_image 1.46
+   https://github.com/nothings/stb
 
 ===============================================================================
 
-stbi-1.33 - public domain JPEG/PNG reader - http://nothings.org/stb_image.c
-   when you control the images you're loading
-                                     no warranty implied; use at your own risk
+stb_image - v1.46 - public domain JPEG/PNG reader - https://github.com/nothings/stb
+   when you control the images you're loading no warranty implied;
+   use at your own risk
 
 
  ============================    Contributors    =========================
               
- Image formats                                Optimizations & bugfixes
-    Sean Barrett (jpeg, png, bmp)                Fabian "ryg" Giesen
-    Nicolas Schulz (hdr, psd)                                                 
-    Jonathan Dummer (tga)                     Bug fixes & warning fixes           
-    Jean-Marc Lienher (gif)                      Marc LeBlanc               
-    Tom Seddon (pic)                             Christpher Lloyd           
-    Thatcher Ulrich (psd)                        Dave Moore                 
-                                                 Won Chun                   
-                                                 the Horde3D community      
- Extensions, features                            Janez Zemva                
-    Jetro Lauha (stbi_info)                      Jonathan Blow              
-    James "moose2000" Brown (iPhone PNG)         Laurent Gomila                             
-    Ben "Disch" Wenger (io callbacks)            Aruelien Pocheville
-    Martin "SpartanJ" Golini                     Ryamond Barbiero
-                                                 David Woo
+ Image formats                                Bug fixes & warning fixes
+    Sean Barrett (jpeg, png, bmp)                Marc LeBlanc
+    Nicolas Schulz (hdr, psd)                    Christpher Lloyd
+    Jonathan Dummer (tga)                        Dave Moore
+    Jean-Marc Lienher (gif)                      Won Chun
+    Tom Seddon (pic)                             the Horde3D community
+    Thatcher Ulrich (psd)                        Janez Zemva
+                                                 Jonathan Blow
+                                                 Laurent Gomila
+ Extensions, features                            Aruelien Pocheville
+    Jetro Lauha (stbi_info)                      Ryamond Barbiero
+    James "moose2000" Brown (iPhone PNG)         David Woo
+    Ben "Disch" Wenger (io callbacks)            Roy Eltham
+    Martin "SpartanJ" Golini                     Luke Graham
+                                                 Thomas Ruf
+                                                 John Bartholomew
+ Optimizations & bugfixes                        Ken Hamada
+    Fabian "ryg" Giesen                          Cort Stratton
+    Arseny Kapoulkine                            Blazej Dariusz Roszkowski
+                                                 Thibault Reuille
+                                                 Paul Du Bois
+                                                 Guillaume George
+                                                 Jerry Jansson
+  If your name should be here but                Hayaki Saito
+  isn't, let Sean know.                          Johan Duparc
+                                                 Ronny Chevalier
+                                                 Michal Cichon
