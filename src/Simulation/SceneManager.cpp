@@ -34,6 +34,11 @@ void SceneManager::HideMouse()
    window.SetMouseState(Window::MouseState::Hidden);
 }
 
+void SceneManager::ShowMouse()
+{
+   window.SetMouseState(Window::MouseState::Normal);
+}
+
 void SceneManager::CenterMouse()
 {
    int windowWidth = 0;
