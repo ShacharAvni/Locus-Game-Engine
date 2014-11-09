@@ -25,7 +25,7 @@ Mesh::Mesh()
 }
 
 Mesh::Mesh(const std::vector<std::vector<MeshVertex>>& faceTriangles)
-   : Model<MeshVertexIndexer, MeshVertex>(), colors(1, Color::White())
+   : Model<MeshVertexIndexer, MeshVertex>()
 {
    std::vector<std::vector<MeshVertex>> faceTrianglesActual;
    Model::GetTriangles(faceTriangles, faceTrianglesActual);
@@ -33,18 +33,21 @@ Mesh::Mesh(const std::vector<std::vector<MeshVertex>>& faceTriangles)
    Construct(faceTrianglesActual);
 }
 
-void Mesh::SetColor(const Color& color)
+void Mesh::AddColor(const Color& color)
 {
-   //only allow one color for now
-
-   colors.clear();
-   colors.resize(1, color);
-   colors.shrink_to_fit();
+   colors.push_back(color);
 }
 
 void Mesh::AddTextureCoordinate(const TextureCoordinate& tc)
 {
    textureCoordinates.push_back(tc);
+}
+
+void Mesh::SetColor(const Color& color)
+{
+   colors.clear();
+   colors.resize(1, color);
+   colors.shrink_to_fit();
 }
 
 void Mesh::Construct(const std::vector<std::vector<MeshVertex>>& faceTriangles, std::vector<std::size_t>* degenerateFaceIndices)
@@ -62,6 +65,9 @@ void Mesh::Construct(const std::vector<std::vector<MeshVertex>>& faceTriangles, 
 
    std::vector<TextureCoordinate> vertTexCoords;
    vertTexCoords.reserve(numFaces * Triangle3D_t::NumPointsOnATriangle);
+
+   std::vector<Color> vertColors;
+   vertColors.reserve(numFaces * Triangle3D_t::NumPointsOnATriangle);
 
    for (std::size_t faceIndex = 0; faceIndex < numFaces; ++faceIndex)
    {
@@ -87,10 +93,15 @@ void Mesh::Construct(const std::vector<std::vector<MeshVertex>>& faceTriangles, 
       {
          for (std::size_t i = 0; i < Triangle3D_t::NumPointsOnATriangle; ++i)
          {
+            vertColors.push_back(faceTriangles[faceIndex][i].color);
             vertTexCoords.push_back(faceTriangles[faceIndex][i].textureCoordinate);
          }
       }
    }
+
+   //get unique colors
+   std::vector<std::size_t> sortedColorIndices;
+   GetUniqueItems<Color>(vertColors, colors, sortedColorIndices);
 
    //get unique texture coordinates
    std::vector<std::size_t> sortedTexCoordIndices;
@@ -104,6 +115,8 @@ void Mesh::Construct(const std::vector<std::vector<MeshVertex>>& faceTriangles, 
       for (std::size_t vertexIndex = 0; vertexIndex < Triangle3D_t::NumPointsOnATriangle; ++vertexIndex)
       {
          faces[faceIndex][vertexIndex].textureCoordinateID = sortedTexCoordIndices[numVertices];
+         faces[faceIndex][vertexIndex].colorID = sortedColorIndices[numVertices];
+
          ++numVertices;
       }
    }
@@ -186,8 +199,6 @@ void Mesh::UpdateGPUVertexData()
 
          std::vector<GPUVertexDataStorage> vertData(numTotalVertices);
 
-         const Color& meshColor = colors[0];
-
          std::size_t vertDataIndex = 0;
          for (const face_t& face : faces)
          {
@@ -211,10 +222,10 @@ void Mesh::UpdateGPUVertexData()
 
                if (gpuVertexDataTransferInfo.sendColors)
                {
-                  currentVertData.color[0] = meshColor.r;
-                  currentVertData.color[1] = meshColor.g;
-                  currentVertData.color[2] = meshColor.b;
-                  currentVertData.color[3] = meshColor.a;
+                  currentVertData.color[0] = colors[vertex.colorID].r;
+                  currentVertData.color[1] = colors[vertex.colorID].g;
+                  currentVertData.color[2] = colors[vertex.colorID].b;
+                  currentVertData.color[3] = colors[vertex.colorID].a;
                }
 
                if (gpuVertexDataTransferInfo.sendTexCoords)

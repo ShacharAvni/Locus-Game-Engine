@@ -71,6 +71,11 @@ void TransformationStack::LoadIdentity()
    Load( Transformation::Identity() );
 }
 
+void TransformationStack::Multiply(const Transformation& trans)
+{
+   TopTransformation(currentMode) = TopTransformation(currentMode) * trans;
+}
+
 void TransformationStack::Translate(const Vector3& t)
 {
    TopTransformation(currentMode).TranslateBy(t);

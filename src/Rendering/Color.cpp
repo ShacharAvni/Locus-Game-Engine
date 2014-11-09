@@ -64,5 +64,35 @@ const Color& Color::Yellow()
    return yellow;
 }
 
+bool operator==(const Color& color1, const Color& color2)
+{
+   return ( (color1.r == color2.r) && (color1.g == color2.g) && (color1.b == color2.b) && (color1.a == color2.a) );
+}
+
+bool operator <(const Color& color1, const Color& color2)
+{
+   if (color1.r == color2.r)
+   {
+      if (color1.g == color2.g)
+      {
+         if (color1.b == color2.b)
+         {
+            return (color1.a < color2.a);
+         }
+         else
+         {
+            return (color1.b < color2.b);
+         }
+      }
+      else
+      {
+         return (color1.g < color2.g);
+      }
+   }
+   else
+   {
+      return (color1.r < color2.r);
+   }
+}
 
 }

@@ -247,12 +247,12 @@ void Window::SetMousePosition(int x, int y)
    glfwSetCursorPos(glfwWindow, x, y);
 }
 
-void Window::GetMousePositionInternal(double& x, double& y)
+void Window::GetMousePositionInternal(double& x, double& y) const
 {
    glfwGetCursorPos(glfwWindow, &x, &y);
 }
 
-void Window::GetMousePosition(int& x, int& y)
+void Window::GetMousePosition(int& x, int& y) const
 {
    double doubleX = 0.0;
    double doubleY = 0.0;
@@ -260,6 +260,11 @@ void Window::GetMousePosition(int& x, int& y)
 
    x = static_cast<int>(std::floor(doubleX));
    y = static_cast<int>(std::floor(doubleY));
+}
+
+void Window::GetPrimaryMonitorWindowSize(int& width, int &height) const
+{
+   windowContext.GetPrimaryMonitorWindowSize(width, height);
 }
 
 void Window::KeyCallback(int key, int /*scancode*/, int action, int /*mods*/)

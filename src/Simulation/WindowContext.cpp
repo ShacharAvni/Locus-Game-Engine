@@ -65,7 +65,7 @@ WindowContext::~WindowContext()
    glfwTerminate();
 }
 
-void WindowContext::GetPrimaryMonitorWindowSize(int& width, int &height)
+void WindowContext::GetPrimaryMonitorWindowSize(int& width, int &height) const
 {
    width = primaryMonitorVideoMode->width;
    height = primaryMonitorVideoMode->height;

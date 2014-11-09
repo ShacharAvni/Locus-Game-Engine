@@ -30,7 +30,7 @@ public:
    WindowContext();
    ~WindowContext();
 
-   void GetPrimaryMonitorWindowSize(int& width, int &height);
+   void GetPrimaryMonitorWindowSize(int& width, int &height) const;
 
    GLFWwindow* sharedWindow;
    GLFWmonitor* primaryMonitor;

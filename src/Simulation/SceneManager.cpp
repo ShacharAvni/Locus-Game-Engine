@@ -61,6 +61,11 @@ void SceneManager::SetMousePosition(int x, int y)
    window.SetMousePosition(x, y);
 }
 
+void SceneManager::GetPrimaryMonitorWindowSize(int& width, int &height) const
+{
+   window.GetPrimaryMonitorWindowSize(width, height);
+}
+
 void SceneManager::SyncWindowSizeToSceneSize()
 {
    int width = 0;

@@ -58,6 +58,7 @@ add_library(Locus_Rendering
             Locus_glew.cpp
             Mesh.cpp
             MeshUtility.cpp
+            OffscreenBuffer.cpp
             Quad.cpp
             RenderingState.cpp
             SAPReading.cpp
@@ -88,6 +89,7 @@ add_library(Locus_Rendering
             ${LOCUS_RENDERING_INCLUDE}/Locus_glew.h
             ${LOCUS_RENDERING_INCLUDE}/Mesh.h
             ${LOCUS_RENDERING_INCLUDE}/MeshUtility.h
+            ${LOCUS_RENDERING_INCLUDE}/OffscreenBuffer.h
             ${LOCUS_RENDERING_INCLUDE}/Quad.h
             ${LOCUS_RENDERING_INCLUDE}/RenderingState.h
             ${LOCUS_RENDERING_INCLUDE}/SAPReading.h

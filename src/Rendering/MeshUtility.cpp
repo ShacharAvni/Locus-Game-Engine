@@ -146,7 +146,7 @@ Mesh MeshUtility::MakeSphere(float radius, unsigned int subdivisions)
    std::vector<std::vector<MeshVertex>> trianglesOnSphere;
    trianglesOnSphere.reserve(subdividedTriangles.size());
 
-   std::vector<MeshVertex> triangleOnSphere(3);
+   std::vector<MeshVertex> triangleOnSphere(3, MeshVertex(Color::White(), Locus::TextureCoordinate()));
 
    Plane fixSmearPlane(Vector3::ZeroVector(), Vector3::NegativeZAxis());
 

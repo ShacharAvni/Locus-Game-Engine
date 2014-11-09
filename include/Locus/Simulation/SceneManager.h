@@ -43,6 +43,7 @@ public:
    void CenterMouse();
    void GetMousePosition(int& x, int &y);
    void SetMousePosition(int x, int y);
+   void GetPrimaryMonitorWindowSize(int& width, int &height) const;
    void MakeWindowed();
    void MakeFullScreen();
 

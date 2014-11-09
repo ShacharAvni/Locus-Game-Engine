@@ -47,6 +47,8 @@ public:
    void Load(const Transformation& trans);
    void LoadIdentity();
 
+   void Multiply(const Transformation& trans);
+
    void Translate(const Vector3& t);
    void Scale(const Vector3& scale);
 

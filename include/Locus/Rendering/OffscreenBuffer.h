@@ -8,38 +8,39 @@
 *                                                                                                        *
 \********************************************************************************************************/
 
-#include "Locus/Rendering/TextureCoordinate.h"
+#pragma once
 
-#include "Locus/Common/Float.h"
+#include "LocusRenderingAPI.h"
+
+#include "GLCommonTypes.h"
+
+#include "Color.h"
 
 namespace Locus
 {
 
-TextureCoordinate::TextureCoordinate()
-   : x(0), y(0)
+class LOCUS_RENDERING_API OffscreenBuffer
 {
-}
+public:
+   OffscreenBuffer(int maxWidth, int maxHeight);
+   ~OffscreenBuffer();
 
-TextureCoordinate::TextureCoordinate(float x, float y)
-   : x(x), y(y)
-{
-}
+   OffscreenBuffer(const OffscreenBuffer&) = delete;
+   OffscreenBuffer& operator=(const OffscreenBuffer&) = delete;
 
-bool operator==(const TextureCoordinate& coord1, const TextureCoordinate& coord2)
-{
-   return ( FEqual<float>(coord1.x, coord2.x) && FEqual<float>(coord1.y, coord2.y) );
-}
+   void Bind() const;
 
-bool operator <(const TextureCoordinate& coord1, const TextureCoordinate& coord2)
-{
-   if (coord1.x == coord2.x)
-   {
-      return coord1.y < coord2.y;
-   }
-   else
-   {
-      return coord1.x < coord2.x;
-   }
-}
+   static void Unbind();
+
+   Color ReadPixel(int x, int y);
+
+private:
+   GLuint fboID;
+   GLuint renderBufferID;
+   GLuint depthBufferID;
+   GLuint pixelPackBufferID;
+
+   void DestroyBuffers();
+};
 
 }

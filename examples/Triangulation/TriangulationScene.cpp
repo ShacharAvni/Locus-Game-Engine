@@ -278,9 +278,9 @@ void TriangulationScene::TriangulateCompletedPolygons()
 
          if (numTriangles > 0)
          {
-            std::vector<std::vector<Locus::MeshVertex>> faceTriangles(numTriangles, std::vector<Locus::MeshVertex>(3));
-
             const Locus::TextureCoordinate Dont_Care_Tex_Coord(0.0f, 0.0f);
+
+            std::vector<std::vector<Locus::MeshVertex>> faceTriangles(numTriangles, std::vector<Locus::MeshVertex>(3, Locus::MeshVertex(CurrentColor(), Dont_Care_Tex_Coord)));
 
             for (size_t triangleIndex = 0; triangleIndex < numTriangles; ++triangleIndex)
             {
@@ -291,8 +291,6 @@ void TriangulationScene::TriangulateCompletedPolygons()
                   meshVertex.position.x = trianglePoints[triangleIndex * 3 + pointIndex]->x;
                   meshVertex.position.y = trianglePoints[triangleIndex * 3 + pointIndex]->y;
                   meshVertex.position.z = REAL_Z_SCENE;
-
-                  meshVertex.textureCoordinate = Dont_Care_Tex_Coord;
                }
             }
 

@@ -70,6 +70,15 @@ struct MeshVertexIndexer : public ModelVertexIndexer
 
 struct MeshVertex : public ModelVertex
 {
+   MeshVertex()
+   {
+   }
+
+   MeshVertex(const Color& color, const TextureCoordinate& textureCoordinate)
+      : color(color), textureCoordinate(textureCoordinate)
+   {
+   }
+
    void Interpolate(const Vector3& interpolatePosition, const MeshVertex& faceVertex1, const MeshVertex& faceVertex2, const MeshVertex& faceVertex3, const Vector3& barycentricCoordinates)
    {
       ModelVertex::Interpolate(interpolatePosition, faceVertex1, faceVertex2, faceVertex3, barycentricCoordinates);
@@ -78,6 +87,7 @@ struct MeshVertex : public ModelVertex
       textureCoordinate.y = (barycentricCoordinates.x * faceVertex1.textureCoordinate.y) + (barycentricCoordinates.y * faceVertex2.textureCoordinate.y) + (barycentricCoordinates.z * faceVertex3.textureCoordinate.y);
    }
 
+   Color color;
    TextureCoordinate textureCoordinate;
 };
 
@@ -91,9 +101,10 @@ public:
 
    std::vector<TextureCoordinate> getTextureCoords(std::size_t faceIndex) const;
 
-   void SetColor(const Color& color);
-
+   void AddColor(const Color& color);
    void AddTextureCoordinate(const TextureCoordinate& tc);
+
+   void SetColor(const Color& color);
 
    void AssignNormals();
    virtual void Clear();

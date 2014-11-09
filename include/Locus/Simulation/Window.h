@@ -66,7 +66,9 @@ public:
 
    void SetMouseState(MouseState state);
    void SetMousePosition(int x, int y);
-   void GetMousePosition(int& x, int& y);
+   void GetMousePosition(int& x, int& y) const;
+
+   void GetPrimaryMonitorWindowSize(int& width, int &height) const;
 
 private:
    WindowContext& windowContext;
@@ -84,7 +86,7 @@ private:
    void DestroyWindow();
    void SwapFullScreenOrWindowedState(int width, int height);
 
-   void GetMousePositionInternal(double& x, double& y);
+   void GetMousePositionInternal(double& x, double& y) const;
 
    static void ExternalKeyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods);
    static void ExternalMouseButtonCallback(GLFWwindow* glfwWindow, int button, int action, int mods);
