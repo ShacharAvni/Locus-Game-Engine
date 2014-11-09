@@ -71,6 +71,7 @@ struct MeshVertexIndexer : public ModelVertexIndexer
 struct MeshVertex : public ModelVertex
 {
    MeshVertex()
+      : color(Color::White())
    {
    }
 
