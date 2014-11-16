@@ -16,6 +16,8 @@ namespace Locus
 {
 
 LOCUS_GEOMETRY_API extern const float PI;
+LOCUS_GEOMETRY_API extern const float TWO_PI;
+LOCUS_GEOMETRY_API extern const float HALF_PI;
 LOCUS_GEOMETRY_API extern const float TO_RADIANS;
 LOCUS_GEOMETRY_API extern const float TO_DEGREES;
 

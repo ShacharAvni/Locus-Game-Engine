@@ -24,6 +24,12 @@ class LOCUS_GEOMETRY_API DualTransformation
 {
 public:
    /*!
+    * \details Set both the underlying transformation and
+    * its inverse to the identity transformation.
+    */
+   void SetToIdentity();
+
+   /*!
     * \details Transformation::TranslateBy 
     * is called on the underlying transformation.
     * Transformation::InverseTranslateBy is

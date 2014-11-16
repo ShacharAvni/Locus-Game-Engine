@@ -8,44 +8,51 @@
 *                                                                                                        *
 \********************************************************************************************************/
 
-#include "Locus/Geometry/DualTransformation.h"
+#pragma once
+
+#include "LocusRenderingAPI.h"
+
 #include "Locus/Geometry/Vector3.h"
+#include "Locus/Geometry/Transformation.h"
 
 namespace Locus
 {
 
-void DualTransformation::SetToIdentity()
-{
-   transform.SetToIdentity();
-   inverse.SetToIdentity();
-}
+class TransformationStack;
 
-void DualTransformation::TranslateBy(const Vector3& t)
+class LOCUS_RENDERING_API ConstrainedViewpoint
 {
-   transform.TranslateBy(t);
-   inverse.InverseTranslateBy(t);
-}
+public:
+   ConstrainedViewpoint();
 
-void DualTransformation::RotateBy(const Vector3& rotation)
-{
-   transform.RotateBy(rotation);
-   inverse.InverseRotateBy(rotation);
-}
+   const Vector3& GetPosition() const;
+   const Vector3& GetRight() const;
+   const Vector3& GetUp() const;
+   const Vector3& GetForward() const;
+   const Transformation& GetRotation() const;
 
-void DualTransformation::ScaleBy(const Vector3& scale)
-{
-   transform.ScaleBy(scale);
-   inverse.InverseScaleBy(scale);
-}
+   Vector3 ToEyePosition(const Vector3& worldPosition) const;
 
-const Transformation& DualTransformation::GetTransformation() const
-{
-   return transform;
-}
+   void TranslateBy(const Vector3& translation);
+   void RotateBy(const Vector3& rotation);
 
-const Transformation& DualTransformation::GetInverse() const
-{
-   return inverse;
-}
+   void Activate(TransformationStack& transformationStack) const;
+   void Deactivate(TransformationStack& transformationStack) const;
+
+private:
+   Transformation rotations;
+   Transformation inverseTransform;
+
+   Vector3 position;
+
+   Vector3 forward;
+   Vector3 up;
+   Vector3 right;
+
+   float angleAroundRight;
+   float angleAroundUp;
+
+   void UpdateTransformation();
+};
 
 }

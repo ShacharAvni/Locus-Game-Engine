@@ -154,4 +154,10 @@ void ClearStack(std::stack<T>& stack)
    }
 }
 
+template <class T>
+T Clamp(T value, T min, T max)
+{
+   return value < min ? min : (value > max ? max : value);
+}
+
 } // namespace Locus

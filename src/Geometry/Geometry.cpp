@@ -22,12 +22,14 @@ namespace Locus
 {
 
 const float PI = 3.141592653589793238f;
+const float TWO_PI = 2.0f * PI;
+const float HALF_PI = 0.5f * PI;
 const float TO_RADIANS = 0.017453292519943295766666666666667f;
 const float TO_DEGREES = 57.295779513082320885235758349777f;
 
 void ResolveCollision(float coefficientOfRestitution,
-                        const Sphere& sphere1, const Sphere& sphere2, const Vector3& collisionPoint,
-                        const Vector3& impulseDirection, MotionProperties& motionProperties1, MotionProperties& motionProperties2)
+                      const Sphere& sphere1, const Sphere& sphere2, const Vector3& collisionPoint,
+                      const Vector3& impulseDirection, MotionProperties& motionProperties1, MotionProperties& motionProperties2)
 {
 #define CLAMP_RESOLVED_SPEEDS
 
