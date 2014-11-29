@@ -128,7 +128,7 @@ void CollisionScene::InitializeCollidableMeshes()
 {
    const std::size_t Num_Templates = 5;
 
-   Locus::Mesh meshTemplates[Num_Templates] =
+   std::unique_ptr<Locus::Mesh> meshTemplates[Num_Templates] =
    {
       MeshUtility::MakeCube(1.0f),
       MeshUtility::MakeIcosahedron(1.0f),
@@ -141,7 +141,7 @@ void CollisionScene::InitializeCollidableMeshes()
 
    for (std::size_t templateIndex = 0; templateIndex < Num_Templates; ++templateIndex)
    {
-      collidableMeshTemplates[templateIndex].GrabMesh(meshTemplates[templateIndex]);
+      collidableMeshTemplates[templateIndex].GrabMesh(*meshTemplates[templateIndex]);
 
       collidableMeshTemplates[templateIndex].gpuVertexDataTransferInfo.sendColors = true;
       collidableMeshTemplates[templateIndex].gpuVertexDataTransferInfo.sendNormals = false;

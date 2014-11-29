@@ -10,7 +10,7 @@
 
 #include "Locus/Rendering/DrawablePointCloud.h"
 #include "Locus/Rendering/ShaderController.h"
-#include "Locus/Rendering/GPUVertexData.h"
+#include "Locus/Rendering/DefaultGPUVertexData.h"
 
 #include "Locus/Common/Util.h"
 
@@ -76,10 +76,10 @@ void DrawablePointCloud::UpdateGPUVertexData()
 
    if (numVertices > 0)
    {
-      if (gpuVertexData != nullptr)
+      if (defaultGPUVertexData != nullptr)
       {
-         gpuVertexData->Bind();
-         gpuVertexData->Buffer(numVertices, GL_STATIC_DRAW);
+         defaultGPUVertexData->Bind();
+         defaultGPUVertexData->Buffer(numVertices, GL_STATIC_DRAW);
 
          std::vector<GPUVertexDataStorage> vertData(numVertices);
 
@@ -95,14 +95,14 @@ void DrawablePointCloud::UpdateGPUVertexData()
             vertData[vertDataIndex].color[3] = colors[vertDataIndex].a;
          }
 
-         gpuVertexData->BufferSub(0, numVertices, vertData.data());
+         defaultGPUVertexData->BufferSub(0, numVertices, vertData.data());
 
-         gpuVertexData->transferInfo.sendPositions = true;
-         gpuVertexData->transferInfo.sendColors = true;
-         gpuVertexData->transferInfo.sendNormals = false;
-         gpuVertexData->transferInfo.sendTexCoords = false;
+         defaultGPUVertexData->transferInfo.sendPositions = true;
+         defaultGPUVertexData->transferInfo.sendColors = true;
+         defaultGPUVertexData->transferInfo.sendNormals = false;
+         defaultGPUVertexData->transferInfo.sendTexCoords = false;
 
-         gpuVertexData->drawMode = GL_POINTS;
+         defaultGPUVertexData->drawMode = GL_POINTS;
       }
    }
 }

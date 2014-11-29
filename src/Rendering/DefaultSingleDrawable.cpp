@@ -8,28 +8,27 @@
 *                                                                                                        *
 \********************************************************************************************************/
 
-#include "Locus/Rendering/SingleDrawable.h"
-#include "Locus/Rendering/GPUVertexData.h"
-#include "Locus/Rendering/RenderingState.h"
+#include "Locus/Rendering/DefaultSingleDrawable.h"
+#include "Locus/Rendering/DefaultGPUVertexData.h"
 
 namespace Locus
 {
 
-SingleDrawable::~SingleDrawable()
+DefaultSingleDrawable::DefaultSingleDrawable()
 {
+   defaultGPUVertexData = nullptr;
 }
 
-void SingleDrawable::DeleteGPUVertexData()
+void DefaultSingleDrawable::CreateGPUVertexData()
 {
-   gpuVertexData.reset();
+   defaultGPUVertexData = new DefaultGPUVertexData();
+   gpuVertexData.reset(defaultGPUVertexData);
 }
 
-void SingleDrawable::Draw(RenderingState& renderingState) const
+void DefaultSingleDrawable::DeleteGPUVertexData()
 {
-   if (gpuVertexData != nullptr)
-   {
-      gpuVertexData->Draw(renderingState.shaderController);
-   }
+   SingleDrawable::DeleteGPUVertexData();
+   defaultGPUVertexData = nullptr;
 }
 
 }

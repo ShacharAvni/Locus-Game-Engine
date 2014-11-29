@@ -95,6 +95,30 @@ GLint ShaderProgram::GetUniformLocation(const std::string& uniform) const
    }
 }
 
+GLint ShaderProgram::EnableAttribute(const std::string& attribute)
+{
+   GLint attributeLocation = GetAttributeLocation(attribute);
+
+   if (attributeLocation != -1)
+   {
+      glEnableVertexAttribArray(attributeLocation);
+
+      enabledAttributes.insert(attributeLocation);
+   }
+
+   return attributeLocation;
+}
+
+void ShaderProgram::DisableProgramAttributes()
+{
+   for (GLint attributeLocation : enabledAttributes)
+   {
+      glDisableVertexAttribArray(attributeLocation);
+   }
+
+   enabledAttributes.clear();
+}
+
 void ShaderProgram::Use() const
 {
    glUseProgram(id);

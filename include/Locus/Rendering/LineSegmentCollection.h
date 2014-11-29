@@ -15,7 +15,7 @@
 #include "Locus/Geometry/Vector3.h"
 #include "Locus/Geometry/LineSegment.h"
 
-#include "SingleDrawable.h"
+#include "DefaultSingleDrawable.h"
 #include "Color.h"
 
 #include <vector>
@@ -25,7 +25,7 @@ namespace Locus
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
-class LOCUS_RENDERING_API LineSegmentCollection : public SingleDrawable
+class LOCUS_RENDERING_API LineSegmentCollection : public DefaultSingleDrawable
 {
 public:
    struct ColoredLineSegment
@@ -34,9 +34,7 @@ public:
       Color color;
    };
 
-   LineSegmentCollection();
-   LineSegmentCollection(const std::vector<ColoredLineSegment>& lineSegments);
-   LineSegmentCollection(std::vector<ColoredLineSegment>&& lineSegments);
+   void CopyFrom(const LineSegmentCollection& lineSegmentCollection);
 
    std::size_t NumLineSegments() const;
 

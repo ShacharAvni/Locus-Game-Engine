@@ -9,7 +9,7 @@
 \********************************************************************************************************/
 
 #include "Locus/Rendering/Mesh.h"
-#include "Locus/Rendering/GPUVertexData.h"
+#include "Locus/Rendering/DefaultGPUVertexData.h"
 #include "Locus/Rendering/RenderingState.h"
 
 #include "Locus/Common/Util.h"
@@ -31,6 +31,17 @@ Mesh::Mesh(const std::vector<std::vector<MeshVertex>>& faceTriangles)
    Model::GetTriangles(faceTriangles, faceTrianglesActual);
 
    Construct(faceTrianglesActual);
+}
+
+void Mesh::CopyFrom(const Mesh& mesh)
+{
+   Model<MeshVertexIndexer, MeshVertex>::operator=(mesh);
+
+   gpuVertexDataTransferInfo = mesh.gpuVertexDataTransferInfo;
+
+   normals = mesh.normals;
+   textureCoordinates = mesh.textureCoordinates;
+   colors = mesh.colors;
 }
 
 void Mesh::AddColor(const Color& color)
@@ -174,11 +185,6 @@ void Mesh::Clear()
    ClearAndShrink(textureCoordinates);
 }
 
-void Mesh::SetGPUVertexAttributes(ShaderController& ShaderController) const
-{
-   gpuVertexData->SetAttributes(ShaderController);
-}
-
 void Mesh::BindGPUVertexData() const
 {
    gpuVertexData->Bind();
@@ -188,14 +194,14 @@ void Mesh::UpdateGPUVertexData()
 {
    if (numTotalVertices > 0)
    {
-      if (gpuVertexData != nullptr)
+      if (defaultGPUVertexData != nullptr)
       {
          bool hasNormals = normals.size() > 0;
 
          bool sendNormals = gpuVertexDataTransferInfo.sendNormals && hasNormals;
 
-         gpuVertexData->Bind();
-         gpuVertexData->Buffer(numTotalVertices, GL_STATIC_DRAW);
+         defaultGPUVertexData->Bind();
+         defaultGPUVertexData->Buffer(numTotalVertices, GL_STATIC_DRAW);
 
          std::vector<GPUVertexDataStorage> vertData(numTotalVertices);
 
@@ -238,12 +244,12 @@ void Mesh::UpdateGPUVertexData()
             }
          }
 
-         gpuVertexData->BufferSub(0, numTotalVertices, vertData.data());
+         defaultGPUVertexData->BufferSub(0, numTotalVertices, vertData.data());
 
-         gpuVertexData->transferInfo = gpuVertexDataTransferInfo;
-         gpuVertexData->transferInfo.sendNormals = sendNormals;
+         defaultGPUVertexData->transferInfo = gpuVertexDataTransferInfo;
+         defaultGPUVertexData->transferInfo.sendNormals = sendNormals;
 
-         gpuVertexData->drawMode = GL_TRIANGLES;
+         defaultGPUVertexData->drawMode = GL_TRIANGLES;
       }
    }
 }

@@ -55,7 +55,7 @@ const Locus::SphereTree_t& CollidableMesh::GetBoundingVolumeHierarchy() const
 
 void CollidableMesh::GrabMesh(const Locus::Mesh& mesh)
 {
-   Mesh::operator=(mesh);
+   Mesh::CopyFrom(mesh);
 }
 
 void CollidableMesh::GrabMeshAndCollidable(const CollidableMesh& other)

@@ -17,6 +17,7 @@
 
 #include <string>
 #include <map>
+#include <set>
 
 namespace Locus
 {
@@ -41,11 +42,17 @@ public:
    GLint GetAttributeLocation(const std::string& attribute) const;
    GLint GetUniformLocation(const std::string& uniform) const;
 
+   GLint EnableAttribute(const std::string& attribute);
+
+   void DisableProgramAttributes();
+
    static void Stop();
 
 private:
    mutable std::map<std::string, GLint> attributeLocationMap;
    mutable std::map<std::string, GLint> uniformLocationMap;
+
+   std::set<GLint> enabledAttributes;
 };
 
 #include "Locus/Preprocessor/EndSilenceDLLInterfaceWarnings"

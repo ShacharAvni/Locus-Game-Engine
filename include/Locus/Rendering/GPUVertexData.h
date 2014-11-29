@@ -11,8 +11,6 @@
 #pragma once
 
 #include "LocusRenderingAPI.h"
-
-#include "GPUVertexDataStorage.h"
 #include "GLCommonTypes.h"
 
 #include <cstddef>
@@ -25,8 +23,8 @@ class ShaderController;
 class LOCUS_RENDERING_API GPUVertexData
 {
 public:
-   GPUVertexData();
-   ~GPUVertexData();
+   GPUVertexData(std::size_t sizeOfSingleElementInBytes);
+   virtual ~GPUVertexData();
 
    GPUVertexData(const GPUVertexData&) = delete;
    GPUVertexData& operator=(const GPUVertexData&) = delete;
@@ -38,18 +36,18 @@ public:
 
    static void SetClientStateToDefault();
 
-   void SetAttributes(ShaderController& shaderController) const;
-   void SetClientState() const;
+   virtual void SetAttributes(ShaderController& shaderController) const = 0;
+   virtual void SetClientState() const = 0;
 
    void PreDraw(ShaderController& shaderController) const;
    void Draw(ShaderController& shaderController) const;
 
    GLenum drawMode;
 
-   GPUVertexDataTransferInfo transferInfo;
-
 private:
    GLuint vertexBufferID;
+
+   std::size_t sizeOfSingleElementInBytes;
 
    bool populated;
 

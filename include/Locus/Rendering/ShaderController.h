@@ -49,10 +49,10 @@ public:
    GLint GetAttributeLocation(const std::string& attribute);
    GLint GetUniformLocation(const std::string& uniform);
 
+   GLint EnableAttribute(const std::string& attribute);
+
    bool CurrentProgramDoesLighting() const;
    bool CurrentProgramDoesTexturing() const;
-
-   void DisableCurrentProgramAttributes();
 
 private:
    std::unordered_map<unsigned int, std::unique_ptr<ShaderProgram>> shaderProgramMap;
@@ -60,6 +60,8 @@ private:
    GLInfo::GLSLVersion activeGLSLVersion;
 
    ShaderProgram* currentProgram;
+
+   void DisableCurrentProgramAttributes();
 };
 
 #include "Locus/Preprocessor/EndSilenceDLLInterfaceWarnings"

@@ -147,7 +147,9 @@ void TriangulationScene::MousePressed(MouseButton_t button)
 
             currentPolygonAsLineSegments.AddLineSegment(coloredLineSegment);
 
-            completedPolygonsAsLineSegments.emplace_back( std::make_unique<Locus::LineSegmentCollection>(currentPolygonAsLineSegments) );
+            completedPolygonsAsLineSegments.emplace_back( std::make_unique<Locus::LineSegmentCollection>() );
+
+            completedPolygonsAsLineSegments.back()->CopyFrom(currentPolygonAsLineSegments);
             completedPolygonsAsLineSegments.back()->CreateGPUVertexData();
             completedPolygonsAsLineSegments.back()->UpdateGPUVertexData();
 

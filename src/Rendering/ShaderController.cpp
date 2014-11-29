@@ -176,23 +176,23 @@ GLint ShaderController::GetUniformLocation(const std::string& uniform)
    }
 }
 
+GLint ShaderController::EnableAttribute(const std::string& attribute)
+{
+   if (currentProgram != nullptr)
+   {
+      return currentProgram->EnableAttribute(attribute);
+   }
+   else
+   {
+      return -1;
+   }
+}
+
 void ShaderController::DisableCurrentProgramAttributes()
 {
    if (currentProgram != nullptr)
    {
-      glDisableVertexAttribArray( currentProgram->GetAttributeLocation(ShaderSource::Vert_Pos) );
-
-      if (currentProgram->doesLighting)
-      {
-         glDisableVertexAttribArray( currentProgram->GetAttributeLocation(ShaderSource::Vert_Normal) );
-      }
-
-      if (currentProgram->doesTexturing)
-      {
-         glDisableVertexAttribArray( currentProgram->GetAttributeLocation(ShaderSource::Vert_Tex) );
-      }
-
-      glDisableVertexAttribArray( currentProgram->GetAttributeLocation(ShaderSource::Color) );
+      currentProgram->DisableProgramAttributes();
    }
 }
 

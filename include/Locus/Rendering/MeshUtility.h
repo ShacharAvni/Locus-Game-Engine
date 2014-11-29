@@ -15,6 +15,8 @@
 #include "Mesh.h"
 #include "TextureCoordinate.h"
 
+#include <memory>
+
 #include <cstddef>
 
 namespace Locus
@@ -25,10 +27,10 @@ class Vector3;
 class LOCUS_RENDERING_API MeshUtility
 {
 public:
-   static Mesh MakeOctahedron(float radius);
-   static Mesh MakeIcosahedron(float radius);
-   static Mesh MakeSphere(float radius, unsigned int subdivisions);
-   static Mesh MakeCube(float lengthOfOneSide);
+   static std::unique_ptr<Mesh> MakeOctahedron(float radius);
+   static std::unique_ptr<Mesh> MakeIcosahedron(float radius);
+   static std::unique_ptr<Mesh> MakeSphere(float radius, unsigned int subdivisions);
+   static std::unique_ptr<Mesh> MakeCube(float lengthOfOneSide);
 
    static TextureCoordinate SphericalUVMapping(const Vector3& pointOnSphere);
 

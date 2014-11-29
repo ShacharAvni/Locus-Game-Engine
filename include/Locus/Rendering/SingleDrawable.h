@@ -26,13 +26,8 @@ class GPUVertexData;
 class LOCUS_RENDERING_API SingleDrawable : public Drawable
 {
 public:
-   SingleDrawable();
-   SingleDrawable(const SingleDrawable& singleDrawable);
    virtual ~SingleDrawable();
 
-   SingleDrawable& operator=(const SingleDrawable& singleDrawable);
-
-   virtual void CreateGPUVertexData() override;
    virtual void DeleteGPUVertexData() override;
 
    virtual void Draw(RenderingState& renderingState) const override;

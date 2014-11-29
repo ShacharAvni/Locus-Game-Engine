@@ -49,6 +49,8 @@ include_directories(${LOCUS_INCLUDE}
 add_library(Locus_Rendering
             Color.cpp
             ConstrainedViewpoint.cpp
+            DefaultGPUVertexData.cpp
+            DefaultSingleDrawable.cpp
             Drawable.cpp
             DrawablePointCloud.cpp
             DrawUtility.cpp
@@ -78,6 +80,8 @@ add_library(Locus_Rendering
             Viewpoint.cpp
             ${LOCUS_RENDERING_INCLUDE}/Color.h
             ${LOCUS_RENDERING_INCLUDE}/ConstrainedViewpoint.h
+            ${LOCUS_RENDERING_INCLUDE}/DefaultGPUVertexData.h
+            ${LOCUS_RENDERING_INCLUDE}/DefaultSingleDrawable.h
             ${LOCUS_RENDERING_INCLUDE}/Drawable.h
             ${LOCUS_RENDERING_INCLUDE}/DrawablePointCloud.h
             ${LOCUS_RENDERING_INCLUDE}/DrawUtility.h

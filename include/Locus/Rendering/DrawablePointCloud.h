@@ -14,7 +14,7 @@
 
 #include "Locus/Geometry/PointCloud.h"
 
-#include "SingleDrawable.h"
+#include "DefaultSingleDrawable.h"
 #include "Color.h"
 
 #include <vector>
@@ -26,7 +26,7 @@ class ShaderController;
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
-class LOCUS_RENDERING_API DrawablePointCloud : public PointCloud, public SingleDrawable
+class LOCUS_RENDERING_API DrawablePointCloud : public PointCloud, public DefaultSingleDrawable
 {
 public:
    DrawablePointCloud();

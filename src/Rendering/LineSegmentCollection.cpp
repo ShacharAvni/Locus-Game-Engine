@@ -9,7 +9,7 @@
 \********************************************************************************************************/
 
 #include "Locus/Rendering/LineSegmentCollection.h"
-#include "Locus/Rendering/GPUVertexData.h"
+#include "Locus/Rendering/DefaultGPUVertexData.h"
 
 #include <Locus/Rendering/Locus_glew.h>
 
@@ -18,18 +18,9 @@
 namespace Locus
 {
 
-LineSegmentCollection::LineSegmentCollection()
+void LineSegmentCollection::CopyFrom(const LineSegmentCollection& lineSegmentCollection)
 {
-}
-
-LineSegmentCollection::LineSegmentCollection(const std::vector<LineSegmentCollection::ColoredLineSegment>& lineSegments)
-   : lineSegments(lineSegments)
-{
-}
-
-LineSegmentCollection::LineSegmentCollection(std::vector<LineSegmentCollection::ColoredLineSegment>&& lineSegments)
-   : lineSegments(lineSegments)
-{
+   lineSegments = lineSegmentCollection.lineSegments;
 }
 
 std::size_t LineSegmentCollection::NumLineSegments() const
@@ -70,14 +61,14 @@ void LineSegmentCollection::InsertLineSegment(std::size_t index, const LineSegme
 
 void LineSegmentCollection::UpdateGPUVertexData()
 {
-   if (gpuVertexData != nullptr)
+   if (defaultGPUVertexData != nullptr)
    {
       std::size_t numLineSegments = lineSegments.size();
 
       std::size_t numVertices = numLineSegments * 2;
 
-      gpuVertexData->Bind();
-      gpuVertexData->Buffer(numVertices, GL_STATIC_DRAW);
+      defaultGPUVertexData->Bind();
+      defaultGPUVertexData->Buffer(numVertices, GL_STATIC_DRAW);
 
       if (numVertices > 0)
       {
@@ -104,15 +95,15 @@ void LineSegmentCollection::UpdateGPUVertexData()
             }
          }
 
-         gpuVertexData->BufferSub(0, numVertices, vertData.data());
+         defaultGPUVertexData->BufferSub(0, numVertices, vertData.data());
       }
 
-      gpuVertexData->transferInfo.sendPositions = true;
-      gpuVertexData->transferInfo.sendColors = true;
-      gpuVertexData->transferInfo.sendNormals = false;
-      gpuVertexData->transferInfo.sendTexCoords = false;
+      defaultGPUVertexData->transferInfo.sendPositions = true;
+      defaultGPUVertexData->transferInfo.sendColors = true;
+      defaultGPUVertexData->transferInfo.sendNormals = false;
+      defaultGPUVertexData->transferInfo.sendTexCoords = false;
 
-      gpuVertexData->drawMode = GL_LINES;
+      defaultGPUVertexData->drawMode = GL_LINES;
    }
 }
 

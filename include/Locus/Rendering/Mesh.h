@@ -15,7 +15,7 @@
 #include "Locus/Geometry/Model.h"
 #include "Locus/Geometry/Vector3.h"
 
-#include "SingleDrawable.h"
+#include "DefaultSingleDrawable.h"
 #include "TextureCoordinate.h"
 #include "Color.h"
 #include "GPUVertexDataStorage.h"
@@ -24,8 +24,6 @@
 
 namespace Locus
 {
-
-class ShaderController;
 
 struct MeshVertexIndexer : public ModelVertexIndexer
 {
@@ -94,11 +92,13 @@ struct MeshVertex : public ModelVertex
 
 #include "Locus/Preprocessor/BeginSilenceDLLInterfaceWarnings"
 
-class LOCUS_RENDERING_API Mesh : public Model<MeshVertexIndexer, MeshVertex>, public SingleDrawable
+class LOCUS_RENDERING_API Mesh : public Model<MeshVertexIndexer, MeshVertex>, public DefaultSingleDrawable
 {
 public:
    Mesh();
    Mesh(const std::vector<std::vector<MeshVertex>>& faceTriangles);
+
+   void CopyFrom(const Mesh& mesh);
 
    std::vector<TextureCoordinate> getTextureCoords(std::size_t faceIndex) const;
 
@@ -111,7 +111,6 @@ public:
    virtual void Clear();
 
    virtual void UpdateGPUVertexData() override;
-   void SetGPUVertexAttributes(ShaderController& ShaderController) const;
    void BindGPUVertexData() const;
 
    GPUVertexDataTransferInfo gpuVertexDataTransferInfo;
