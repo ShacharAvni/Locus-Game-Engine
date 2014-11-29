@@ -34,6 +34,10 @@ public:
       Color color;
    };
 
+   LineSegmentCollection();
+   LineSegmentCollection(const std::vector<ColoredLineSegment>& lineSegments);
+   LineSegmentCollection(std::vector<ColoredLineSegment>&& lineSegments);
+
    void CopyFrom(const LineSegmentCollection& lineSegmentCollection);
 
    std::size_t NumLineSegments() const;

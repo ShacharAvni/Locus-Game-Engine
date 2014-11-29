@@ -18,6 +18,20 @@
 namespace Locus
 {
 
+LineSegmentCollection::LineSegmentCollection()
+{
+}
+
+LineSegmentCollection::LineSegmentCollection(const std::vector<LineSegmentCollection::ColoredLineSegment>& lineSegments)
+   : lineSegments(lineSegments)
+{
+}
+
+LineSegmentCollection::LineSegmentCollection(std::vector<LineSegmentCollection::ColoredLineSegment>&& lineSegments)
+   : lineSegments(lineSegments)
+{
+}
+
 void LineSegmentCollection::CopyFrom(const LineSegmentCollection& lineSegmentCollection)
 {
    lineSegments = lineSegmentCollection.lineSegments;
