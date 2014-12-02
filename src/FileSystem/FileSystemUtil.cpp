@@ -60,6 +60,38 @@ static std::string GetExePath_Internal()
    }
 }
 
+bool GetAllFilesInDirectory(const std::string& directoryPath, std::vector<std::string>& filesInDirectory)
+{
+   filesInDirectory.clear();
+
+   std::string directoryPathSearchString = directoryPath + "/*";
+
+   WIN32_FIND_DATA findData;
+
+   HANDLE findHandle = FindFirstFileA(directoryPathSearchString.c_str(), &findData);
+
+   if (findHandle == INVALID_HANDLE_VALUE) 
+   {
+      return false;
+   } 
+
+   do
+   {
+      if (!(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+      {
+         filesInDirectory.push_back(findData.cFileName);
+      }
+   }
+   while (FindNextFileA(findHandle, &findData) != 0);
+
+   if (GetLastError() != ERROR_NO_MORE_FILES) 
+   {
+      return false;
+   }
+
+   return (FindClose(findHandle) == TRUE);
+}
+
 #elif defined(LOCUS_OSX)
 static std::string GetExePath_Internal()
 {
@@ -84,6 +116,12 @@ static std::string GetExePath_Internal()
    }
 }
 
+//TODO
+bool GetAllFilesInDirectory(const std::string& directoryPath, std::vector<std::string>& filesInDirectory)
+{
+   return false;
+}
+
 #else
 static std::string GetExePath_Internal()
 {
@@ -99,6 +137,12 @@ static std::string GetExePath_Internal()
    {
       return "";
    }
+}
+
+//TODO
+bool GetAllFilesInDirectory(const std::string& directoryPath, std::vector<std::string>& filesInDirectory)
+{
+   return false;
 }
 
 #endif

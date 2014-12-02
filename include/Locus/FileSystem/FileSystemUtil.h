@@ -48,4 +48,6 @@ LOCUS_FILE_SYSTEM_API void ReadWholeFile(const std::string& filePath, std::vecto
  */
 LOCUS_FILE_SYSTEM_API void ReadWholeFile(const MountedFilePath& mountedFilePath, std::vector<char>& data);
 
+LOCUS_FILE_SYSTEM_API bool GetAllFilesInDirectory(const std::string& directoryPath, std::vector<std::string>& filesInDirectory);
+
 } // namespace Locus
