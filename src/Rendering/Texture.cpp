@@ -21,35 +21,23 @@
 namespace Locus
 {
 
-Texture::Texture(const std::string& filePath, bool clamp, const GLInfo& glInfo)
-   : Image(filePath)
-{
-   FinishInit(clamp, glInfo);
-}
-
-Texture::Texture(const MountedFilePath& mountedFilePath, bool clamp, const GLInfo& glInfo)
-   : Image(mountedFilePath)
-{
-   FinishInit(clamp, glInfo);
-}
-
-Texture::~Texture()
-{
-   glDeleteTextures(1, &id);
-}
-
-void Texture::FinishInit(bool clamp, const GLInfo& glInfo)
+Texture::Texture(const Image& image, bool clamp, const GLInfo& glInfo)
 {
    glGenTextures(1, &id);
 
    Bind();
 
-   GenerateMipmaps(glInfo);
+   GenerateMipmaps(image, glInfo);
 
    bool doClamp = (clamp && (GLEW_VERSION_1_2 || glewIsExtensionSupported("GL_EXT_texture_edge_clamp")));
 
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, doClamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, doClamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+}
+
+Texture::~Texture()
+{
+   glDeleteTextures(1, &id);
 }
 
 void Texture::Bind()
@@ -108,15 +96,15 @@ void Texture::SendTextureData(const Image& image, GLint textureLevel)
    glTexImage2D(GL_TEXTURE_2D, textureLevel, format, image.Width(), image.Height(), 0, format, GL_UNSIGNED_BYTE, image.PixelData());
 }
 
-void Texture::GenerateMipmaps(const GLInfo& glInfo) const
+void Texture::GenerateMipmaps(const Image& image, const GLInfo& glInfo) const
 {
-   Texture::SetUnpackAlignmentForPixelComponents(NumPixelComponents());
+   Texture::SetUnpackAlignmentForPixelComponents(image.NumPixelComponents());
 
    GLInfo::Vendor vendor = glInfo.GetVendor();
 
    if ((vendor == GLInfo::Vendor::Microsoft) || (vendor == GLInfo::Vendor::Unknown))
    {
-      GenerateMipmapsLegacy();
+      GenerateMipmapsLegacy(image);
    }
    else
    {
@@ -124,7 +112,7 @@ void Texture::GenerateMipmaps(const GLInfo& glInfo) const
 
       if (GLEW_VERSION_3_0)
       {
-         Texture::SendTextureData(*this, 0);
+         Texture::SendTextureData(image, 0);
 
          if (vendorIsATI)
          {
@@ -135,7 +123,7 @@ void Texture::GenerateMipmaps(const GLInfo& glInfo) const
       }
       else if (GLEW_VERSION_2_1 && glewIsExtensionSupported("GL_EXT_framebuffer_object"))
       {
-         Texture::SendTextureData(*this, 0);
+         Texture::SendTextureData(image, 0);
 
          if (vendorIsATI)
          {
@@ -146,12 +134,12 @@ void Texture::GenerateMipmaps(const GLInfo& glInfo) const
       }
       else
       {
-         GenerateMipmapsLegacy();
+         GenerateMipmapsLegacy(image);
       }
    }
 }
 
-void Texture::GenerateMipmapsLegacy() const
+void Texture::GenerateMipmapsLegacy(const Image& image) const
 {
    if (GLEW_VERSION_1_4)
    {
@@ -159,11 +147,11 @@ void Texture::GenerateMipmapsLegacy() const
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 
-      Texture::SendTextureData(*this, 0);
+      Texture::SendTextureData(image, 0);
    }
    else
    {
-      GenerateManualMipmaps();
+      GenerateManualMipmaps(image);
    }
 }
 
@@ -192,19 +180,19 @@ unsigned int Texture::ClosestPowerOf2(unsigned int num)
    return closestPowerOf2;
 }
 
-void Texture::GenerateManualMipmaps() const
+void Texture::GenerateManualMipmaps(const Image& image) const
 {
-   unsigned int closestXPowerOf2 = Texture::ClosestPowerOf2(Width());
-   unsigned int closestYPowerOf2 = Texture::ClosestPowerOf2(Height());
+   unsigned int closestXPowerOf2 = Texture::ClosestPowerOf2(image.Width());
+   unsigned int closestYPowerOf2 = Texture::ClosestPowerOf2(image.Height());
 
-   Image image(PixelData(), Width(), Height(), NumPixelComponents());
+   Image scaledImage(image);
 
-   if ((closestXPowerOf2 != Width()) || (closestYPowerOf2 != Height()))
+   if ((closestXPowerOf2 != image.Width()) || (closestYPowerOf2 != image.Height()))
    {
-      image.Scale(closestXPowerOf2, closestYPowerOf2);
+      scaledImage.Scale(closestXPowerOf2, closestYPowerOf2);
    }
 
-   GenerateManualMipmapsUsingPowerOf2Image(image);
+   GenerateManualMipmapsUsingPowerOf2Image(scaledImage);
 }
 
 void Texture::GenerateManualMipmapsUsingPowerOf2Image(Image& image)

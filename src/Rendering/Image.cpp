@@ -24,6 +24,11 @@
 namespace Locus
 {
 
+Image::Image(unsigned int width, unsigned int height, unsigned int numPixelComponents)
+   : width(width), height(height), numPixelComponents(numPixelComponents), pixelData(width * height * numPixelComponents)
+{
+}
+
 Image::Image(const std::string& filePath)
 {
    int numPixelsX = 0;
@@ -79,9 +84,9 @@ void Image::FinishLoad(unsigned char* pixels, unsigned int width, unsigned int h
       stbi_image_free(pixels);
    });
 
-   this->numPixelComponents = numPixelComponents;
    this->width = width;
    this->height = height;
+   this->numPixelComponents = numPixelComponents;
 
    pixelData.insert(pixelData.end(), pixels, pixels + (numPixelComponents * width * height));
 
@@ -108,9 +113,88 @@ const unsigned char* Image::PixelData() const
    return pixelData.data();
 }
 
-void Image::ClearPixelData()
+unsigned int Image::GetPixelOffset(unsigned int x, unsigned int y) const
 {
-   ClearAndShrink(pixelData);
+   assert(x < width);
+   assert(y < height);
+
+   return Image::GetPixelOffset(x, y, width, numPixelComponents);
+}
+
+unsigned int Image::GetPixelOffset(unsigned int x, unsigned int y, unsigned int width, unsigned int numPixelComponents)
+{
+   return (numPixelComponents * ((y * width) + x));
+}
+
+const unsigned char* Image::GetPixel(unsigned int x, unsigned int y) const
+{
+   return const_cast<Image*>(this)->GetPixel(x, y);
+}
+
+unsigned char* Image::GetPixel(unsigned int x, unsigned int y)
+{
+   return &(pixelData[GetPixelOffset(x, y)]);
+}
+
+void Image::GetSubImage(unsigned int x, unsigned int y, unsigned int rectWidth, unsigned int rectHeight, std::vector<unsigned char>& subImagePixelData) const
+{
+   GetSubImage(x, y, rectWidth, rectHeight, numPixelComponents, subImagePixelData);
+}
+
+void Image::GetSubImage(unsigned int x, unsigned int y, unsigned int rectWidth, unsigned int rectHeight, unsigned int rectPixelComponents, std::vector<unsigned char>& subImagePixelData) const
+{
+   assert(x < width);
+   assert(y < height);
+   assert((x + rectWidth) <= width);
+   assert((y + rectHeight) <= height);
+   assert(rectPixelComponents <= numPixelComponents);
+
+   subImagePixelData.resize(rectWidth * rectHeight * rectPixelComponents);
+
+   for (unsigned int pixelX = x; pixelX < (x + rectWidth); ++pixelX)
+   {
+      for (unsigned int pixelY = y; pixelY < (y + rectHeight); ++pixelY)
+      {
+         const unsigned char* pixel = GetPixel(pixelX, pixelY);
+
+         unsigned int offsetIntoSubImage = Image::GetPixelOffset(pixelX - x, pixelY - y, rectWidth, rectPixelComponents);
+
+         for (unsigned int component = 0; component < rectPixelComponents; ++component)
+         {
+            subImagePixelData[offsetIntoSubImage + component] = pixel[component];
+         }
+      }
+   }
+}
+
+void Image::SetSubImage(unsigned int x, unsigned int y, unsigned int rectWidth, unsigned int rectHeight, const std::vector<unsigned char>& subImagePixelData)
+{
+   SetSubImage(x, y, rectWidth, rectHeight, numPixelComponents, subImagePixelData);
+}
+
+void Image::SetSubImage(unsigned int x, unsigned int y, unsigned int rectWidth, unsigned int rectHeight, unsigned int rectPixelComponents, const std::vector<unsigned char>& subImagePixelData)
+{
+   assert(x < width);
+   assert(y < height);
+   assert((x + rectWidth) <= width);
+   assert((y + rectHeight) <= height);
+   assert(rectPixelComponents <= numPixelComponents);
+   assert(subImagePixelData.size() == (rectWidth * rectHeight * rectPixelComponents));
+
+   for (unsigned int pixelX = x; pixelX < (x + rectWidth); ++pixelX)
+   {
+      for (unsigned int pixelY = y; pixelY < (y + rectHeight); ++pixelY)
+      {
+         unsigned char* pixel = GetPixel(pixelX, pixelY);
+
+         unsigned int offsetIntoSubImage = Image::GetPixelOffset(pixelX - x, pixelY - y, rectWidth, rectPixelComponents);
+
+         for (unsigned int component = 0; component < rectPixelComponents; ++component)
+         {
+            pixel[component] = subImagePixelData[offsetIntoSubImage + component];
+         }
+      }
+   }
 }
 
 void Image::FlipVertically()
@@ -121,12 +205,12 @@ void Image::FlipVertically()
    {
       for (unsigned int pixelX = 0; pixelX < width; ++pixelX)
       {
-         unsigned int offsetFromTop = (numPixelComponents * ((yOffset * width) + pixelX));
-         unsigned int offsetFromBottom = (numPixelComponents * ((height - yOffset - 1) * width + pixelX));
+         unsigned char* pixelFromTop = GetPixel(pixelX, yOffset);
+         unsigned char* pixelFromBottom = GetPixel(pixelX, (height - yOffset - 1));
 
          for (unsigned int component = 0; component < numPixelComponents; ++component)
          {
-            std::swap(pixelData[offsetFromTop + component], pixelData[offsetFromBottom + component]);
+            std::swap(pixelFromTop[component], pixelFromBottom[component]);
          }
       }
    }
@@ -189,16 +273,16 @@ void Image::Scale(unsigned int newWidth, unsigned int newHeight)
          {
             for (unsigned int originalPixelIndexX = oldPixelXFrom; originalPixelIndexX <= oldPixelXTo; ++originalPixelIndexX)
             {
-               unsigned int pixelOffset = (numPixelComponents * ((originalPixelIndexY * width) + originalPixelIndexX));
+               unsigned char* pixel = GetPixel(originalPixelIndexX, originalPixelIndexY);
 
                for (unsigned int component = 0; component < numPixelComponents; ++component)
                {
-                  singlePixel[component] += pixelData[pixelOffset + component];
+                  singlePixel[component] += pixel[component];
                }
             }
          }
 
-         unsigned int pixelOffset = (numPixelComponents * ((newPixelIndexY * newWidth) + newPixelIndexX));
+         unsigned int pixelOffset = Image::GetPixelOffset(newPixelIndexX, newPixelIndexY, newWidth, numPixelComponents);
 
          for (unsigned int component = 0; component < numPixelComponents; ++component)
          {

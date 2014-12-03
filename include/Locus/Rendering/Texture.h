@@ -23,11 +23,10 @@ namespace Locus
 class GLInfo;
 struct MountedFilePath;
 
-class LOCUS_RENDERING_API Texture : public Image
+class LOCUS_RENDERING_API Texture
 {
 public:
-   Texture(const std::string& filePath, bool clamp, const GLInfo& glInfo);
-   Texture(const MountedFilePath& mountedFilePath, bool clamp, const GLInfo& glInfo);
+   Texture(const Image& image, bool clamp, const GLInfo& glInfo);
    ~Texture();
 
    Texture(const Texture&) = delete;
@@ -45,11 +44,9 @@ private:
 
    static unsigned int ClosestPowerOf2(unsigned int num);
 
-   void FinishInit(bool clamp, const GLInfo& glInfo);
-
-   void GenerateMipmaps(const GLInfo& glInfo) const;
-   void GenerateMipmapsLegacy() const;
-   void GenerateManualMipmaps() const;
+   void GenerateMipmaps(const Image& image, const GLInfo& glInfo) const;
+   void GenerateMipmapsLegacy(const Image& image) const;
+   void GenerateManualMipmaps(const Image& image) const;
    static void GenerateManualMipmapsUsingPowerOf2Image(Image& image);
 };
 
