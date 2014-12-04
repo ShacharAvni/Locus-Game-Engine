@@ -11,6 +11,7 @@
 #include "Locus/Rendering/TextureManager.h"
 #include "Locus/Rendering/GLInfo.h"
 #include "Locus/Rendering/Texture.h"
+#include "Locus/Rendering/Image.h"
 
 namespace Locus
 {

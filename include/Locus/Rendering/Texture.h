@@ -12,7 +12,6 @@
 
 #include "LocusRenderingAPI.h"
 
-#include "Image.h"
 #include "GLCommonTypes.h"
 
 #include <string>
@@ -20,8 +19,8 @@
 namespace Locus
 {
 
+class Image;
 class GLInfo;
-struct MountedFilePath;
 
 class LOCUS_RENDERING_API Texture
 {
@@ -32,7 +31,7 @@ public:
    Texture(const Texture&) = delete;
    Texture& operator=(const Texture&) = delete;
 
-   void Bind();
+   void Bind() const;
 
    static void SetUnpackAlignmentForPixelComponents(unsigned int numPixelComponents);
    static GLint GLFormat(unsigned int numPixelComponents);

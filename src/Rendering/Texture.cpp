@@ -10,6 +10,7 @@
 
 #include "Locus/Rendering/Texture.h"
 #include "Locus/Rendering/GLInfo.h"
+#include "Locus/Rendering/Image.h"
 
 #include <Locus/Rendering/Locus_glew.h>
 
@@ -40,7 +41,7 @@ Texture::~Texture()
    glDeleteTextures(1, &id);
 }
 
-void Texture::Bind()
+void Texture::Bind() const
 {
    glBindTexture(GL_TEXTURE_2D, id);
 }
