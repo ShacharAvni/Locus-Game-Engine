@@ -30,6 +30,8 @@ public:
    Image(const MountedFilePath& mountedFilePath);
    Image(const unsigned char* pixelData, unsigned int width, unsigned int height, unsigned int numPixelComponents);
 
+   static bool ValidPixelComponents(unsigned int numPixelComponents);
+
    unsigned int Width() const;
    unsigned int Height() const;
    unsigned int NumPixelComponents() const;

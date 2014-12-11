@@ -74,6 +74,7 @@ add_library(Locus_Rendering
             SingleDrawable.cpp
             SkyBox.cpp
             Texture.cpp
+            TextureArray.cpp
             TextureCoordinate.cpp
             TextureManager.cpp
             TransformationStack.cpp
@@ -108,6 +109,7 @@ add_library(Locus_Rendering
             ${LOCUS_RENDERING_INCLUDE}/SingleDrawable.h
             ${LOCUS_RENDERING_INCLUDE}/SkyBox.h
             ${LOCUS_RENDERING_INCLUDE}/Texture.h
+            ${LOCUS_RENDERING_INCLUDE}/TextureArray.h
             ${LOCUS_RENDERING_INCLUDE}/TextureCoordinate.h
             ${LOCUS_RENDERING_INCLUDE}/TextureManager.h
             ${LOCUS_RENDERING_INCLUDE}/TransformationStack.h

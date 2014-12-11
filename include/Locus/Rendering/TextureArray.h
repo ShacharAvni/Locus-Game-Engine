@@ -13,39 +13,28 @@
 #include "LocusRenderingAPI.h"
 
 #include "GLCommonTypes.h"
+#include "Image.h"
+
+#include <vector>
 
 namespace Locus
 {
 
-class Image;
-class GLInfo;
-
-class LOCUS_RENDERING_API Texture
+class LOCUS_RENDERING_API TextureArray
 {
 public:
-   Texture(const Image& image, bool clamp, const GLInfo& glInfo);
-   ~Texture();
+   TextureArray(const std::vector<Image>& images, bool clamp);
+   ~TextureArray();
 
-   Texture(const Texture&) = delete;
-   Texture& operator=(const Texture&) = delete;
+   TextureArray(const TextureArray&) = delete;
+   TextureArray& operator=(const TextureArray&) = delete;
 
    void Bind() const;
-
-   static void SetUnpackAlignmentForPixelComponents(unsigned int numPixelComponents);
-   static GLint GLFormat(unsigned int numPixelComponents);
-   static GLint GLSizedFormat(unsigned int numPixelComponents);
-
-   static void SendTextureData(const Image& image, GLint textureLevel);
 
 private:
    GLuint id;
 
-   static unsigned int ClosestPowerOf2(unsigned int num);
-
-   void GenerateMipmaps(const Image& image, const GLInfo& glInfo) const;
-   void GenerateMipmapsLegacy(const Image& image) const;
-   void GenerateManualMipmaps(const Image& image) const;
-   static void GenerateManualMipmapsUsingPowerOf2Image(Image& image);
+   static bool ImagesAreWellFormed(const std::vector<Image>& images);
 };
 
 }

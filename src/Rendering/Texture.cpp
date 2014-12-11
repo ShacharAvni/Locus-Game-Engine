@@ -48,7 +48,7 @@ void Texture::Bind() const
 
 void Texture::SetUnpackAlignmentForPixelComponents(unsigned int numPixelComponents)
 {
-   assert((numPixelComponents > 0) && (numPixelComponents <= 4));
+   assert(Image::ValidPixelComponents(numPixelComponents));
 
    switch (numPixelComponents)
    {
@@ -68,7 +68,7 @@ void Texture::SetUnpackAlignmentForPixelComponents(unsigned int numPixelComponen
 
 GLint Texture::GLFormat(unsigned int numPixelComponents)
 {
-   assert((numPixelComponents > 0) && (numPixelComponents <= 4));
+   assert(Image::ValidPixelComponents(numPixelComponents));
 
    switch (numPixelComponents)
    {
@@ -87,6 +87,31 @@ GLint Texture::GLFormat(unsigned int numPixelComponents)
    case 1:
    default:
       return GL_RED;
+      break;
+   }
+}
+
+GLint Texture::GLSizedFormat(unsigned int numPixelComponents)
+{
+   assert(Image::ValidPixelComponents(numPixelComponents));
+
+   switch (numPixelComponents)
+   {
+   case 4:
+      return GL_RGBA8;
+      break;
+
+   case 3:
+      return GL_RGB8;
+      break;
+
+   case 2:
+      return GL_RG8;
+      break;
+
+   case 1:
+   default:
+      return GL_R8;
       break;
    }
 }

@@ -27,6 +27,7 @@ namespace Locus
 Image::Image(unsigned int width, unsigned int height, unsigned int numPixelComponents)
    : width(width), height(height), numPixelComponents(numPixelComponents), pixelData(width * height * numPixelComponents)
 {
+   assert(Image::ValidPixelComponents(numPixelComponents));
 }
 
 Image::Image(const std::string& filePath)
@@ -75,6 +76,7 @@ Image::Image(const MountedFilePath& mountedFilePath)
 Image::Image(const unsigned char* pixelData, unsigned int width, unsigned int height, unsigned int numPixelComponents)
    : pixelData(pixelData, pixelData + (numPixelComponents * width * height)), numPixelComponents(numPixelComponents), width(width), height(height)
 {
+   assert(Image::ValidPixelComponents(numPixelComponents));
 }
 
 void Image::FinishLoad(unsigned char* pixels, unsigned int width, unsigned int height, unsigned int numPixelComponents)
@@ -91,6 +93,11 @@ void Image::FinishLoad(unsigned char* pixels, unsigned int width, unsigned int h
    pixelData.insert(pixelData.end(), pixels, pixels + (numPixelComponents * width * height));
 
    FlipVertically();
+}
+
+bool Image::ValidPixelComponents(unsigned int numPixelComponents)
+{
+   return ((numPixelComponents > 0) && (numPixelComponents <= 4));
 }
 
 unsigned int Image::Width() const
