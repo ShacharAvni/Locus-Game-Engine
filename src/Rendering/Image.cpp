@@ -143,6 +143,37 @@ unsigned char* Image::GetPixel(unsigned int x, unsigned int y)
    return &(pixelData[GetPixelOffset(x, y)]);
 }
 
+void Image::SetPixelComponents(unsigned int numPixelComponents)
+{
+   assert(Image::ValidPixelComponents(numPixelComponents));
+
+   if (this->numPixelComponents != numPixelComponents)
+   {
+      std::vector<unsigned char> newPixelData(numPixelComponents * width * height);
+
+      unsigned int minPixelComponents = std::min(this->numPixelComponents, numPixelComponents);
+
+      for (unsigned int x = 0; x < width; ++x)
+      {
+         for (unsigned int y = 0; y < height; ++y)
+         {
+            const unsigned char* pixel = GetPixel(x, y);
+
+            unsigned int offsetIntoNewPixelData = Image::GetPixelOffset(x, y, width, numPixelComponents);
+
+            for (unsigned int component = 0; component < minPixelComponents; ++component)
+            {
+               newPixelData[offsetIntoNewPixelData + component] = pixel[component];
+            }
+         }
+      }
+
+      this->numPixelComponents = numPixelComponents;
+
+      pixelData = std::move(newPixelData);
+   }
+}
+
 void Image::GetSubImage(unsigned int x, unsigned int y, unsigned int rectWidth, unsigned int rectHeight, std::vector<unsigned char>& subImagePixelData) const
 {
    GetSubImage(x, y, rectWidth, rectHeight, numPixelComponents, subImagePixelData);

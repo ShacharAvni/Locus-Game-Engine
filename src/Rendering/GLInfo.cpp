@@ -78,7 +78,7 @@ bool GLInfo::InitializeGLSL()
 
    if (rawGLSLVersionString.length() > 0)
    {
-      std::regex getVersionPattern("(\\d+?)\\.(\\d+)");
+      std::regex getVersionPattern("^(\\d+?)\\.(\\d+)");
 
       std::smatch matches;
 

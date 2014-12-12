@@ -40,6 +40,8 @@ public:
    const unsigned char* GetPixel(unsigned int x, unsigned int y) const;
    unsigned char* GetPixel(unsigned int x, unsigned int y);
 
+   void SetPixelComponents(unsigned int numPixelComponents);
+
    void GetSubImage(unsigned int x, unsigned int y, unsigned int rectWidth, unsigned int rectHeight, std::vector<unsigned char>& subImagePixelData) const;
    void GetSubImage(unsigned int x, unsigned int y, unsigned int rectWidth, unsigned int rectHeight, unsigned int rectPixelComponents, std::vector<unsigned char>& subImagePixelData) const;
    void SetSubImage(unsigned int x, unsigned int y, unsigned int rectWidth, unsigned int rectHeight, const std::vector<unsigned char>& subImagePixelData);

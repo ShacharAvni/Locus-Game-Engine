@@ -39,6 +39,8 @@ TextureArray::TextureArray(const std::vector<Image>& images, bool clamp)
 
    GLsizei numImages = LossyCast<std::size_t, GLsizei>(images.size());
 
+   Texture::SetUnpackAlignmentForPixelComponents(numPixelComponents);
+
    glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, Texture::GLSizedFormat(numPixelComponents), width, height, numImages);
 
    GLint format = Texture::GLFormat(numPixelComponents);
