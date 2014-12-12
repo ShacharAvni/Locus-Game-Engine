@@ -41,16 +41,17 @@ TextureArray::TextureArray(const std::vector<Image>& images, bool clamp)
 
    Texture::SetUnpackAlignmentForPixelComponents(numPixelComponents);
 
-   glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, Texture::GLSizedFormat(numPixelComponents), width, height, numImages);
+   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
    GLint format = Texture::GLFormat(numPixelComponents);
+
+   glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, Texture::GLSizedFormat(numPixelComponents), width, height, numImages, 0, format, GL_UNSIGNED_BYTE, nullptr);
 
    for (GLsizei imageIndex = 0; imageIndex < numImages; ++imageIndex)
    {
       glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, imageIndex, width, height, 1, format, GL_UNSIGNED_BYTE, images[imageIndex].PixelData());
    }
-
-   glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 
    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
