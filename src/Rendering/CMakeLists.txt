@@ -43,7 +43,6 @@ set(THIRD_PARTY_DIR ${PROJECT_SOURCE_DIR}/third-party)
 include_directories(${LOCUS_INCLUDE}
                     ${THIRD_PARTY_DIR}/GLEW/include
                     ${THIRD_PARTY_DIR}/stb_image/include
-                    ${THIRD_PARTY_DIR}/RapidXML/include
                     ${THIRD_PARTY_DIR}/FreeType/include)
 
 add_library(Locus_Rendering
@@ -64,7 +63,6 @@ add_library(Locus_Rendering
             OffscreenBuffer.cpp
             Quad.cpp
             RenderingState.cpp
-            SAPReading.cpp
             Shader.cpp
             ShaderController.cpp
             ShaderLinkException.cpp
@@ -99,7 +97,6 @@ add_library(Locus_Rendering
             ${LOCUS_RENDERING_INCLUDE}/OffscreenBuffer.h
             ${LOCUS_RENDERING_INCLUDE}/Quad.h
             ${LOCUS_RENDERING_INCLUDE}/RenderingState.h
-            ${LOCUS_RENDERING_INCLUDE}/SAPReading.h
             ${LOCUS_RENDERING_INCLUDE}/Shader.h
             ${LOCUS_RENDERING_INCLUDE}/ShaderController.h
             ${LOCUS_RENDERING_INCLUDE}/ShaderLinkException.h

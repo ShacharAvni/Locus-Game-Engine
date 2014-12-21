@@ -34,6 +34,7 @@ include_directories(${LOCUS_INCLUDE}
 add_library(Locus_XML
             XMLAttribute.cpp
             XMLParsing.cpp
+            XMLTag.cpp
             ${LOCUS_XML_INCLUDE}/LocusXMLAPI.h
             ${LOCUS_XML_INCLUDE}/XMLAttribute.h
             ${LOCUS_XML_INCLUDE}/XMLParsing.h
