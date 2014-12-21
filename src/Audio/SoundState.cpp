@@ -65,19 +65,13 @@ void SoundState::SetListenerPosition(float x, float y, float z)
 
 SoundState::~SoundState()
 {
+   alcMakeContextCurrent(nullptr);
+
    alcDestroyContext(context);
 
-   #ifndef NDEBUG
-      ALenum error = alGetError();
-      assert(error != AL_NO_ERROR);
-   #endif
+   assert(alcGetError(device) == ALC_NO_ERROR);
 
    alcCloseDevice(device);
-
-   #ifndef NDEBUG
-      error = alGetError();
-      assert(error != AL_NO_ERROR);
-   #endif
 }
 
 }
