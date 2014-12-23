@@ -8,7 +8,7 @@
 *                                                                                                        *
 \********************************************************************************************************/
 
-#include "Locus/Common/Parsing.h"
+#include "Locus/Common/Util.h"
 
 #include <algorithm>
 
@@ -17,35 +17,38 @@
 namespace Locus
 {
 
-void RemoveWhitespaces(std::string& str)
+int CaseInsensitiveCompare(const std::string& first, const std::string& second)
 {
-   str.erase(std::remove_if(str.begin(), str.end(), isspace), str.end());
-}
+   std::size_t firstLength = first.length();
+   std::size_t secondLength = second.length();
 
-void TrimString(std::string& str)
-{
-   std::istringstream trimmerStream(str);
-   trimmerStream >> str;
-}
+   std::size_t minSize = std::min(firstLength, secondLength);
 
-void ToLower(std::string& str)
-{
-   std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-}
-
-void ToUpper(std::string& str)
-{
-   std::transform(str.begin(), str.end(), str.begin(), ::toupper);
-}
-
-void TrimUpToLastOccurenceOfChar(std::string& str, char c)
-{
-   std::size_t indexOfLastC = str.rfind(c);
-
-   if (indexOfLastC != std::string::npos)
+   for (std::size_t index = 0; index < minSize; ++index)
    {
-      str = str.substr(0, indexOfLastC + 1);
+      int toLowerFirst = ::tolower(first[index]);
+      int toLowerSecond = ::tolower(second[index]);
+
+      if (toLowerFirst < toLowerSecond)
+      {
+         return -1;
+      }
+      else if (toLowerFirst > toLowerSecond)
+      {
+         return 1;
+      }
    }
+
+   if (firstLength < secondLength)
+   {
+      return -1;
+   }
+   else if (firstLength > secondLength)
+   {
+      return 1;
+   }
+
+   return 0;
 }
 
 }

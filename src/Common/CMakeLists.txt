@@ -39,6 +39,7 @@ add_library(Locus_Common
             Random.cpp
             ScopeFinalizer.cpp
             SequentialIDGenerator.cpp
+            Util.cpp
             ${LOCUS_COMMON_INCLUDE}/Casts.h
             ${LOCUS_COMMON_INCLUDE}/CircularList.h
             ${LOCUS_COMMON_INCLUDE}/Exception.h

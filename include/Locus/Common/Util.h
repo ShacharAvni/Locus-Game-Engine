@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "LocusCommonAPI.h"
+
 #include <vector>
 #include <stack>
 #include <algorithm>
@@ -159,5 +161,14 @@ T Clamp(T value, T min, T max)
 {
    return value < min ? min : (value > max ? max : value);
 }
+
+/*!
+ * \brief Case insensitive lexicographic comparison.
+ *
+ * \return negative if first comes before second, zero
+ * if first and second compare the same, or positive if first
+ * comes after second.
+ */
+LOCUS_COMMON_API int CaseInsensitiveCompare(const std::string& first, const std::string& second);
 
 } // namespace Locus

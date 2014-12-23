@@ -53,4 +53,11 @@ LOCUS_COMMON_API void ToLower(std::string& str);
 /// Calls std::toupper on all characters.
 LOCUS_COMMON_API void ToUpper(std::string& str);
 
+/*!
+ * \brief str becomes the characters after the last occurrence of c.
+ *
+ * \details If c is not in str, then str is untouched.
+ */
+LOCUS_COMMON_API void TrimUpToLastOccurenceOfChar(std::string& str, char c);
+
 } // namespace Locus

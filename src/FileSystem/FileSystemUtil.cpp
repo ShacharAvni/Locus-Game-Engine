@@ -14,6 +14,7 @@
 #include "Locus/FileSystem/File.h"
 
 #include "Locus/Common/Exception.h"
+#include "Locus/Common/Parsing.h"
 
 #if defined(LOCUS_WINDOWS)
    #define NOMINMAX
@@ -36,17 +37,17 @@ static std::string StripExeFromFullPath(const char* fullExePathIncludingExecutab
 {
    std::string exePath(fullExePathIncludingExecutable);
 
-   std::size_t indexOfLastSlash = 
-#ifdef LOCUS_WINDOWS
-      exePath.rfind('\\');
-#else
-      exePath.rfind('/');
-#endif
+   #ifdef LOCUS_WINDOWS
+      Locus::TrimUpToLastOccurenceOfChar(exePath, '\\');
+   #else
+      Locus::TrimUpToLastOccurenceOfChar(exePath, '/');
+   #endif
 
-   return exePath.substr(0, indexOfLastSlash + 1);
+   return exePath;
 }
 
 #if defined(LOCUS_WINDOWS)
+
 static std::string GetExePath_Internal()
 {
    char buffer[MAX_PATH + 1];
@@ -93,6 +94,7 @@ bool GetAllFilesInDirectory(const std::string& directoryPath, std::vector<std::s
 }
 
 #elif defined(LOCUS_OSX)
+
 static std::string GetExePath_Internal()
 {
    std::vector<char> buffer(1024);
@@ -123,6 +125,7 @@ bool GetAllFilesInDirectory(const std::string& directoryPath, std::vector<std::s
 }
 
 #else
+
 static std::string GetExePath_Internal()
 {
    char buffer[1024];
