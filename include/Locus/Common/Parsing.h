@@ -14,6 +14,7 @@
 
 #include <string>
 #include <sstream>
+#include <vector>
 
 namespace Locus
 {
@@ -59,5 +60,17 @@ LOCUS_COMMON_API void ToUpper(std::string& str);
  * \details If c is not in str, then str is untouched.
  */
 LOCUS_COMMON_API void TrimUpToLastOccurenceOfChar(std::string& str, char c);
+
+/*!
+ * \brief Split the string str given a delimiter.
+ *
+ * \param[in] str the input string
+ * \param[in] delimiter the delimiter to split the string
+ * \param[out] tokens will contain the parts of the string
+ * between the occurrences of the delimiter in the input
+ * string in order. If the delimiter is not found, then
+ * tokens will contain one token (the whole string).
+ */
+LOCUS_COMMON_API void SplitString(const std::string& str, const std::string& delimiter, std::vector<std::string>& tokens);
 
 } // namespace Locus

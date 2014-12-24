@@ -110,7 +110,7 @@ void ParseXMLFile(DataStream& xmlDataStream, XMLTag& rootTag)
 {
    if (!xmlDataStream.Seek(0, DataStream::SeekType::Beginning))
    {
-      throw Exception("Failed to seek to the beginning of the data stream");
+      throw Exception("ParseXMLFile: Failed to seek to the beginning of the data stream");
    }
 
    std::size_t sizeInBytes = xmlDataStream.SizeInBytes();
@@ -119,7 +119,7 @@ void ParseXMLFile(DataStream& xmlDataStream, XMLTag& rootTag)
 
    if (xmlDataStream.Read(xmlRawChars, sizeInBytes, 0) != sizeInBytes)
    {
-      throw Exception("Failed to read data stream");
+      throw Exception("ParseXMLFile: Failed to read data stream");
    }
 
    xmlRawChars.push_back(0);
@@ -132,14 +132,14 @@ void ParseXMLFile(DataStream& xmlDataStream, XMLTag& rootTag)
    }
    catch (rapidxml::parse_error& parseError)
    {
-      throw Exception(std::string("Failed to parse XML data stream. Underlying error: ") + parseError.what());
+      throw Exception(std::string("ParseXMLFile: Failed to parse XML data stream. Underlying error: ") + parseError.what());
    }
 
    rapidxml::xml_node<>* rapidXMLRootNode = xmlDocument.first_node(0);
 
    if (rapidXMLRootNode == nullptr)
    {
-      throw Exception("Failed to find root XML node");
+      throw Exception("ParseXMLFile: Failed to find root XML node");
    }
 
    rootTag.attributes.clear();

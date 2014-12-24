@@ -48,4 +48,40 @@ void TrimUpToLastOccurenceOfChar(std::string& str, char c)
    }
 }
 
+void SplitString(const std::string& str, const std::string& delimiter, std::vector<std::string>& tokens)
+{
+   tokens.clear();
+
+   std::size_t indexTo = str.find(delimiter);
+
+   if (indexTo != std::string::npos)
+   {
+      std::size_t indexFrom = 0;
+
+      do
+      {
+         tokens.push_back(str.substr(indexFrom, indexTo - indexFrom));
+
+         indexFrom = indexTo + 1;
+
+         indexTo = str.find(delimiter, indexFrom);
+      } while (indexTo != std::string::npos);
+
+      std::size_t length = str.length();
+
+      if (indexFrom == length)
+      {
+         tokens.push_back("");
+      }
+      else
+      {
+         tokens.push_back(str.substr(indexFrom, length - indexFrom));
+      }
+   }
+   else
+   {
+      tokens.push_back(str);
+   }
+}
+
 }
