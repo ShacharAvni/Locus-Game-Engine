@@ -25,6 +25,62 @@ TextureCoordinate::TextureCoordinate(float x, float y)
 {
 }
 
+TextureCoordinate operator+(const TextureCoordinate& t1, const TextureCoordinate& t2)
+{
+   return TextureCoordinate(t1.x + t2.x, t1.y + t2.y);
+}
+
+TextureCoordinate& operator+=(TextureCoordinate& t1, const TextureCoordinate& t2)
+{
+   t1.x += t2.x;
+   t1.y += t2.y;
+
+   return t1;
+}
+
+TextureCoordinate operator-(const TextureCoordinate& t1, const TextureCoordinate& t2)
+{
+   return TextureCoordinate(t1.x - t2.x, t1.y - t2.y);
+}
+
+TextureCoordinate& operator-=(TextureCoordinate& t1, const TextureCoordinate& t2)
+{
+   t1.x -= t2.x;
+   t1.y -= t2.y;
+
+   return t1;
+}
+
+TextureCoordinate operator/(const TextureCoordinate& t1, float k)
+{
+   return TextureCoordinate(t1.x / k, t1.y / k);
+}
+
+TextureCoordinate& operator/=(TextureCoordinate& t1, float k)
+{
+   t1.x /= k;
+   t1.y /= k;
+
+   return t1;
+}
+
+TextureCoordinate operator*(const TextureCoordinate& t1, float k)
+{
+   return TextureCoordinate(t1.x * k, t1.y * k);
+}
+
+TextureCoordinate operator*(float k, const TextureCoordinate& t1)
+{
+   return (t1 * k);
+}
+TextureCoordinate& operator*=(TextureCoordinate& t1, float k)
+{
+   t1.x *= k;
+   t1.y *= k;
+
+   return t1;
+}
+
 bool operator==(const TextureCoordinate& coord1, const TextureCoordinate& coord2)
 {
    return ( FEqual<float>(coord1.x, coord2.x) && FEqual<float>(coord1.y, coord2.y) );
