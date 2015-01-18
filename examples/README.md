@@ -79,5 +79,6 @@ are available in the accompanying LICENSE.txt:
 * [RapidXML](http://rapidxml.sourceforge.net/ "RapidXML Homepage") 1.13  
   Copyright (c) 2006, 2007 Marcin Kalicinski
 
-* [stb_image](http://nothings.org/stb_image.c "stb_image Homepage") 1.33  
+* [stb_image](https://github.com/nothings/stb "stb_image GitHub") 1.46  
   Public Domain
+  Contributions by Sean Barrett and others
