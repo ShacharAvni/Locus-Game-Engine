@@ -73,4 +73,18 @@ LOCUS_COMMON_API void TrimUpToLastOccurenceOfChar(std::string& str, char c);
  */
 LOCUS_COMMON_API void SplitString(const std::string& str, const std::string& delimiter, std::vector<std::string>& tokens);
 
+/*!
+ * \brief Returns true if the string str ends with the string ending.
+ *
+ * \details This function is case sensitive.
+ */
+LOCUS_COMMON_API bool EndsWith(const std::string& str, const std::string& ending);
+
+/*!
+ * \brief Returns true if the string str starts with the string starting.
+ *
+ * \details This function is case sensitive.
+ */
+LOCUS_COMMON_API bool StartsWith(const std::string& str, const std::string& starting);
+
 } // namespace Locus

@@ -84,4 +84,24 @@ void SplitString(const std::string& str, const std::string& delimiter, std::vect
    }
 }
 
+bool EndsWith(const std::string& str, const std::string& ending)
+{
+   if (str.length() >= ending.length())
+   {
+      return (str.compare(str.length() - ending.length(), ending.length(), ending) == 0);
+   }
+
+   return false;
+}
+
+bool StartsWith(const std::string& str, const std::string& starting)
+{
+   if (str.length() >= starting.length())
+   {
+      return (str.compare(0, starting.length(), starting) == 0);
+   }
+
+   return false;
+}
+
 }
