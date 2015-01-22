@@ -21,6 +21,8 @@ struct Light
 {
    Vector3 eyePosition;
    Color diffuseColor;
+   Color ambientColor;
+   Color specularColor;
    float attenuation;
    float linearAttenuation;
    float quadraticAttenuation;

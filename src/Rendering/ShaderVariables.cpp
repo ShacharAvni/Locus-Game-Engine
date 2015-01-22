@@ -25,6 +25,7 @@ LOCUS_RENDERING_API_AT_DEFINITION const std::string Vert_Pos = "Vert_Pos";
 LOCUS_RENDERING_API_AT_DEFINITION const std::string Vert_Tex = "Vert_Tex";
 LOCUS_RENDERING_API_AT_DEFINITION const std::string Vert_Normal = "Vert_Normal";
 
+LOCUS_RENDERING_API_AT_DEFINITION const std::string Light_GlobalAmbient = "Light_Global_Ambient";
 LOCUS_RENDERING_API_AT_DEFINITION const std::string Light_EyePos = "Light_EyePos";
 LOCUS_RENDERING_API_AT_DEFINITION const std::string Light_Diffuse = "Light_Diffuse";
 LOCUS_RENDERING_API_AT_DEFINITION const std::string Light_Ambient = "Light_Ambient";

@@ -44,6 +44,7 @@ public:
    void SetTextureUniform(const std::string& whichTex, GLuint textureUnit);
    void SetMatrix4Uniform(const std::string& whichMatrix, const float* matrixElements);
    void SetMatrix3Uniform(const std::string& whichMatrix, const float* matrixElements);
+   void SetGlobalAmbientLightColorUniform(const Color& globalAmbientColor);
    void SetLightUniforms(unsigned int whichLight, const Light& light);
 
    GLint GetAttributeLocation(const std::string& attribute);

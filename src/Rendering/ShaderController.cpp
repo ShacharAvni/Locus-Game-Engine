@@ -111,6 +111,19 @@ void ShaderController::SetMatrix3Uniform(const std::string& whichMatrix, const f
    }
 }
 
+void ShaderController::SetGlobalAmbientLightColorUniform(const Color& globalAmbientColor)
+{
+   if (currentProgram != nullptr)
+   {
+      GLint globalAmbientLightColorUniformLocation = currentProgram->GetUniformLocation(ShaderSource::Light_GlobalAmbient);
+
+      if (globalAmbientLightColorUniformLocation != -1)
+      {
+         glUniform4f(globalAmbientLightColorUniformLocation, globalAmbientColor.r / 255.0f, globalAmbientColor.g / 255.0f, globalAmbientColor.b / 255.0f, globalAmbientColor.a / 255.0f);
+      }
+   }
+}
+
 void ShaderController::SetLightUniforms(unsigned int whichLight, const Light& light)
 {
    if (currentProgram != nullptr)
@@ -127,6 +140,20 @@ void ShaderController::SetLightUniforms(unsigned int whichLight, const Light& li
       if (diffuseLightUniformLocation != -1)
       {
          glUniform4f(diffuseLightUniformLocation, light.diffuseColor.r / 255.0f, light.diffuseColor.g / 255.0f, light.diffuseColor.b / 255.0f, light.diffuseColor.a / 255.0f);
+      }
+
+      GLint ambientLightUniformLocation = currentProgram->GetUniformLocation( ShaderSource::GetMultiVariableName(ShaderSource::Light_Ambient, whichLight) );
+
+      if (ambientLightUniformLocation != -1)
+      {
+         glUniform4f(ambientLightUniformLocation, light.ambientColor.r / 255.0f, light.ambientColor.g / 255.0f, light.ambientColor.b / 255.0f, light.ambientColor.a / 255.0f);
+      }
+
+      GLint specularLightUniformLocation = currentProgram->GetUniformLocation( ShaderSource::GetMultiVariableName(ShaderSource::Light_Specular, whichLight) );
+
+      if (specularLightUniformLocation != -1)
+      {
+         glUniform4f(specularLightUniformLocation, light.specularColor.r / 255.0f, light.specularColor.g / 255.0f, light.specularColor.b / 255.0f, light.specularColor.a / 255.0f);
       }
 
       GLint attenuationUniformLocation = currentProgram->GetUniformLocation( ShaderSource::GetMultiVariableName(ShaderSource::Light_Attenuation, whichLight) );

@@ -29,6 +29,7 @@ LOCUS_RENDERING_API extern const std::string Vert_Pos;
 LOCUS_RENDERING_API extern const std::string Vert_Tex;
 LOCUS_RENDERING_API extern const std::string Vert_Normal;
 
+LOCUS_RENDERING_API extern const std::string Light_GlobalAmbient;
 LOCUS_RENDERING_API extern const std::string Light_EyePos;
 LOCUS_RENDERING_API extern const std::string Light_Diffuse;
 LOCUS_RENDERING_API extern const std::string Light_Ambient;
