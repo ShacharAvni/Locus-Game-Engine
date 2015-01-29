@@ -12,6 +12,8 @@
 
 #include "LocusRenderingAPI.h"
 
+#include "Locus/Common/IDType.h"
+
 #include "ShaderProgram.h"
 #include "GLInfo.h"
 #include "Light.h"
@@ -35,11 +37,11 @@ public:
 
    GLInfo::GLSLVersion GetActiveGLSLVersion() const;
 
-   void UseProgram(unsigned int whichProgram);
+   void UseProgram(ID_t whichProgram);
    void StopProgams();
 
-   void LoadShaderProgram(unsigned int whichProgram, const Shader& shader1, const Shader& shader2, bool doesTexturing, bool doesLighting);
-   void LoadShaderProgram(unsigned int whichProgram, GLInfo::GLSLVersion activeGLSLVersion, bool doesTexturing, unsigned int numLights);
+   ID_t LoadShaderProgram(const Shader& shader1, const Shader& shader2, bool doesTexturing, bool doesLighting);
+   ID_t LoadShaderProgram(GLInfo::GLSLVersion activeGLSLVersion, bool doesTexturing, unsigned int numLights);
 
    void SetTextureUniform(const std::string& whichTex, GLuint textureUnit);
    void SetMatrix4Uniform(const std::string& whichMatrix, const float* matrixElements);
@@ -56,7 +58,9 @@ public:
    bool CurrentProgramDoesTexturing() const;
 
 private:
-   std::unordered_map<unsigned int, std::unique_ptr<ShaderProgram>> shaderProgramMap;
+   std::unordered_map<ID_t, std::unique_ptr<ShaderProgram>> shaderProgramMap;
+
+   ID_t nextProgramID;
 
    GLInfo::GLSLVersion activeGLSLVersion;
 

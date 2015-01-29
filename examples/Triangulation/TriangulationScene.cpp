@@ -62,9 +62,7 @@ void TriangulationScene::InitializeRenderingState()
 
    Locus::GLInfo::GLSLVersion activeGLSLVersion = renderingState->shaderController.GetActiveGLSLVersion();
 
-   const unsigned int Shader_ID = 0;
-
-   renderingState->shaderController.LoadShaderProgram(Shader_ID, activeGLSLVersion, false, 0);
+   Locus::ID_t shaderProgramID = renderingState->shaderController.LoadShaderProgram(activeGLSLVersion, false, 0);
 
    renderingState->SetOpenGLStateToDefault();
 
@@ -76,7 +74,7 @@ void TriangulationScene::InitializeRenderingState()
    renderingState->transformationStack.SetTransformationMode(Locus::TransformationStack::ModelView);
    renderingState->transformationStack.LoadIdentity();
 
-   renderingState->shaderController.UseProgram(Shader_ID);
+   renderingState->shaderController.UseProgram(shaderProgramID);
 }
 
 void TriangulationScene::KeyPressed(Locus::Key_t key)

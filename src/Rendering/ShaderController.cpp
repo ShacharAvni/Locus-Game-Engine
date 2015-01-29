@@ -22,7 +22,7 @@ namespace Locus
 {
 
 ShaderController::ShaderController(const GLInfo& glInfo, GLInfo::GLSLVersion requiredGLSLVersion, bool useHighestSupportedGLSLVersion)
-   : activeGLSLVersion(useHighestSupportedGLSLVersion ? glInfo.GetHighestSupportedGLSLVersion() : requiredGLSLVersion), currentProgram(nullptr)
+   : nextProgramID(1), activeGLSLVersion(useHighestSupportedGLSLVersion ? glInfo.GetHighestSupportedGLSLVersion() : requiredGLSLVersion), currentProgram(nullptr)
 {
 }
 
@@ -31,9 +31,9 @@ GLInfo::GLSLVersion ShaderController::GetActiveGLSLVersion() const
    return activeGLSLVersion;
 }
 
-void ShaderController::UseProgram(unsigned int whichProgram)
+void ShaderController::UseProgram(ID_t whichProgram)
 {
-   std::unordered_map<unsigned int, std::unique_ptr<ShaderProgram>>::iterator programKeyPairIter = shaderProgramMap.find(whichProgram);
+   std::unordered_map<ID_t, std::unique_ptr<ShaderProgram>>::iterator programKeyPairIter = shaderProgramMap.find(whichProgram);
 
    if (programKeyPairIter != shaderProgramMap.end())
    {
@@ -56,20 +56,32 @@ void ShaderController::StopProgams()
    }
 }
 
-void ShaderController::LoadShaderProgram(unsigned int whichProgram, const Shader& shader1, const Shader& shader2, bool doesTexturing, bool doesLighting)
+ID_t ShaderController::LoadShaderProgram(const Shader& shader1, const Shader& shader2, bool doesTexturing, bool doesLighting)
 {
-   shaderProgramMap[whichProgram] = std::make_unique<ShaderProgram>(shader1, shader2, doesTexturing, doesLighting);
+   ID_t thisProgramID = nextProgramID;
+
+   shaderProgramMap[thisProgramID] = std::make_unique<ShaderProgram>(shader1, shader2, doesTexturing, doesLighting);
+
+   ++nextProgramID;
+
+   return thisProgramID;
 }
 
-void ShaderController::LoadShaderProgram(unsigned int whichProgram, GLInfo::GLSLVersion activeGLSLVersion, bool doesTexturing, unsigned int numLights)
+ID_t ShaderController::LoadShaderProgram(GLInfo::GLSLVersion activeGLSLVersion, bool doesTexturing, unsigned int numLights)
 {
-   shaderProgramMap[whichProgram] = std::make_unique<ShaderProgram>
+   ID_t thisProgramID = nextProgramID;
+
+   shaderProgramMap[thisProgramID] = std::make_unique<ShaderProgram>
    (
       Shader(Shader::ShaderType::Vertex, Locus::ShaderSource::Vert(activeGLSLVersion, doesTexturing, numLights)),
       Shader(Shader::ShaderType::Fragment, Locus::ShaderSource::Frag(activeGLSLVersion, doesTexturing, numLights)),
       doesTexturing,
       (numLights > 0)
    );
+
+   ++nextProgramID;
+
+   return thisProgramID;
 }
 
 void ShaderController::SetTextureUniform(const std::string& whichTex, GLuint textureUnit)
