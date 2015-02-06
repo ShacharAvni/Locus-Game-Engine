@@ -82,3 +82,7 @@ are available in the accompanying LICENSE.txt:
 * [stb_image](https://github.com/nothings/stb "stb_image GitHub") 1.46  
   Public Domain
   Contributions by Sean Barrett and others
+
+* [stb_image_write](https://github.com/nothings/stb "stb_image_write GitHub") 0.97
+  Public Domain
+  Contributions by Sean Barrett and others

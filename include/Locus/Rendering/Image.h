@@ -50,6 +50,10 @@ public:
    void FlipVertically();
    void Scale(unsigned int newWidth, unsigned int newHeight);
 
+   bool SaveAsBMP(const std::string& filePath) const;
+   bool SaveAsPNG(const std::string& filePath) const;
+   bool SaveAsTGA(const std::string& filePath) const;
+
 private:
    unsigned int width;
    unsigned int height;

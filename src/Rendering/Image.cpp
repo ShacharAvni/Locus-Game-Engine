@@ -18,6 +18,7 @@
 #include "Locus/FileSystem/File.h"
 
 #include "stb_image/stb_image.h"
+#include "stb_image/stb_image_write.h"
 
 #include <cassert>
 
@@ -332,6 +333,21 @@ void Image::Scale(unsigned int newWidth, unsigned int newHeight)
    pixelData = std::move(newPixelData);
    width = newWidth;
    height = newHeight;
+}
+
+bool Image::SaveAsBMP(const std::string& filePath) const
+{
+   return (stbi_write_bmp(filePath.c_str(), Width(), Height(), NumPixelComponents(), pixelData.data()) != 0);
+}
+
+bool Image::SaveAsPNG(const std::string& filePath) const
+{
+   return (stbi_write_png(filePath.c_str(), Width(), Height(), NumPixelComponents(), pixelData.data(), 0) != 0);
+}
+
+bool Image::SaveAsTGA(const std::string& filePath) const
+{
+   return (stbi_write_tga(filePath.c_str(), Width(), Height(), NumPixelComponents(), pixelData.data()) != 0);
 }
 
 }

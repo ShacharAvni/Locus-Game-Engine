@@ -26,4 +26,9 @@ set(STB_IMAGE_INCLUDE ${PROJECT_SOURCE_DIR}/third-party/stb_image/include)
 
 include_directories(${STB_IMAGE_INCLUDE})
 
-add_library(stb_image stb_image.c ${STB_IMAGE_INCLUDE}/stb_image/stb_image.h)
+add_library(stb_image
+            stb_image.c
+            stb_image_write.c
+            ${STB_IMAGE_INCLUDE}/stb_image/stb_image_api.h
+            ${STB_IMAGE_INCLUDE}/stb_image/stb_image.h
+            ${STB_IMAGE_INCLUDE}/stb_image/stb_image_write.h)
