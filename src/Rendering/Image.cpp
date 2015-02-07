@@ -240,7 +240,7 @@ void Image::FlipVertically()
 {
    unsigned int middleY = height / 2;
 
-   for (unsigned int yOffset = 0; yOffset <= middleY; ++yOffset)
+   for (unsigned int yOffset = 0; yOffset < middleY; ++yOffset)
    {
       for (unsigned int pixelX = 0; pixelX < width; ++pixelX)
       {
