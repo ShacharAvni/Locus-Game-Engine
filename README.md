@@ -80,6 +80,6 @@ are available in the accompanying LICENSE.txt:
   Public Domain
   Contributions by Sean Barrett and others
 
-* [stb_image_write](https://github.com/nothings/stb "stb_image_write GitHub") 0.97
+* [stb_image_write](https://github.com/nothings/stb "stb_image_write GitHub") 0.97  
   Public Domain
   Contributions by Sean Barrett and others
