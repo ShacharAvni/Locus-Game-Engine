@@ -200,8 +200,8 @@ bool Vector3::isOrthogonalTo(const Vector3& v) const
 Vector3 Vector3::cross(const Vector3& v) const
 {
    return Vector3((y * v.z) - (z * v.y),
-                     (z * v.x) - (x * v.z),
-                     (x * v.y) - (y * v.x));
+                  (z * v.x) - (x * v.z),
+                  (x * v.y) - (y * v.x));
 }
 
 void Vector3::rotateAround(const Vector3& axis, float angleRadians)
@@ -247,8 +247,6 @@ bool Vector3::PreciselyEqualTo(const Vector3& other) const
    return ( (x == other.x) && (y == other.y) && (z == other.z) );
 }
 
-//////////////////////////////////////Operators//////////////////////////////////////////
-
 bool operator==(const Vector3& v1, const Vector3& v2)
 {
    return v1.ApproximatelyEqualTo(v2);
@@ -261,28 +259,17 @@ bool operator!=(const Vector3& v1, const Vector3& v2)
 
 bool operator <(const Vector3& v1, const Vector3& v2)
 {
-   if (v1.x == v2.x)
-   {
-      if (v1.y == v2.y)
-      {
-         if (v1.z == v2.z)
-         {
-            return false;
-         }
-         else
-         {
-            return v1.z < v2.z;
-         }
-      }
-      else
-      {
-         return v1.y < v2.y;
-      }
-   }
-   else
+   if (v1.x != v2.x)
    {
       return v1.x < v2.x;
    }
+
+   if (v1.y != v2.y)
+   {
+      return v1.y < v2.y;
+   }
+
+   return v1.z < v2.z;
 }
 
 Vector3& operator*=(Vector3& v, float s)

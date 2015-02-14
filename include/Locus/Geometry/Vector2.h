@@ -96,6 +96,8 @@ LOCUS_GEOMETRY_API Vector2& operator-=(Vector2& v1, const Vector2& v2);
 LOCUS_GEOMETRY_API Vector2& operator*=(Vector2& v, float s);
 LOCUS_GEOMETRY_API Vector2& operator/=(Vector2& v, float d);
 
+LOCUS_GEOMETRY_API bool operator <(const Vector2& v1, const Vector2& v2);
+
 }
 
 namespace std

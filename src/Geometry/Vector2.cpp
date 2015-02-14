@@ -205,8 +205,6 @@ bool Vector2::PreciselyEqualTo(const Vector2& other) const
    return ( (x == other.x) && (y == other.y) );
 }
 
-//////////////////////////////////////Operators//////////////////////////////////////////
-
 bool operator==(const Vector2& v1, const Vector2& v2)
 {
    return v1.ApproximatelyEqualTo(v2);
@@ -215,6 +213,16 @@ bool operator==(const Vector2& v1, const Vector2& v2)
 bool operator!=(const Vector2& v1, const Vector2& v2)
 {
    return !(v1 == v2);
+}
+
+bool operator <(const Vector2& v1, const Vector2& v2)
+{
+   if (v1.x != v2.x)
+   {
+      return v1.x < v2.x;
+   }
+
+   return v1.y < v2.y;
 }
 
 Vector2& operator*=(Vector2& v, float s)
