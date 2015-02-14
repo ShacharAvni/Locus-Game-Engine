@@ -24,6 +24,7 @@ Locus is split up into the following modules, each compiled as a separate librar
 
 * Locus_Common: A collection of data structures and other common code used throughout
   the Locus codebase
+* Locus_XML: XML parsing (mainly a wrapper around RapidXML)
 * Locus_FileSystem: File and archive reading (mainly a wrapper around PhysFS)
 * Locus_Audio: Audio file loading and playback (mainly a wrapper around OpenAL)
 * Locus_Math: Matrix, polynomials and other algebra routines
