@@ -24,11 +24,21 @@ namespace Locus
 
 Texture::Texture(const Image& image, bool clamp, const GLInfo& glInfo)
 {
+   Construct(image, MipmapGeneration::GLGenerateMipMap, clamp, glInfo);
+}
+
+Texture::Texture(const Image& image, MipmapGeneration mipmapGeneration, bool clamp, const GLInfo& glInfo)
+{
+   Construct(image, mipmapGeneration, clamp, glInfo);
+}
+
+void Texture::Construct(const Image& image, MipmapGeneration mipmapGeneration, bool clamp, const GLInfo& glInfo)
+{
    glGenTextures(1, &id);
 
    Bind();
 
-   GenerateMipmaps(image, glInfo);
+   GenerateMipmaps(image, mipmapGeneration, glInfo);
 
    bool doClamp = (clamp && (GLEW_VERSION_1_2 || glewIsExtensionSupported("GL_EXT_texture_edge_clamp")));
 
@@ -122,20 +132,28 @@ void Texture::SendTextureData(const Image& image, GLint textureLevel)
    glTexImage2D(GL_TEXTURE_2D, textureLevel, format, image.Width(), image.Height(), 0, format, GL_UNSIGNED_BYTE, image.PixelData());
 }
 
-void Texture::GenerateMipmaps(const Image& image, const GLInfo& glInfo) const
+void Texture::GenerateMipmaps(const Image& image, MipmapGeneration mipmapGeneration, const GLInfo& glInfo) const
 {
    Texture::SetUnpackAlignmentForPixelComponents(image.NumPixelComponents());
+
+   if (mipmapGeneration == MipmapGeneration::Manual)
+   {
+      GenerateManualMipmaps(image);
+      return;
+   }
 
    GLInfo::Vendor vendor = glInfo.GetVendor();
 
    if ((vendor == GLInfo::Vendor::Microsoft) || (vendor == GLInfo::Vendor::Unknown))
    {
-      GenerateMipmapsLegacy(image);
+      GenerateMipmapsLegacy(image, mipmapGeneration);
+      return;
    }
-   else
-   {
-      bool vendorIsATI = (vendor == GLInfo::Vendor::ATI);
 
+   bool vendorIsATI = (vendor == GLInfo::Vendor::ATI);
+
+   if (mipmapGeneration == MipmapGeneration::GLGenerateMipMap)
+   {
       if (GLEW_VERSION_3_0)
       {
          Texture::SendTextureData(image, 0);
@@ -146,8 +164,10 @@ void Texture::GenerateMipmaps(const Image& image, const GLInfo& glInfo) const
          }
 
          glGenerateMipmap(GL_TEXTURE_2D);
+         return;
       }
-      else if (GLEW_VERSION_2_1 && glewIsExtensionSupported("GL_EXT_framebuffer_object"))
+
+      if (GLEW_VERSION_2_1 && glewIsExtensionSupported("GL_EXT_framebuffer_object"))
       {
          Texture::SendTextureData(image, 0);
 
@@ -157,20 +177,25 @@ void Texture::GenerateMipmaps(const Image& image, const GLInfo& glInfo) const
          }
 
          glGenerateMipmapEXT(GL_TEXTURE_2D);
-      }
-      else
-      {
-         GenerateMipmapsLegacy(image);
+         return;
       }
    }
+
+   GenerateMipmapsLegacy(image, mipmapGeneration);
 }
 
-void Texture::GenerateMipmapsLegacy(const Image& image) const
+void Texture::GenerateMipmapsLegacy(const Image& image, MipmapGeneration mipmapGeneration) const
 {
    if (GLEW_VERSION_1_4)
    {
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+      bool mipMapNearest = (mipmapGeneration == MipmapGeneration::GLGenerateMipMapLegacyNearest);
+
+      GLint minFilterParam = mipMapNearest ? GL_NEAREST_MIPMAP_LINEAR : GL_LINEAR_MIPMAP_LINEAR;
+      GLint magFilterParam = mipMapNearest ? GL_NEAREST : GL_LINEAR;
+
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilterParam);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilterParam);
+
       glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 
       Texture::SendTextureData(image, 0);

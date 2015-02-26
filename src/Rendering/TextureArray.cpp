@@ -21,7 +21,7 @@
 namespace Locus
 {
 
-TextureArray::TextureArray(const std::vector<Image>& images, bool clamp)
+TextureArray::TextureArray(const std::vector<Image>& images, bool minMagFilterLinear, bool clamp)
 {
    assert(TextureArray::ImagesAreWellFormed(images));
 
@@ -41,8 +41,10 @@ TextureArray::TextureArray(const std::vector<Image>& images, bool clamp)
 
    Texture::SetUnpackAlignmentForPixelComponents(numPixelComponents);
 
-   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   GLint minMagFilterParam = minMagFilterLinear ? GL_LINEAR : GL_NEAREST;
+
+   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, minMagFilterParam);
+   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, minMagFilterParam);
 
    GLint format = Texture::GLFormat(numPixelComponents);
 

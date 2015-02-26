@@ -23,7 +23,7 @@ namespace Locus
 class LOCUS_RENDERING_API TextureArray
 {
 public:
-   TextureArray(const std::vector<Image>& images, bool clamp);
+   TextureArray(const std::vector<Image>& images, bool minMagFilterLinear, bool clamp);
    ~TextureArray();
 
    TextureArray(const TextureArray&) = delete;

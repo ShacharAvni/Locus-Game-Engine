@@ -23,7 +23,16 @@ class GLInfo;
 class LOCUS_RENDERING_API Texture
 {
 public:
+   enum class MipmapGeneration
+   {
+      GLGenerateMipMap,
+      GLGenerateMipMapLegacyLinear,
+      GLGenerateMipMapLegacyNearest,
+      Manual
+   };
+
    Texture(const Image& image, bool clamp, const GLInfo& glInfo);
+   Texture(const Image& image, MipmapGeneration mipmapGeneration, bool clamp, const GLInfo& glInfo);
    ~Texture();
 
    Texture(const Texture&) = delete;
@@ -40,10 +49,13 @@ public:
 private:
    GLuint id;
 
+   //TODO: Get rid of this after delegating constructors are supported
+   void Construct(const Image& image, MipmapGeneration mipmapGeneration, bool clamp, const GLInfo& glInfo);
+
    static unsigned int ClosestPowerOf2(unsigned int num);
 
-   void GenerateMipmaps(const Image& image, const GLInfo& glInfo) const;
-   void GenerateMipmapsLegacy(const Image& image) const;
+   void GenerateMipmaps(const Image& image, MipmapGeneration mipmapGeneration, const GLInfo& glInfo) const;
+   void GenerateMipmapsLegacy(const Image& image, MipmapGeneration mipmapGeneration) const;
    void GenerateManualMipmaps(const Image& image) const;
    static void GenerateManualMipmapsUsingPowerOf2Image(Image& image);
 };
