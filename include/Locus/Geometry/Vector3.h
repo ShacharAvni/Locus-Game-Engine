@@ -96,6 +96,18 @@ public:
    bool goesExactlyTheSameWayAs(const Vector3& other) const;
    bool ApproximatelyEqualTo(const Vector3& other, float toleranceFactor = 1) const;
    bool PreciselyEqualTo(const Vector3& other) const;
+
+   /*!
+    * \brief serializes the Vector3.
+    *
+    * \param[in] destination pointer to a pre allocated
+    * memory location where the Vector3 data will be placed.
+    *
+    * \details this function writes to destination (x), destination + 1
+    * (y), and destination + 2 (z). Undefined behaviour will occur if
+    * any of these locations are invalid.
+    */
+   void SerializeTo(float* destination) const;
 };
 
 LOCUS_GEOMETRY_API Vector3 operator+(const Vector3& v1, const Vector3& v2);

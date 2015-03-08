@@ -332,4 +332,13 @@ Vector3 operator-(const Vector3& v)
    return Vector3(-v.x, -v.y, -v.z);
 }
 
+void Vector3::SerializeTo(float* destination) const
+{
+   assert(destination != nullptr);
+
+   destination[0] = x;
+   destination[1] = y;
+   destination[2] = z;
+}
+
 }

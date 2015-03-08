@@ -10,6 +10,8 @@
 
 #include "Locus/Rendering/Color.h"
 
+#include <cassert>
+
 namespace Locus
 {
 
@@ -26,6 +28,16 @@ Color::Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 Color::Color(unsigned char r, unsigned char g, unsigned char b)
    : r(r), g(g), b(b), a(255)
 {
+}
+
+void Color::SerializeTo(unsigned char* destination) const
+{
+   assert(destination != nullptr);
+
+   destination[0] = r;
+   destination[1] = g;
+   destination[2] = b;
+   destination[3] = a;
 }
 
 const Color& Color::Black()
