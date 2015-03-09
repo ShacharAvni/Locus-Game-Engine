@@ -22,6 +22,19 @@ struct LOCUS_RENDERING_API TextureCoordinate
 
    float x;
    float y;
+
+   /*!
+    * \brief serializes the TextureCoordinate.
+    *
+    * \param[in] destination pointer to a pre allocated
+    * memory location where the TextureCoordinate data
+    * will be placed.
+    *
+    * \details this function writes to destination (x), and destination + 1
+    * (y). Undefined behaviour will occur if any of these locations are
+    * invalid.
+    */
+   void SerializeTo(float* destination) const;
 };
 
 LOCUS_RENDERING_API TextureCoordinate operator+(const TextureCoordinate& t1, const TextureCoordinate& t2);

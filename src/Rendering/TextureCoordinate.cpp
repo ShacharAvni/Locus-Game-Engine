@@ -12,6 +12,8 @@
 
 #include "Locus/Common/Float.h"
 
+#include <cassert>
+
 namespace Locus
 {
 
@@ -23,6 +25,14 @@ TextureCoordinate::TextureCoordinate()
 TextureCoordinate::TextureCoordinate(float x, float y)
    : x(x), y(y)
 {
+}
+
+void TextureCoordinate::SerializeTo(float* destination) const
+{
+   assert(destination != nullptr);
+
+   destination[0] = x;
+   destination[1] = y;
 }
 
 TextureCoordinate operator+(const TextureCoordinate& t1, const TextureCoordinate& t2)
