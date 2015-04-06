@@ -31,6 +31,9 @@ public:
    const Vector3& GetForward() const;
    const Transformation& GetRotation() const;
 
+   void GetPositionAndOrientation(Vector3& position, float& angleAroundRight, float& angleAroundUp) const;
+   void SetPositionAndOrientation(const Vector3& position, float angleAroundRight, float angleAroundUp);
+
    Vector3 ToEyePosition(const Vector3& worldPosition) const;
 
    void TranslateBy(const Vector3& translation);

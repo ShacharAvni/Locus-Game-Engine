@@ -51,6 +51,22 @@ const Transformation& ConstrainedViewpoint::GetRotation() const
    return rotations;
 }
 
+void ConstrainedViewpoint::GetPositionAndOrientation(Vector3& position, float& angleAroundRight, float& angleAroundUp) const
+{
+   position = this->position;
+   angleAroundRight = this->angleAroundRight;
+   angleAroundUp = this->angleAroundUp;
+}
+
+void ConstrainedViewpoint::SetPositionAndOrientation(const Vector3& position, float angleAroundRight, float angleAroundUp)
+{
+   this->position = position;
+   this->angleAroundRight = Clamp(angleAroundRight, -HALF_PI, HALF_PI);
+   this->angleAroundUp = angleAroundUp;
+
+   UpdateTransformation();
+}
+
 Vector3 ConstrainedViewpoint::ToEyePosition(const Vector3& worldPosition) const
 {
    return inverseTransform.MultVertex( worldPosition );
