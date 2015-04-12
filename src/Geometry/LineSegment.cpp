@@ -38,7 +38,7 @@ LineSegment<PointType>::LineSegment(const PointType& P1, const PointType& P2)
 template <class PointType>
 bool LineSegment<PointType>::IsDegenerate() const
 {
-   return P1 == P2;
+   return P1.ApproximatelyEqualTo(P2);
 }
 
 template <class PointType>
@@ -136,7 +136,7 @@ IntersectionType LineSegment<PointType>::GetCollinearLineSegmentIntersection(con
          }
       }
 
-      if (pIntersection1 == pIntersection2)
+      if (pIntersection1.ApproximatelyEqualTo(pIntersection2))
       {
          return IntersectionType::Point;
       }

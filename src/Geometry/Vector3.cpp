@@ -234,7 +234,7 @@ bool Vector3::goesTheSameWayAs(const Vector3& other) const
 
 bool Vector3::goesExactlyTheSameWayAs(const Vector3& other) const
 {
-   return ( (cross(other) == Vector3::ZeroVector()) && goesTheSameWayAs(other) );
+   return ( cross(other).ApproximatelyEqualTo(Vector3::ZeroVector()) && goesTheSameWayAs(other) );
 }
 
 bool Vector3::ApproximatelyEqualTo(const Vector3& other, float toleranceFactor) const
@@ -245,16 +245,6 @@ bool Vector3::ApproximatelyEqualTo(const Vector3& other, float toleranceFactor) 
 bool Vector3::PreciselyEqualTo(const Vector3& other) const
 {
    return ( (x == other.x) && (y == other.y) && (z == other.z) );
-}
-
-bool operator==(const Vector3& v1, const Vector3& v2)
-{
-   return v1.ApproximatelyEqualTo(v2);
-}
-
-bool operator!=(const Vector3& v1, const Vector3& v2)
-{
-   return !(v1 == v2);
 }
 
 bool operator <(const Vector3& v1, const Vector3& v2)

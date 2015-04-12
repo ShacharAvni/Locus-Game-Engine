@@ -117,8 +117,6 @@ LOCUS_GEOMETRY_API Vector3 operator*(float s, const Vector3& v);
 LOCUS_GEOMETRY_API Vector3 operator/(const Vector3& v, float d);
 LOCUS_GEOMETRY_API Vector3 operator-(const Vector3& v);
 
-LOCUS_GEOMETRY_API bool operator==(const Vector3& v1, const Vector3& v2);
-LOCUS_GEOMETRY_API bool operator!=(const Vector3& v1, const Vector3& v2);
 LOCUS_GEOMETRY_API Vector3& operator+=(Vector3& v1, const Vector3& v2);
 LOCUS_GEOMETRY_API Vector3& operator-=(Vector3& v1, const Vector3& v2);
 LOCUS_GEOMETRY_API Vector3& operator*=(Vector3& v, float s);

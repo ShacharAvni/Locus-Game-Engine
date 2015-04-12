@@ -112,7 +112,7 @@ bool Plane::intersectsLineAtOnePoint(const Line3D_t& line, float& s) const
 
 bool Plane::isParallelTo(const Plane& otherPlane) const
 {
-   return N.cross(otherPlane.N) == Vector3::ZeroVector();
+   return N.cross(otherPlane.N).ApproximatelyEqualTo(Vector3::ZeroVector());
 }
 
 bool Plane::isCoplanarTo(const Plane& otherPlane) const
@@ -377,7 +377,7 @@ IntersectionType Plane::TriangleIntersection(const Triangle3D_t& triangle, Vecto
             {
                p2 = intersectionPoint;
 
-               if (p2 != p1)
+               if (!p2.ApproximatelyEqualTo(p1))
                {
                   break;
                }
@@ -401,7 +401,7 @@ IntersectionType Plane::TriangleIntersection(const Triangle3D_t& triangle, Vecto
 
       if (hasIntersection)
       {
-         if (p1 == p2)
+         if (p1.ApproximatelyEqualTo(p2))
          {
             return IntersectionType::Point;
          }

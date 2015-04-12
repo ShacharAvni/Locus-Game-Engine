@@ -206,7 +206,7 @@ IntersectionType Triangle<PointType>::CoplanarTriangleIntersection(const Triangl
          std::vector<PointType> uniqueIntersectionPoints;
          std::vector<std::size_t> uniqueIndices;
 
-         GetUniqueItems<PointType>(possibleIntersectionPoints, uniqueIntersectionPoints, uniqueIndices);
+         GetUniqueItems<PointType>(possibleIntersectionPoints, uniqueIntersectionPoints, [](const PointType& first, const PointType& second)->bool{ return first.ApproximatelyEqualTo(second); }, uniqueIndices);
 
          ReorderCoplanarVertices<PointType>(uniqueIntersectionPoints, this->Normal(), PolygonWinding::CounterClockwise,
             [](const PointType& v)->Vector3
@@ -456,7 +456,7 @@ IntersectionType Triangle<PointType>::CoplanarLineIntersection(const Line<PointT
       {
          if (hasIntersection)
          {
-            if (lineLineSegmentIntersectionPoint1 != p1)
+            if (!lineLineSegmentIntersectionPoint1.ApproximatelyEqualTo(p1))
             {
                p2 = lineLineSegmentIntersectionPoint1;
 
@@ -560,7 +560,7 @@ IntersectionType Triangle<PointType>::CoplanarLineSegmentIntersection(const Line
       {
          if (hasIntersection)
          {
-            if (lineSegmentLineSegmentIntersectionPoint1 != p1)
+            if (!lineSegmentLineSegmentIntersectionPoint1.ApproximatelyEqualTo(p1))
             {
                p2 = lineSegmentLineSegmentIntersectionPoint1;
 

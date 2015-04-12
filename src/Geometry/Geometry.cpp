@@ -39,8 +39,8 @@ void ResolveCollision(float coefficientOfRestitution,
 
    //a) compute velocities at the point of contact
 
-   bool hasAngularComponent[2] = { ( FNotZero<float>(motionProperties1.speed) && (motionProperties1.rotation != Vector3::ZeroVector()) ),
-                                   ( FNotZero<float>(motionProperties2.speed) && (motionProperties2.rotation != Vector3::ZeroVector()) ) };
+   bool hasAngularComponent[2] = { ( FNotZero<float>(motionProperties1.speed) && !motionProperties1.rotation.ApproximatelyEqualTo(Vector3::ZeroVector()) ),
+                                   ( FNotZero<float>(motionProperties2.speed) && !motionProperties2.rotation.ApproximatelyEqualTo(Vector3::ZeroVector()) ) };
 
    Vector3 contactVectors[2] = { collisionPoint - boundingSpheres[0].center, collisionPoint - boundingSpheres[1].center };
 

@@ -31,7 +31,7 @@ Polygon<PointType>::Polygon()
 template <class PointType>
 bool Polygon<PointType>::IsWellDefined() const
 {
-   return (numPoints >= 3) && (normal != Vector3::ZeroVector());
+   return ( (numPoints >= 3) && !normal.ApproximatelyEqualTo(Vector3::ZeroVector()) );
 }
 
 template <class PointType>
@@ -103,7 +103,7 @@ void Polygon<PointType>::UpdateNormal()
       {
          normal = (points[(pointIndex + 1) % numPoints] - points[pointIndex]).cross(points[(pointIndex + 2) % numPoints] - points[(pointIndex + 1) % numPoints]);
 
-         if (normal != Vector3::ZeroVector())
+         if (!normal.ApproximatelyEqualTo(Vector3::ZeroVector()))
          {
             break;
          }
@@ -309,7 +309,7 @@ Vector3 Polygon<PointType>::CrossAtVertex(std::size_t vertexIndex) const
 template <class PointType>
 PolygonWinding Polygon<PointType>::GetWinding(const Vector3& normalVector) const
 {
-   if (!IsWellDefined() || (normalVector.cross(normal) != Vector3::ZeroVector()))
+   if (!IsWellDefined() || !normalVector.cross(normal).ApproximatelyEqualTo(Vector3::ZeroVector()))
    {
       return PolygonWinding::Undefined;
    }
@@ -357,7 +357,7 @@ PolygonWinding Polygon<PointType>::GetWinding(const Vector3& normalVector) const
 template <>
 PolygonWinding Polygon<Vector2>::GetWinding(const Vector3& normalVector) const
 {
-   if (!IsWellDefined() || (normalVector.cross(normal) != Vector3::ZeroVector()))
+   if (!IsWellDefined() || !normalVector.cross(normal).ApproximatelyEqualTo(Vector3::ZeroVector()))
    {
       return PolygonWinding::Undefined;
    }

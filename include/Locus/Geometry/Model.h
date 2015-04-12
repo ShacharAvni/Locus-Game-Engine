@@ -94,7 +94,7 @@ struct ModelVertex
 
    bool operator!=(const ModelVertex& other) const
    {
-      return position != other.position;
+      return !(position.ApproximatelyEqualTo(other.position));
    }
 
    Vector3 position;
@@ -666,7 +666,7 @@ protected:
 
       //NOTE: may cause degenerate faces
       std::vector<std::size_t> sortedPositionIndices;
-      GetUniqueItems<Vector3>(vertPositions, positions, sortedPositionIndices);
+      GetUniqueItems<Vector3>(vertPositions, positions, [](const Vector3& first, const Vector3& second)->bool{ return first.ApproximatelyEqualTo(second); }, sortedPositionIndices);
 
       //construct faces
       std::size_t numDegenerateFaces = 0;
