@@ -10,6 +10,7 @@
 
 #include "Locus/Geometry/Line.h"
 #include "Locus/Geometry/LineSegment.h"
+#include "Locus/Geometry/Vector3Geometry.h"
 
 #include "Locus/Common/Float.h"
 
@@ -19,13 +20,13 @@ namespace Locus
 {
 
 template <>
-Line<Vector3>::Line()
+Line<FVector3>::Line()
    : V(1, 0, 0), isRay(false) //avoiding degenerate case by setting the line initially to the X axis.
 {
 }
 
 template <>
-Line<Vector2>::Line()
+Line<FVector2>::Line()
    : V(1, 0), isRay(false)  //avoiding degenerate case by setting the line initially to the X axis.
 {
 }
@@ -37,13 +38,13 @@ Line<PointType>::Line(const PointType& pointOnLine, const PointType& vectorInDir
 }
 
 template <>
-bool Line<Vector2>::IsDegenerate() const
+bool Line<FVector2>::IsDegenerate() const
 {
    return ( (V.x == 0.0f) && (V.y == 0.0f) );
 }
 
 template <>
-bool Line<Vector3>::IsDegenerate() const
+bool Line<FVector3>::IsDegenerate() const
 {
    return ( (V.x == 0.0f) && (V.y == 0.0f) && (V.z == 0.0f) );
 }
@@ -65,18 +66,18 @@ PointType Line<PointType>::GetPointOnLine(float s) const
 template <class PointType>
 bool Line<PointType>::IsPointOnLine(const PointType& checkPoint, float toleranceFactor) const
 {
-   bool isOnLine = V.cross(checkPoint - P).ApproximatelyEqualTo(Vector3::ZeroVector(), toleranceFactor);
+   bool isOnLine = ApproximatelyEqual(Cross(V, checkPoint - P), Vec3D::ZeroVector(), toleranceFactor);
 
    if (isRay)
    {
-      isOnLine = isOnLine && FGreaterOrEqual<float>( (checkPoint - P).dot(V), 0.0f, toleranceFactor );
+      isOnLine = isOnLine && FGreaterOrEqual<float>( Dot(checkPoint - P, V), 0.0f, toleranceFactor );
    }
 
    return isOnLine;
 }
 
 template <>
-IntersectionType Line<Vector3>::GetLineIntersection(const Line<Vector3>& otherLine, Vector3& intersectionPoint1, Vector3& intersectionPoint2, float toleranceFactor) const
+IntersectionType Line<FVector3>::GetLineIntersection(const Line<FVector3>& otherLine, FVector3& intersectionPoint1, FVector3& intersectionPoint2, float toleranceFactor) const
 {
    if (IsDegenerate() || otherLine.IsDegenerate())
    {
@@ -85,13 +86,13 @@ IntersectionType Line<Vector3>::GetLineIntersection(const Line<Vector3>& otherLi
 
    //from http://geomalgorithms.com/a07-_distance.html
 
-   Vector3 wZero = P - otherLine.P;
+   FVector3 wZero = P - otherLine.P;
 
-   float a = V.dot(V);
-   float b = V.dot(otherLine.V);
-   float c = otherLine.V.dot(otherLine.V);
-   float d = V.dot(wZero);
-   float e = otherLine.V.dot(wZero);
+   float a = Dot(V, V);
+   float b = Dot(V, otherLine.V);
+   float c = Dot(otherLine.V, otherLine.V);
+   float d = Dot(V, wZero);
+   float e = Dot(otherLine.V, wZero);
 
    float ACMinusBSquared = a * c - b * b;
 
@@ -100,10 +101,10 @@ IntersectionType Line<Vector3>::GetLineIntersection(const Line<Vector3>& otherLi
       return GetParallelLineIntersection(otherLine, intersectionPoint1, intersectionPoint2, toleranceFactor);
    }
 
-   Vector3 closestPointOnThisLine = P + ( (b * e - c * d) / ACMinusBSquared ) * V;
-   Vector3 closestPointOnOtherLine = otherLine.P + ( (a * e - b * d) / ACMinusBSquared ) * otherLine.V;
+   FVector3 closestPointOnThisLine = P + ( (b * e - c * d) / ACMinusBSquared ) * V;
+   FVector3 closestPointOnOtherLine = otherLine.P + ( (a * e - b * d) / ACMinusBSquared ) * otherLine.V;
 
-   if (FEqual<float>(closestPointOnThisLine.distanceTo(closestPointOnOtherLine), 0.0f, toleranceFactor))
+   if (FEqual<float>(DistanceBetween(closestPointOnThisLine, closestPointOnOtherLine), 0.0f, toleranceFactor))
    {
       if (isRay || otherLine.isRay)
       {
@@ -138,14 +139,14 @@ IntersectionType Line<Vector3>::GetLineIntersection(const Line<Vector3>& otherLi
 }
 
 template <>
-IntersectionType Line<Vector2>::GetLineIntersection(const Line<Vector2>& otherLine, Vector2& intersectionPoint1, Vector2& intersectionPoint2, float toleranceFactor) const
+IntersectionType Line<FVector2>::GetLineIntersection(const Line<FVector2>& otherLine, FVector2& intersectionPoint1, FVector2& intersectionPoint2, float toleranceFactor) const
 {
    //re-use 3D solution
 
-   Line<Vector3> thisLine3D(P, V, isRay);
-   Line<Vector3> otherLine3D(otherLine.P, otherLine.V, otherLine.isRay);
+   Line<FVector3> thisLine3D(P, V, isRay);
+   Line<FVector3> otherLine3D(otherLine.P, otherLine.V, otherLine.isRay);
 
-   Vector3 intersectionPoint3D1, intersectionPoint3D2;
+   FVector3 intersectionPoint3D1, intersectionPoint3D2;
    IntersectionType lineIntersection = thisLine3D.GetLineIntersection(otherLine3D, intersectionPoint3D1, intersectionPoint3D2, toleranceFactor);
 
    if (lineIntersection != IntersectionType::None)
@@ -175,9 +176,9 @@ IntersectionType Line<PointType>::GetParallelLineIntersection(const Line<PointTy
 
          if (thisPointIsOnOther || otherPointIsOnThis)
          {
-            if (P.ApproximatelyEqualTo(otherLine.P, toleranceFactor))
+            if (ApproximatelyEqual(P, otherLine.P, toleranceFactor))
             {
-               if (V.goesTheSameWayAs(otherLine.V))
+               if (GoTheSameWay(V, otherLine.V))
                {
                   return IntersectionType::Ray;
                }
@@ -336,7 +337,7 @@ IntersectionType Line<PointType>::GetParallelLineSegmentIntersection(const LineS
    } 
 }
 
-template class LOCUS_GEOMETRY_API_AT_DEFINITION Line<Vector3>;
-template class LOCUS_GEOMETRY_API_AT_DEFINITION Line<Vector2>;
+template class LOCUS_GEOMETRY_API_AT_DEFINITION Line<FVector3>;
+template class LOCUS_GEOMETRY_API_AT_DEFINITION Line<FVector2>;
 
 }

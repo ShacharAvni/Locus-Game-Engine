@@ -14,16 +14,16 @@
 
 #include "Transformation.h"
 
+#include "Locus/Math/VectorsFwd.h"
+
 namespace Locus
 {
-
-class Vector3;
 
 class LOCUS_GEOMETRY_API Quaternion
 {
 public:
    Quaternion(float a, float b, float c, float d);
-   Quaternion(const Vector3& rotationAxis, float angleRadians);
+   Quaternion(const FVector3& rotationAxis, float angleRadians);
 
    float a;
    float b;

@@ -12,12 +12,13 @@
 
 #include "LocusRenderingAPI.h"
 
+#include "Locus/Math/VectorsFwd.h"
+
 namespace Locus
 {
 
 class RenderingState;
 class Transformation;
-class Vector3;
 
 class LOCUS_RENDERING_API DrawUtility
 {
@@ -32,7 +33,7 @@ public:
                          const Transformation& projection,
                          int resolutionX,
                          int resolutionY,
-                         Vector3& worldCoordinate);
+                         FVector3& worldCoordinate);
 };
 
 }

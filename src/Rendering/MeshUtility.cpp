@@ -19,19 +19,19 @@
 
 #include <algorithm>
 
-#include <math.h>
+#include <cmath>
 
 namespace Locus
 {
 
-TextureCoordinate MeshUtility::SphericalUVMapping(const Vector3& pointOnSphere)
+TextureCoordinate MeshUtility::SphericalUVMapping(const FVector3& pointOnSphere)
 {
    //see http://en.wikipedia.org/wiki/UV_mapping
 
-   Vector3 d = -pointOnSphere;
-   d.normalize();
+   FVector3 d = -pointOnSphere;
+   Normalize(d);
 
-   return TextureCoordinate( 0.5f - ( atan2(d.z, d.x) / (2 * PI) ), 0.5f - 2 * ( asin(d.y) / (2 * PI) ) );
+   return TextureCoordinate( 0.5f - ( std::atan2(d.z, d.x) / (2 * PI) ), 0.5f - 2 * ( std::asin(d.y) / (2 * PI) ) );
 }
 
 void MeshUtility::AddFaceToMesh(Mesh& mesh, std::size_t p1Index, std::size_t p2Index, std::size_t p3Index)
@@ -59,7 +59,7 @@ std::unique_ptr<Mesh> MeshUtility::MakeOctahedron(float radius)
 
    octahedron->AddPositions( ModelUtility::OctahedronPositions(radius) );
 
-   for (const Vector3& octohedronVertex : octahedron->GetPositions())
+   for (const FVector3& octohedronVertex : octahedron->GetPositions())
    {
       octahedron->AddTextureCoordinate(SphericalUVMapping(octohedronVertex));
    }
@@ -87,7 +87,7 @@ std::unique_ptr<Mesh> MeshUtility::MakeIcosahedron(float radius)
 
    icosahedron->AddPositions( ModelUtility::IcosahedronPositions(radius) );
 
-   for (const Vector3& icosahedronVertex : icosahedron->GetPositions())
+   for (const FVector3& icosahedronVertex : icosahedron->GetPositions())
    {
       icosahedron->AddTextureCoordinate(SphericalUVMapping(icosahedronVertex));
    }
@@ -148,13 +148,13 @@ std::unique_ptr<Mesh> MeshUtility::MakeSphere(float radius, unsigned int subdivi
 
    std::vector<MeshVertex> triangleOnSphere(3, MeshVertex(Color::White(), Locus::TextureCoordinate()));
 
-   Plane fixSmearPlane(Vector3::ZeroVector(), Vector3::NegativeZAxis());
+   Plane fixSmearPlane(Vec3D::ZeroVector(), Vec3D::NegativeZAxis());
 
    for (const Triangle3D_t& triangle : subdividedTriangles)
    {
       for (std::size_t i = 0; i < Triangle3D_t::NumPointsOnATriangle; ++i)
       {
-         triangleOnSphere[i].position = triangle[i].normVector() * radius;
+         triangleOnSphere[i].position = NormVector(triangle[i]) * radius;
          triangleOnSphere[i].textureCoordinate = MeshUtility::SphericalUVMapping(triangleOnSphere[i].position);
       }
 

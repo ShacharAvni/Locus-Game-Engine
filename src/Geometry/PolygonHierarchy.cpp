@@ -11,13 +11,15 @@
 #include "Locus/Geometry/PolygonHierarchy.h"
 #include "Locus/Geometry/Polygon.h"
 
+#include "Locus/Math/Vectors.h"
+
 #include "Locus/Common/Float.h"
 
 namespace Locus
 {
 
 template <class PolygonType>
-PolygonHierarchy<PolygonType>::PolygonHierarchy(std::vector<PolygonType*>& polygons, PolygonWinding winding, const Vector3& normal, float toleranceFactor)
+PolygonHierarchy<PolygonType>::PolygonHierarchy(std::vector<PolygonType*>& polygons, PolygonWinding winding, const FVector3& normal, float toleranceFactor)
    : root(std::make_unique<Node>())
 {
    root->polygon = nullptr;
@@ -103,7 +105,7 @@ void PolygonHierarchy<PolygonType>::DetermineTopLevelPolygonsAndTheirChildren(st
 }
 
 template <class PolygonType>
-void PolygonHierarchy<PolygonType>::FormHierarchyAtNode_R(std::unique_ptr<Node>& node, std::vector<PolygonType*>& polygons, PolygonWinding winding, const Vector3& normal, float toleranceFactor)
+void PolygonHierarchy<PolygonType>::FormHierarchyAtNode_R(std::unique_ptr<Node>& node, std::vector<PolygonType*>& polygons, PolygonWinding winding, const FVector3& normal, float toleranceFactor)
 {
    if (polygons.size() > 0)
    {

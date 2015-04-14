@@ -12,13 +12,14 @@
 
 #include "LocusGeometryAPI.h"
 
-#include "Vector3.h"
 #include "Triangle.h"
 #include "Model.h"
 
 #include "Sphere.h"
 #include "AxisAlignedBox.h"
 #include "OrientedBox.h"
+
+#include "Locus/Math/Vectors.h"
 
 #include <vector>
 #include <array>

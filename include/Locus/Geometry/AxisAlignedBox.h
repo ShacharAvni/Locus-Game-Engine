@@ -12,8 +12,9 @@
 
 #include "LocusGeometryAPI.h"
 
-#include "Vector3.h"
 #include "TriangleFwd.h"
+
+#include "Locus/Math/Vectors.h"
 
 #include <vector>
 #include <array>
@@ -41,7 +42,7 @@ public:
     * \param[in] max The coordinates of the corner
     * of the box with maximum x, y, and z.
     */
-   AxisAlignedBox(const Vector3& min, const Vector3& max);
+   AxisAlignedBox(const FVector3& min, const FVector3& max);
 
    /*!
     * \brief Constructs an axis-aligned cube.
@@ -54,7 +55,7 @@ public:
     *
     * \sa DiagonalLength
     */
-   AxisAlignedBox(const Vector3& center, float diagonalLength);
+   AxisAlignedBox(const FVector3& center, float diagonalLength);
 
    /*!
     * \param[in] points The points whose bounding box will be
@@ -67,10 +68,10 @@ public:
     * of the smallest sphere that encloses all the input points and is
     * centered at the centroid.
     */
-   AxisAlignedBox(const std::vector<Vector3>& points, bool tight);
+   AxisAlignedBox(const std::vector<FVector3>& points, bool tight);
 
    /// \return true if the given point is within the box or is within a tolerance of one of the boundaries.
-   bool Contains(const Vector3& point) const;
+   bool Contains(const FVector3& point) const;
 
    /// \return true if the triangle does not intersect the box in any fashion.
    bool IsOutside(const Triangle3D_t& triangle) const;
@@ -124,13 +125,13 @@ public:
     * \param[out] maxBox The axis-aligned box on the side that contains
     * the maximum corner of this box.
     *
-    * \param[in] whichCoordinate The coordinate that will be split. For
-    * instance, say that this box goes from -2 to +4 along X and that
-    * X is passed as whichCoordinate. Then, minBox would be this box
-    * between X = -2 and X = 1 inclusively, and maxBox would be this
-    * box between X = 1 and X = 4 inclusively.
+    * \param[in] whichCoordinate The index of the coordinate that will
+    * be split. For instance, say that this box goes from -2 to +4 along
+    * X and that the index of X (i.e. 0) is passed as whichCoordinate. Then,
+    * minBox would be this box between X = -2 and X = 1 inclusively, and
+    * maxBox would be this box between X = 1 and X = 4 inclusively.
     */
-   void Split(AxisAlignedBox& minBox, AxisAlignedBox& maxBox, Vector3::Coordinate whichCoordinate) const;
+   void Split(AxisAlignedBox& minBox, AxisAlignedBox& maxBox, unsigned int whichCoordinate) const;
 
    /*!
     * \brief Gets the eight axis-aligned boxes of equal size that
@@ -165,11 +166,11 @@ public:
    float DiagonalLength() const;
 
    /// \return the centroid of the box.
-   Vector3 Centroid() const;
+   FVector3 Centroid() const;
 
 protected:
-   Vector3 min;
-   Vector3 max;
+   FVector3 min;
+   FVector3 max;
 };
 
 }

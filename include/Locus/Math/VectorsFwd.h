@@ -10,22 +10,27 @@
 
 #pragma once
 
-#include "LocusRenderingAPI.h"
-
-#include "Locus/Math/VectorsFwd.h"
-
-#include "Mesh.h"
+#include "LocusMathAPI.h"
 
 namespace Locus
 {
 
-class Color;
+template <typename ElementType>
+struct LOCUS_MATH_API Vector2;
 
-class LOCUS_RENDERING_API Quad : public Mesh
-{
-public:
-   Quad();
-   void Set(const FVector3& lowerLeftCorner, const FVector3& widthDirection, const FVector3& heightDirection, float width, float height, const Color& color);
-};
+template <typename ElementType>
+struct LOCUS_MATH_API Vector3;
+
+template <typename ElementType>
+struct LOCUS_MATH_API Vector4;
+
+typedef Vector2<float> FVector2;
+typedef Vector2<int> IVector2;
+
+typedef Vector3<float> FVector3;
+typedef Vector3<int> IVector3;
+
+typedef Vector4<float> FVector4;
+typedef Vector4<int> IVector4;
 
 }

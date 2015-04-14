@@ -12,7 +12,8 @@
 
 #include "LocusRenderingAPI.h"
 
-#include "Locus/Geometry/Vector3.h"
+#include "Locus/Math/Vectors.h"
+
 #include "Locus/Geometry/LineSegment.h"
 
 #include "DefaultSingleDrawable.h"
@@ -30,7 +31,7 @@ class LOCUS_RENDERING_API LineSegmentCollection : public DefaultSingleDrawable
 public:
    struct ColoredLineSegment
    {
-      LineSegment<Vector3> segment;
+      LineSegment<FVector3> segment;
       Color color;
    };
 

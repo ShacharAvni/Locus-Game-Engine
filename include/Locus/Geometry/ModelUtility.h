@@ -12,8 +12,9 @@
 
 #include "LocusGeometryAPI.h"
 
+#include "Locus/Math/Vectors.h"
+
 #include "Model.h"
-#include "Vector3.h"
 #include "Triangle.h"
 
 #include <vector>
@@ -24,9 +25,9 @@ namespace Locus
 class LOCUS_GEOMETRY_API ModelUtility
 {
 public:
-   static std::vector<Vector3> OctahedronPositions(float radius);
-   static std::vector<Vector3> IcosahedronPositions(float mainLength);
-   static std::vector<Vector3> CubePositions(float lengthOfOneSide);
+   static std::vector<FVector3> OctahedronPositions(float radius);
+   static std::vector<FVector3> IcosahedronPositions(float mainLength);
+   static std::vector<FVector3> CubePositions(float lengthOfOneSide);
 
    static Model_t MakeCube(float lengthOfOneSide);
    static Model_t MakeOctahedron(float radius);

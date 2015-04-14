@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "Vector3.h"
+#include "Locus/Math/Vectors.h"
 
 namespace Locus
 {
@@ -22,9 +22,9 @@ struct MotionProperties
    {
    }
 
-   Vector3 direction;
+   FVector3 direction;
    float speed;
-   Vector3 rotation;
+   FVector3 rotation;
    float angularSpeed;
 };
 

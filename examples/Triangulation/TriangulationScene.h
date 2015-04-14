@@ -64,7 +64,7 @@ private:
    int lastMouseX;
    int lastMouseY;
 
-   bool Unproject(int x, int y, Locus::Vector3& worldCoordinate) const;
+   bool Unproject(int x, int y, Locus::FVector3& worldCoordinate) const;
 
    Locus::Color CurrentColor() const;
 

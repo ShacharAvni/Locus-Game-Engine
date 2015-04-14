@@ -11,30 +11,32 @@
 #include "Locus/Rendering/Viewpoint.h"
 #include "Locus/Rendering/TransformationStack.h"
 
+#include "Locus/Geometry/Vector3Geometry.h"
+
 namespace Locus
 {
 
 Viewpoint::Viewpoint()
-   :  forward(Vector3::NegativeZAxis()), up(Vector3::YAxis()), right(Vector3::XAxis())
+   :  forward(Vec3D::NegativeZAxis()), up(Vec3D::YAxis()), right(Vec3D::XAxis())
 {
 }
 
-const Vector3& Viewpoint::GetPosition() const
+const FVector3& Viewpoint::GetPosition() const
 {
    return position;
 }
 
-const Vector3& Viewpoint::GetRight() const
+const FVector3& Viewpoint::GetRight() const
 {
    return right;
 }
 
-const Vector3& Viewpoint::GetUp() const
+const FVector3& Viewpoint::GetUp() const
 {
    return up;
 }
 
-const Vector3& Viewpoint::GetForward() const
+const FVector3& Viewpoint::GetForward() const
 {
    return forward;
 }
@@ -49,12 +51,12 @@ const DualTransformation& Viewpoint::GetTransformation() const
    return transformation;
 }
 
-Vector3 Viewpoint::ToEyePosition(const Vector3& worldPosition) const
+FVector3 Viewpoint::ToEyePosition(const FVector3& worldPosition) const
 {
    return transformation.GetInverse().MultVertex( worldPosition );
 }
 
-void Viewpoint::TranslateBy(const Vector3& translation)
+void Viewpoint::TranslateBy(const FVector3& translation)
 {
    transformation.TranslateBy(translation);
 
@@ -63,14 +65,14 @@ void Viewpoint::TranslateBy(const Vector3& translation)
    position += -translation.z * forward;
 }
 
-void Viewpoint::RotateBy(const Vector3& rotation)
+void Viewpoint::RotateBy(const FVector3& rotation)
 {
    transformation.RotateBy(rotation);
    rotations.RotateBy(rotation);
 
-   forward = rotations.MultVector(Vector3::NegativeZAxis());
-   up = rotations.MultVector(Vector3::YAxis());
-   right = forward.cross(up);
+   forward = rotations.MultVector(Vec3D::NegativeZAxis());
+   up = rotations.MultVector(Vec3D::YAxis());
+   right = Cross(forward, up);
 }
 
 void Viewpoint::Activate(TransformationStack& transformationStack) const

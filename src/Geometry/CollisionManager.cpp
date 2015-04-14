@@ -108,8 +108,8 @@ void CollisionManager::Add(Collidable* collidable)
 
    if (inserted)
    {
-      const Vector3& broadCollisionExtentMin = collidable->GetBroadCollisionExtentMin();
-      const Vector3& broadCollisionExtentMax = collidable->GetBroadCollisionExtentMax();
+      const FVector3& broadCollisionExtentMin = collidable->GetBroadCollisionExtentMin();
+      const FVector3& broadCollisionExtentMax = collidable->GetBroadCollisionExtentMax();
 
       impl->xIntervals[collidable] = std::make_unique<CollisionInterval>(collidable, broadCollisionExtentMin.x, broadCollisionExtentMax.x);
       impl->yIntervals[collidable] = std::make_unique<CollisionInterval>(collidable, broadCollisionExtentMin.y, broadCollisionExtentMax.y);
@@ -197,8 +197,8 @@ void CollisionManager::Update(Collidable* collidable)
 {
    assert(impl->collidables.find(collidable) != impl->collidables.end());
 
-   const Vector3& broadCollisionExtentMin = collidable->GetBroadCollisionExtentMin();
-   const Vector3& broadCollisionExtentMax = collidable->GetBroadCollisionExtentMax();
+   const FVector3& broadCollisionExtentMin = collidable->GetBroadCollisionExtentMin();
+   const FVector3& broadCollisionExtentMax = collidable->GetBroadCollisionExtentMax();
 
    impl->xIntervals[collidable]->min = broadCollisionExtentMin.x;
    impl->xIntervals[collidable]->max = broadCollisionExtentMax.x;

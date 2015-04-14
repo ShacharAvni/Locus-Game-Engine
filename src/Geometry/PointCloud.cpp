@@ -9,6 +9,7 @@
 \********************************************************************************************************/
 
 #include "Locus/Geometry/PointCloud.h"
+#include "Locus/Geometry/Vector3Geometry.h"
 
 #include "Locus/Common/Float.h"
 #include "Locus/Common/Util.h"
@@ -21,7 +22,7 @@ PointCloud::PointCloud()
 {
 }
 
-PointCloud::PointCloud(const std::vector<Vector3>& positions)
+PointCloud::PointCloud(const std::vector<FVector3>& positions)
    : positions(positions), maxDistanceToCenter(0.0f)
 {
 }
@@ -30,12 +31,12 @@ PointCloud::~PointCloud()
 {
 }
 
-const std::vector<Vector3>& PointCloud::GetPositions() const
+const std::vector<FVector3>& PointCloud::GetPositions() const
 {
    return positions;
 }
 
-std::vector<Vector3> PointCloud::GetTransformedPositions(const Transformation* transformation) const
+std::vector<FVector3> PointCloud::GetTransformedPositions(const Transformation* transformation) const
 {
    if (transformation == nullptr)
    {
@@ -47,15 +48,15 @@ std::vector<Vector3> PointCloud::GetTransformedPositions(const Transformation* t
    }
 }
 
-std::vector<Vector3> PointCloud::GetTransformedPositions(const Transformation& transformation) const
+std::vector<FVector3> PointCloud::GetTransformedPositions(const Transformation& transformation) const
 {
-   std::vector<Vector3> transformedPositions;
+   std::vector<FVector3> transformedPositions;
       
    if (positions.size() > 0)
    {
       transformedPositions.reserve(positions.size());
 
-      for (const Vector3& position : positions)
+      for (const FVector3& position : positions)
       {
          transformedPositions.push_back(transformation.MultVertex(position));
       }
@@ -64,14 +65,14 @@ std::vector<Vector3> PointCloud::GetTransformedPositions(const Transformation& t
    return transformedPositions;
 }
 
-void PointCloud::AddPosition(const Vector3& v)
+void PointCloud::AddPosition(const FVector3& v)
 {
    positions.push_back(v);
 }
 
-void PointCloud::AddPositions(const std::vector<Vector3>& positionsToAdd)
+void PointCloud::AddPositions(const std::vector<FVector3>& positionsToAdd)
 {
-   for (const Vector3& position : positionsToAdd)
+   for (const FVector3& position : positionsToAdd)
    {
       AddPosition(position);
    }
@@ -80,20 +81,20 @@ void PointCloud::AddPositions(const std::vector<Vector3>& positionsToAdd)
 void PointCloud::Clear()
 {
    ClearAndShrink(positions);
-   centroid = Vector3::ZeroVector();
+   centroid = Vec3D::ZeroVector();
 }
 
-void PointCloud::Translate(const Vector3& translation)
+void PointCloud::Translate(const FVector3& translation)
 {
    Moveable::Translate(translation);
    centroid += translation;
 }
 
-Vector3 PointCloud::ComputeCentroid(const std::vector<Vector3>& points)
+FVector3 PointCloud::ComputeCentroid(const std::vector<FVector3>& points)
 {
-   Vector3 centroidComputed(0, 0, 0);
+   FVector3 centroidComputed(0, 0, 0);
 
-   for (const Vector3& point : points)
+   for (const FVector3& point : points)
    {
       centroidComputed += point;
    }
@@ -118,10 +119,10 @@ void PointCloud::UpdateMaxDistanceToCenter()
 
    Transformation modelTransformation = CurrentModelTransformation();
 
-   for (const Vector3& vertexPosition : positions)
+   for (const FVector3& vertexPosition : positions)
    {
-      Vector3 worldVertex = modelTransformation.MultVertex(vertexPosition);
-      float distance = (worldVertex - centroid).norm();
+      FVector3 worldVertex = modelTransformation.MultVertex(vertexPosition);
+      float distance = Norm(worldVertex - centroid);
 
       if (FGreater<float>(distance, maxDistanceToCenter))
       {

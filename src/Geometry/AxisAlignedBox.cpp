@@ -28,29 +28,29 @@ AxisAlignedBox::AxisAlignedBox()
 {
 }
 
-AxisAlignedBox::AxisAlignedBox(const Vector3& min, const Vector3& max)
+AxisAlignedBox::AxisAlignedBox(const FVector3& min, const FVector3& max)
    : min(min), max(max)
 {
    assert((min.x <= max.x) && (min.y <= max.y) && (min.z <= max.z));
 }
 
-AxisAlignedBox::AxisAlignedBox(const Vector3& center, float diagonalLength)
+AxisAlignedBox::AxisAlignedBox(const FVector3& center, float diagonalLength)
 {
-   min = center - (diagonalLength / 2) * Vector3::DiagonalNormalized();
-   max = center + (diagonalLength / 2) * Vector3::DiagonalNormalized();
+   min = center - (diagonalLength / 2) * Vec3D::DiagonalNormalized();
+   max = center + (diagonalLength / 2) * Vec3D::DiagonalNormalized();
 }
 
-AxisAlignedBox::AxisAlignedBox(const std::vector<Vector3>& points, bool tight)
+AxisAlignedBox::AxisAlignedBox(const std::vector<FVector3>& points, bool tight)
 {
    if (tight)
    {
       const float reallyBigNumber = std::numeric_limits<float>::max();
       const float reallySmallNumber = -reallyBigNumber;
 
-      min.set(reallyBigNumber, reallyBigNumber, reallyBigNumber);
-      max.set(reallySmallNumber, reallySmallNumber, reallySmallNumber);
+      min.Set(reallyBigNumber, reallyBigNumber, reallyBigNumber);
+      max.Set(reallySmallNumber, reallySmallNumber, reallySmallNumber);
 
-      for (const Vector3& singlePoint : points)
+      for (const FVector3& singlePoint : points)
       {
          min.x = std::min(min.x, singlePoint.x);
          min.y = std::min(min.y, singlePoint.y);
@@ -65,12 +65,12 @@ AxisAlignedBox::AxisAlignedBox(const std::vector<Vector3>& points, bool tight)
    {
       Sphere sphere(points);
 
-      min = sphere.center - (sphere.radius * Vector3::Diagonal());
-      max = sphere.center + (sphere.radius * Vector3::Diagonal());
+      min = sphere.center - (sphere.radius * Vec3D::Diagonal());
+      max = sphere.center + (sphere.radius * Vec3D::Diagonal());
    }
 }
 
-bool AxisAlignedBox::Contains(const Vector3& point) const
+bool AxisAlignedBox::Contains(const FVector3& point) const
 {
    return ( FGreaterOrEqual<float>(point.x, min.x) && FLessOrEqual<float>(point.x, max.x) &&
             FGreaterOrEqual<float>(point.y, min.y) && FLessOrEqual<float>(point.y, max.y) &&
@@ -79,7 +79,7 @@ bool AxisAlignedBox::Contains(const Vector3& point) const
 
 bool AxisAlignedBox::IsOutside(const Triangle3D_t& triangle) const
 {
-   Vector3 normal(-1, 0, 0);
+   FVector3 normal(-1, 0, 0);
 
    Plane plane(min, normal);
    if (plane.triangleIntersectionTest(triangle) == Plane::IntersectionQuery::Positive)
@@ -162,7 +162,7 @@ bool AxisAlignedBox::Intersects(const Sphere& sphere) const
 
    float d = 0.0f;
 
-   for (Vector3::Coordinate coordinate = Vector3::Coordinate_X; coordinate <= Vector3::Coordinate_Z; coordinate = static_cast<Vector3::Coordinate>(coordinate + 1))
+   for (unsigned int coordinate = 0; coordinate < 3; ++coordinate)
    {
       float e = sphere.center[coordinate] - min[coordinate];
 
@@ -196,7 +196,7 @@ void AxisAlignedBox::TransformBy(const Moveable& moveable)
 {
    const Transformation& modelTransformation = moveable.CurrentModelTransformation();
 
-   Vector3 centroid = Centroid();
+   FVector3 centroid = Centroid();
 
    min -= centroid;
    max -= centroid;
@@ -212,7 +212,7 @@ void AxisAlignedBox::TransformBy(const Moveable& moveable)
    max += centroid;
 }
 
-void AxisAlignedBox::Split(AxisAlignedBox& minBox, AxisAlignedBox& maxBox, Vector3::Coordinate whichCoordinate) const
+void AxisAlignedBox::Split(AxisAlignedBox& minBox, AxisAlignedBox& maxBox, unsigned int whichCoordinate) const
 {
    minBox = *this;
    maxBox = *this;
@@ -228,13 +228,13 @@ void AxisAlignedBox::OctantSplit(std::array<AxisAlignedBox, 8>& octants) const
    //Split this box into two halves along X
    //Store halves temporarily
 
-   Split(octants[0], octants[4], Vector3::Coordinate_X);
+   Split(octants[0], octants[4], 0);
 
    //Split the two halves computed above into two halves along Y each,
    //storing the results temporarily
 
-   octants[0].Split(octants[1], octants[2], Vector3::Coordinate_Y);
-   octants[4].Split(octants[5], octants[6], Vector3::Coordinate_Y);
+   octants[0].Split(octants[1], octants[2], 1);
+   octants[4].Split(octants[5], octants[6], 1);
 
    //Split the quarters computed above such that we have the following
    //configuration:
@@ -249,27 +249,27 @@ void AxisAlignedBox::OctantSplit(std::array<AxisAlignedBox, 8>& octants) const
    //octants[6] == (max half x, max half y, min half z)
    //octants[7] == (max half x, max half y, max half z)
 
-   octants[1].Split(octants[0], octants[1], Vector3::Coordinate_Z);
-   octants[2].Split(octants[2], octants[3], Vector3::Coordinate_Z);
-   octants[5].Split(octants[4], octants[5], Vector3::Coordinate_Z);
-   octants[6].Split(octants[6], octants[7], Vector3::Coordinate_Z);
+   octants[1].Split(octants[0], octants[1], 2);
+   octants[2].Split(octants[2], octants[3], 2);
+   octants[5].Split(octants[4], octants[5], 2);
+   octants[6].Split(octants[6], octants[7], 2);
 }
 
 void AxisAlignedBox::Extents(std::array<float, 3>& extents) const
 {
-   extents[Vector3::Coordinate_X] = max.x - min.x;
-   extents[Vector3::Coordinate_Y] = max.y - min.y;
-   extents[Vector3::Coordinate_Z] = max.z - min.z;
+   extents[0] = max.x - min.x;
+   extents[1] = max.y - min.y;
+   extents[2] = max.z - min.z;
 }
 
 float AxisAlignedBox::DiagonalLength() const
 {
-   return (max - min).norm();
+   return Norm(max - min);
 }
 
-Vector3 AxisAlignedBox::Centroid() const
+FVector3 AxisAlignedBox::Centroid() const
 {
-   return min + ((max - min) / 2);
+   return min + ((max - min) / 2.0f);
 }
 
 }

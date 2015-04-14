@@ -125,9 +125,9 @@ void CollidableMesh::ResolveCollision(CollidableMesh& otherCollidableMesh)
 
    if ( GetCollidableMeshIntersection(otherCollidableMesh, intersectingTriangle1, intersectingTriangle2) )
    {
-      Locus::Vector3 collisionPoint = Locus::Triangle3D_t::ComputeCentroid(intersectingTriangle1, intersectingTriangle2);
+      Locus::FVector3 collisionPoint = Locus::Triangle3D_t::ComputeCentroid(intersectingTriangle1, intersectingTriangle2);
 
-      Locus::Vector3 impulseDirection = intersectingTriangle1.Normal().normVector();
+      Locus::FVector3 impulseDirection = NormVector(intersectingTriangle1.Normal());
 
       Locus::ResolveCollision(1.0f, BoundingSphere(), otherCollidableMesh.BoundingSphere(), collisionPoint, impulseDirection,
                                motionProperties, otherCollidableMesh.motionProperties);

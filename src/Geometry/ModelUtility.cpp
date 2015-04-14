@@ -20,7 +20,7 @@ const unsigned int ModelUtility::MAX_SPHERE_SUBDIVISIONS = 7;
 //"radius" is the length from the centroid
 //to the pointy bits at the end of the octahedron.
 //"radius" is not the correct term for this
-std::vector<Vector3> ModelUtility::OctahedronPositions(float radius)
+std::vector<FVector3> ModelUtility::OctahedronPositions(float radius)
 {
    return
    {
@@ -35,7 +35,7 @@ std::vector<Vector3> ModelUtility::OctahedronPositions(float radius)
 
 //"mainLength" is the length from the centroid to the vertices
 //of the Icosahedron.
-std::vector<Vector3> ModelUtility::IcosahedronPositions(float mainLength)
+std::vector<FVector3> ModelUtility::IcosahedronPositions(float mainLength)
 {
    //'a' and 'b' are half the length and width of a golden rectangle, respectively
    //(when radius is 1). The vertices of three orthogonal golden rectangles form an
@@ -61,7 +61,7 @@ std::vector<Vector3> ModelUtility::IcosahedronPositions(float mainLength)
    };
 }
 
-std::vector<Vector3> ModelUtility::CubePositions(float lengthOfOneSide)
+std::vector<FVector3> ModelUtility::CubePositions(float lengthOfOneSide)
 {
    const float h = lengthOfOneSide / 2;
 
@@ -136,7 +136,7 @@ void ModelUtility::SubdivideTriangle(const Triangle3D_t& triangle, std::vector<T
    }
    else
    {
-      Vector3 midpoints[3] = { triangle.MidpointOfEdge(0), triangle.MidpointOfEdge(1), triangle.MidpointOfEdge(2) };
+      FVector3 midpoints[3] = { triangle.MidpointOfEdge(0), triangle.MidpointOfEdge(1), triangle.MidpointOfEdge(2) };
 
       //Create Triforce, then subdivide each triangle in the Triforce
       ModelUtility::SubdivideTriangle( Triangle3D_t( triangle[0], midpoints[0], midpoints[2]), triangles, subdivisionsLeft - 1 );
@@ -177,7 +177,7 @@ Model_t ModelUtility::MakeSphere(float radius, unsigned int subdivisions)
 
    for (const Triangle3D_t& triangle : subdividedTriangles)
    {
-      trianglesOnSphere.emplace_back( std::vector<ModelVertex>{ {triangle[0].normVector() * radius}, {triangle[1].normVector() * radius}, {triangle[2].normVector() * radius} } );
+      trianglesOnSphere.emplace_back( std::vector<ModelVertex>{ {NormVector(triangle[0]) * radius}, {NormVector(triangle[1]) * radius}, {NormVector(triangle[2]) * radius} } );
    }
 
    return Model_t(trianglesOnSphere);

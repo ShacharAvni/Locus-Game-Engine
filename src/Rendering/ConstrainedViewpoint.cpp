@@ -16,6 +16,7 @@
 #include "Locus/Common/Float.h"
 
 #include "Locus/Geometry/Geometry.h"
+#include "Locus/Geometry/Vector3Geometry.h"
 
 namespace Locus
 {
@@ -26,22 +27,22 @@ ConstrainedViewpoint::ConstrainedViewpoint()
    UpdateTransformation();
 }
 
-const Vector3& ConstrainedViewpoint::GetPosition() const
+const FVector3& ConstrainedViewpoint::GetPosition() const
 {
    return position;
 }
 
-const Vector3& ConstrainedViewpoint::GetRight() const
+const FVector3& ConstrainedViewpoint::GetRight() const
 {
    return right;
 }
 
-const Vector3& ConstrainedViewpoint::GetUp() const
+const FVector3& ConstrainedViewpoint::GetUp() const
 {
    return up;
 }
 
-const Vector3& ConstrainedViewpoint::GetForward() const
+const FVector3& ConstrainedViewpoint::GetForward() const
 {
    return forward;
 }
@@ -51,14 +52,14 @@ const Transformation& ConstrainedViewpoint::GetRotation() const
    return rotations;
 }
 
-void ConstrainedViewpoint::GetPositionAndOrientation(Vector3& position, float& angleAroundRight, float& angleAroundUp) const
+void ConstrainedViewpoint::GetPositionAndOrientation(FVector3& position, float& angleAroundRight, float& angleAroundUp) const
 {
    position = this->position;
    angleAroundRight = this->angleAroundRight;
    angleAroundUp = this->angleAroundUp;
 }
 
-void ConstrainedViewpoint::SetPositionAndOrientation(const Vector3& position, float angleAroundRight, float angleAroundUp)
+void ConstrainedViewpoint::SetPositionAndOrientation(const FVector3& position, float angleAroundRight, float angleAroundUp)
 {
    this->position = position;
    this->angleAroundRight = Clamp(angleAroundRight, -HALF_PI, HALF_PI);
@@ -67,12 +68,12 @@ void ConstrainedViewpoint::SetPositionAndOrientation(const Vector3& position, fl
    UpdateTransformation();
 }
 
-Vector3 ConstrainedViewpoint::ToEyePosition(const Vector3& worldPosition) const
+FVector3 ConstrainedViewpoint::ToEyePosition(const FVector3& worldPosition) const
 {
    return inverseTransform.MultVertex( worldPosition );
 }
 
-void ConstrainedViewpoint::TranslateBy(const Vector3& translation)
+void ConstrainedViewpoint::TranslateBy(const FVector3& translation)
 {
    position += translation.x * right;
    position += translation.y * up;
@@ -81,7 +82,7 @@ void ConstrainedViewpoint::TranslateBy(const Vector3& translation)
    UpdateTransformation();
 }
 
-void ConstrainedViewpoint::RotateBy(const Vector3& rotation)
+void ConstrainedViewpoint::RotateBy(const FVector3& rotation)
 {
    angleAroundRight += rotation.x;
    angleAroundRight = Clamp(angleAroundRight, -HALF_PI, HALF_PI);
@@ -97,9 +98,9 @@ void ConstrainedViewpoint::UpdateTransformation()
 
    rotations = Transformation::XRotation(HALF_PI) * Transformation::YRotation(angleAroundUp) * Transformation::XRotation(angleAroundRight);
 
-   forward = rotations.MultVector(Vector3::NegativeZAxis());
-   up = rotations.MultVector(Vector3::YAxis());
-   right = forward.cross(up);
+   forward = rotations.MultVector(Vec3D::NegativeZAxis());
+   up = rotations.MultVector(Vec3D::YAxis());
+   right = Cross(forward, up);
 
    Transformation inverseRotations;
    inverseRotations = Transformation::XRotation(-angleAroundRight) * Transformation::YRotation(-angleAroundUp) * Transformation::XRotation(-HALF_PI);

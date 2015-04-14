@@ -13,7 +13,8 @@
 #include "LocusGeometryAPI.h"
 
 #include "Transformation.h"
-#include "Vector3.h"
+
+#include "Locus/Math/Vectors.h"
 
 namespace Locus
 {
@@ -24,16 +25,16 @@ public:
    Moveable();
    virtual ~Moveable();
 
-   virtual void Translate(const Vector3& translation);
-   virtual void Rotate(const Vector3& rotation);
-   virtual void Scale(const Vector3& scale);
+   virtual void Translate(const FVector3& translation);
+   virtual void Rotate(const FVector3& rotation);
+   virtual void Scale(const FVector3& scale);
 
-   virtual Vector3 Position() const;
+   virtual FVector3 Position() const;
 
-   virtual void Reset(const Vector3& position, const Transformation& rotationTransformation = Transformation::Identity(), const Vector3& scale = Transformation::IdentityScale());
+   virtual void Reset(const FVector3& position, const Transformation& rotationTransformation = Transformation::Identity(), const FVector3& scale = Transformation::IdentityScale());
 
-   const Vector3& CurrentScale() const;
-   const Vector3& CurrentTranslation() const;
+   const FVector3& CurrentScale() const;
+   const FVector3& CurrentTranslation() const;
    const Transformation& CurrentRotation() const;
 
    const Transformation& CurrentModelTransformation() const;
@@ -41,8 +42,8 @@ public:
 
 private:
    Transformation modelRotation;
-   Vector3 modelTranslation;
-   Vector3 modelScale;
+   FVector3 modelTranslation;
+   FVector3 modelScale;
 
    Transformation modelTransformation;
    Transformation modelTranslationAndRotation;

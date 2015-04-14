@@ -12,12 +12,12 @@
 
 #include "LocusGeometryAPI.h"
 
+#include "Locus/Math/VectorsFwd.h"
+
 #include "Transformation.h"
 
 namespace Locus
 {
-
-class Vector3;
 
 /// Wraps a transformation and its inverse.
 class LOCUS_GEOMETRY_API DualTransformation
@@ -37,7 +37,7 @@ public:
     *
     * \sa Transformation::TranslateBy Transformation::InverseTranslateBy
     */
-   void TranslateBy(const Vector3& t);
+   void TranslateBy(const FVector3& t);
 
    /*!
     * \details Transformation::RotateBy 
@@ -47,7 +47,7 @@ public:
     *
     * \sa Transformation::RotateBy Transformation::InverseRotateBy
     */
-   void RotateBy(const Vector3& rotation);
+   void RotateBy(const FVector3& rotation);
 
    /*!
     * \details Transformation::ScaleBy 
@@ -57,7 +57,7 @@ public:
     *
     * \sa Transformation::ScaleBy Transformation::InverseScaleBy
     */
-   void ScaleBy(const Vector3& scale);
+   void ScaleBy(const FVector3& scale);
 
    /*!
     * \return The underlying transformation.

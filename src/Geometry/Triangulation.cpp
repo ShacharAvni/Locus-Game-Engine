@@ -18,18 +18,18 @@
 namespace Locus
 {
 
-void Triangulate(const Polygon2D_t& polygon, std::vector<const Vector2*>& triangles)
+void Triangulate(const Polygon2D_t& polygon, std::vector<const FVector2*>& triangles)
 {
    EarClipper(polygon).Triangulate(triangles);
 }
 
-void Triangulate(const Polygon2D_t& polygon, const std::vector<const Polygon2D_t*>& innerPolygons, std::vector<const Vector2*>& triangles)
+void Triangulate(const Polygon2D_t& polygon, const std::vector<const Polygon2D_t*>& innerPolygons, std::vector<const FVector2*>& triangles)
 {
    EarClipper(polygon, innerPolygons).Triangulate(triangles);
 }
 
 //{CodeReview:Triangulation}
-void Triangulate(std::vector<Polygon2D_t>& polygons, PolygonWinding winding, std::vector<const Vector2*>& triangles)
+void Triangulate(std::vector<Polygon2D_t>& polygons, PolygonWinding winding, std::vector<const FVector2*>& triangles)
 {
    std::vector<Polygon2D_t*> polygonsForHierarchy;
    polygonsForHierarchy.reserve(polygons.size());
@@ -39,7 +39,7 @@ void Triangulate(std::vector<Polygon2D_t>& polygons, PolygonWinding winding, std
       polygonsForHierarchy.push_back(&polygon);
    }
 
-   PolygonHierarchy<Polygon2D_t> polygonHierarchy(polygonsForHierarchy, winding, Vector3::ZAxis(), EarClipper::EXPERIMENTAL_TOLERANCE);
+   PolygonHierarchy<Polygon2D_t> polygonHierarchy(polygonsForHierarchy, winding, Vec3D::ZAxis(), EarClipper::EXPERIMENTAL_TOLERANCE);
 
    std::queue< const PolygonHierarchy<Polygon2D_t>::Node* > polygonNodesToTriangulate;
 

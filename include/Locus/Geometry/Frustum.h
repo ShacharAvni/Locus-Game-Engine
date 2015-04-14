@@ -12,8 +12,9 @@
 
 #include "LocusGeometryAPI.h"
 
+#include "Locus/Math/Vectors.h"
+
 #include "Plane.h"
-#include "Vector3.h"
 
 namespace Locus
 {
@@ -47,13 +48,13 @@ public:
     * \param[in] distFar The distance from the viewpoint to
     * the far plane.
     */
-   Frustum(const Vector3& point, const Vector3& forward, const Vector3& up, float horizField, float vertField, float distNear, float distFar);
+   Frustum(const FVector3& point, const FVector3& forward, const FVector3& up, float horizField, float vertField, float distNear, float distFar);
 
    /// \return true if the point is within the frustum.
-   bool Within(const Vector3& point) const;
+   bool Within(const FVector3& point) const;
 
    /// \return true if the sphere given by its center and radius is completely within the frustum.
-   bool Within(const Vector3& centerOfSphere, float sphereRadius) const;
+   bool Within(const FVector3& centerOfSphere, float sphereRadius) const;
 
 private:
    enum PlaneLocations
@@ -68,9 +69,9 @@ private:
    };
 
    Plane planes[NUM_PLANES];
-   Vector3 viewPoint;
-   Vector3 forwardVector;
-   Vector3 upVector;
+   FVector3 viewPoint;
+   FVector3 forwardVector;
+   FVector3 upVector;
    float horizontalField; //in degrees
    float verticalField; //in degrees
    float nearDistance;

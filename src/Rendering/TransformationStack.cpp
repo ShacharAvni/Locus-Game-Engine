@@ -12,7 +12,7 @@
 #include "Locus/Rendering/ShaderController.h"
 #include "Locus/Rendering/ShaderVariables.h"
 
-#include "Locus/Geometry/Vector3.h"
+#include "Locus/Math/Vectors.h"
 
 #include "Locus/Common/Util.h"
 
@@ -76,12 +76,12 @@ void TransformationStack::Multiply(const Transformation& trans)
    TopTransformation(currentMode) = TopTransformation(currentMode) * trans;
 }
 
-void TransformationStack::Translate(const Vector3& t)
+void TransformationStack::Translate(const FVector3& t)
 {
    TopTransformation(currentMode).TranslateBy(t);
 }
 
-void TransformationStack::Scale(const Vector3& scale)
+void TransformationStack::Scale(const FVector3& scale)
 {
    TopTransformation(currentMode).ScaleBy(scale);
 }

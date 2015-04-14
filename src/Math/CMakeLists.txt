@@ -34,11 +34,14 @@ add_library(Locus_Math
 			   MByNIterations.cpp
 			   Polynomial.cpp
 			   SJTPermutations.cpp
+            Vectors.cpp
 			   ${LOCUS_MATH_INCLUDE}/ComplexUtil.h
 			   ${LOCUS_MATH_INCLUDE}/Matrix.h
 			   ${LOCUS_MATH_INCLUDE}/MByNIterations.h
 			   ${LOCUS_MATH_INCLUDE}/Polynomial.h
 			   ${LOCUS_MATH_INCLUDE}/SJTPermutations.h
+            ${LOCUS_MATH_INCLUDE}/Vectors.h
+            ${LOCUS_MATH_INCLUDE}/VectorsFwd.h
 			   ${LOCUS_MATH_INCLUDE}/LocusMathAPI.h)
 
 target_link_libraries(Locus_Math Locus_Common)

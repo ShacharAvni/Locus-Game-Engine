@@ -15,10 +15,10 @@
 #include "Locus/Common/Float.h"
 #include "Locus/Common/Util.h"
 
+#include "Locus/Math/Vectors.h"
+
 #include "Geometry.h"
 #include "PointCloud.h"
-#include "Vector3.h"
-#include "Vector2.h"
 #include "Triangle.h"
 #include "Line.h"
 #include "LineSegment.h"
@@ -82,7 +82,7 @@ struct ModelVertexIndexer
 
 struct ModelVertex
 {
-   void Interpolate(const Vector3& interpolatePosition, const ModelVertex& /*faceVertex1*/, const ModelVertex& /*faceVertex2*/, const ModelVertex& /*faceVertex3*/, const Vector3& /*barycentricCoordinates*/)
+   void Interpolate(const FVector3& interpolatePosition, const ModelVertex& /*faceVertex1*/, const ModelVertex& /*faceVertex2*/, const ModelVertex& /*faceVertex3*/, const FVector3& /*barycentricCoordinates*/)
    {
       position = interpolatePosition;
    }
@@ -94,10 +94,10 @@ struct ModelVertex
 
    bool operator!=(const ModelVertex& other) const
    {
-      return !(position.ApproximatelyEqualTo(other.position));
+      return !ApproximatelyEqual(position, other.position);
    }
 
-   Vector3 position;
+   FVector3 position;
 };
 
 template <class VertexIndexerType = ModelVertexIndexer, class VertexType = ModelVertex>
@@ -241,14 +241,14 @@ public:
       numTotalVertices = 0;
    }
 
-   void GetIntersection(const Model<VertexIndexerType,VertexType>& other, std::vector<std::vector<Vector3>>& intersectionPoints,  std::vector<std::vector<Vector3>>& intersectionTriangles) const
+   void GetIntersection(const Model<VertexIndexerType,VertexType>& other, std::vector<std::vector<FVector3>>& intersectionPoints,  std::vector<std::vector<FVector3>>& intersectionTriangles) const
    {
-      std::vector<Vector3> thisTransformedPositions = GetTransformedPositions();
-      std::vector<Vector3> otherTransformedPositions = other.GetTransformedPositions();
+      std::vector<FVector3> thisTransformedPositions = GetTransformedPositions();
+      std::vector<FVector3> otherTransformedPositions = other.GetTransformedPositions();
 
-      std::vector<Vector3> individualIntersection;
-      std::vector<Vector3> thisTrianglePoints(3);
-      std::vector<Vector3> otherTrianglePoints(3);
+      std::vector<FVector3> individualIntersection;
+      std::vector<FVector3> thisTrianglePoints(3);
+      std::vector<FVector3> otherTrianglePoints(3);
 
       for (const face_t& face : faces)
       {
@@ -285,8 +285,8 @@ public:
 
    bool GetIntersection(const Model<VertexIndexerType, VertexType>& other, Triangle3D_t* intersectingTriangle1, Triangle3D_t* intersectingTriangle2) const
    {
-      std::vector<Vector3> thisTransformedPositions = GetTransformedPositions();
-      std::vector<Vector3> otherTransformedPositions = other.GetTransformedPositions();
+      std::vector<FVector3> thisTransformedPositions = GetTransformedPositions();
+      std::vector<FVector3> otherTransformedPositions = other.GetTransformedPositions();
 
       for (const face_t& face : faces)
       {
@@ -351,9 +351,9 @@ public:
 
    bool IntersectsLine(const Line3D_t& line) const
    {
-      std::vector<Vector3> thisTransformedPositions = GetTransformedPositions();
+      std::vector<FVector3> thisTransformedPositions = GetTransformedPositions();
 
-      std::vector<Vector3> intersectionPoints;
+      std::vector<FVector3> intersectionPoints;
 
       for (const face_t& face : faces)
       {
@@ -574,7 +574,7 @@ public:
    {
       if (FNotEqual<float>(scale, 1.0f))
       {
-         for (Vector3& position : positions)
+         for (FVector3& position : positions)
          {
             position *= scale;
          }
@@ -583,7 +583,7 @@ public:
 
    void ToModel()
    {
-      for (Vector3& position : positions)
+      for (FVector3& position : positions)
       {
          position -= centroid;
       }
@@ -653,7 +653,7 @@ protected:
 
       std::size_t numFaces = faceTriangles.size();
 
-      std::vector<Vector3> vertPositions;
+      std::vector<FVector3> vertPositions;
       vertPositions.reserve(numFaces * Triangle3D_t::NumPointsOnATriangle);
 
       for (const std::vector<VertexType>& triangle : faceTriangles)
@@ -666,7 +666,7 @@ protected:
 
       //NOTE: may cause degenerate faces
       std::vector<std::size_t> sortedPositionIndices;
-      GetUniqueItems<Vector3>(vertPositions, positions, [](const Vector3& first, const Vector3& second)->bool{ return first.ApproximatelyEqualTo(second); }, sortedPositionIndices);
+      GetUniqueItems<FVector3>(vertPositions, positions, [](const FVector3& first, const FVector3& second)->bool{ return ApproximatelyEqual(first, second); }, sortedPositionIndices);
 
       //construct faces
       std::size_t numDegenerateFaces = 0;
@@ -969,7 +969,7 @@ private:
 
                for (std::size_t pointIndex = 1; pointIndex < numPointsInComponent; ++pointIndex)
                {
-                  if (! (checkPointsInComponent[pointIndex].vertex)->position.PreciselyEqualTo((checkPointsInComponent[pointIndex - 1].vertex)->position) )
+                  if ( (checkPointsInComponent[pointIndex].vertex)->position != (checkPointsInComponent[pointIndex - 1].vertex)->position )
                   {
                      if (numSameVertices > 1)
                      {
@@ -993,7 +993,7 @@ private:
       }
    }
 
-   static void CollectBoundaryFaces(const std::vector<std::vector<VertexType>>& connectedComponents, const Vector3& normal, std::vector<std::vector<VertexType>>& faces)
+   static void CollectBoundaryFaces(const std::vector<std::vector<VertexType>>& connectedComponents, const FVector3& normal, std::vector<std::vector<VertexType>>& faces)
    {
       std::size_t numConnectedComponents = connectedComponents.size();
 
@@ -1002,7 +1002,7 @@ private:
          std::vector<std::vector<bool>> keepPoints;
          DetermineUniquePointsToKeepInConnectedComponents(connectedComponents, keepPoints);
 
-         std::array<Vector3, 2> coordSystemPoints;
+         std::array<FVector3, 2> coordSystemPoints;
 
          std::size_t numCoordSystemPoints = 0;
 
@@ -1019,23 +1019,23 @@ private:
 
          if (numCoordSystemPoints == 2)
          {
-            Vector3 xAxis = coordSystemPoints[1] - coordSystemPoints[0];
-            xAxis.normalize();
+            FVector3 xAxis = coordSystemPoints[1] - coordSystemPoints[0];
+            Normalize(xAxis);
 
-            Vector3 yAxis = xAxis;
-            yAxis.rotateAround(normal, 90 * TO_RADIANS);
+            FVector3 yAxis = xAxis;
+            RotateAround(yAxis, normal, 90 * TO_RADIANS);
 
             std::vector<Polygon2D_t> polygons(numConnectedComponents);
 
             struct KeyEquality
             {
-               bool operator()(const Vector2& first, const Vector2& second) const
+               bool operator()(const FVector2& first, const FVector2& second) const
                {
-                  return first.PreciselyEqualTo(second);
+                  return (first == second);
                }
             };
 
-            std::unordered_map<Vector2, const VertexType*, std::hash<Vector2>, KeyEquality> twoDToThreeDLookUpTable;
+            std::unordered_map<FVector2, const VertexType*, std::hash<FVector2>, KeyEquality> twoDToThreeDLookUpTable;
 
             for (std::size_t connectedComponentIndex = 0; connectedComponentIndex < numConnectedComponents; ++connectedComponentIndex)
             {
@@ -1043,9 +1043,9 @@ private:
                {
                   if (keepPoints[connectedComponentIndex][vertexIndex])
                   {
-                     Vector3 pointInCoordSystem = connectedComponents[connectedComponentIndex][vertexIndex].position - coordSystemPoints[0];
+                     FVector3 pointInCoordSystem = connectedComponents[connectedComponentIndex][vertexIndex].position - coordSystemPoints[0];
 
-                     Vector2 pointOnPlane(pointInCoordSystem.dot(xAxis), pointInCoordSystem.dot(yAxis));
+                     FVector2 pointOnPlane(Dot(pointInCoordSystem, xAxis), Dot(pointInCoordSystem, yAxis));
 
                      polygons[connectedComponentIndex].AddPoint(pointOnPlane);
 
@@ -1054,7 +1054,7 @@ private:
                }
             }
 
-            std::vector<const Vector2*> triangles;
+            std::vector<const FVector2*> triangles;
             Locus::Triangulate(polygons, PolygonWinding::CounterClockwise, triangles);
 
             std::vector<VertexType> triangleToAdd(3);
@@ -1074,10 +1074,10 @@ private:
 
    static bool SplitEdge(const LineSegment3D_t& edge, const Plane& plane, const Triangle3D_t& faceTriangle, const std::vector<VertexType>& face, VertexType& intersectionVertex)
    {
-      Vector3 intersectionPoint;
+      FVector3 intersectionPoint;
       if (plane.getLineSegmentIntersection(edge, intersectionPoint) == Plane::IntersectionQuery::Intersects)
       {
-         Vector3 barycentric = faceTriangle.ComputeBarycentricCoordinates(intersectionPoint);
+         FVector3 barycentric = faceTriangle.ComputeBarycentricCoordinates(intersectionPoint);
 
          intersectionVertex.Interpolate(intersectionPoint, face[0], face[1], face[2], barycentric);
 

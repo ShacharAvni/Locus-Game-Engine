@@ -12,7 +12,7 @@
 
 #include "LocusGeometryAPI.h"
 
-#include "Vector3.h"
+#include "Locus/Math/Vectors.h"
 
 namespace Locus
 {
@@ -41,14 +41,14 @@ public:
     * cube used as the broad phase collision extent
     * for this object.
     */
-   const Vector3& GetBroadCollisionExtentMin() const;
+   const FVector3& GetBroadCollisionExtentMin() const;
 
    /*!
     * \return The max corner point of the axis-aligned
     * cube used as the broad phase collision extent
     * for this object.
     */
-   const Vector3& GetBroadCollisionExtentMax() const;
+   const FVector3& GetBroadCollisionExtentMax() const;
 
    /*!
     * \brief Overriders should determine the new
@@ -109,11 +109,11 @@ protected:
     *
     * \param[in] halfLength Half the side length of the cube.
     */
-   void UpdateBroadCollisionExtent(const Vector3& centroid, float halfLength);
+   void UpdateBroadCollisionExtent(const FVector3& centroid, float halfLength);
 
 private:
-   Vector3 broadCollisionExtentMin;
-   Vector3 broadCollisionExtentMax;
+   FVector3 broadCollisionExtentMin;
+   FVector3 broadCollisionExtentMax;
 };
 
 }

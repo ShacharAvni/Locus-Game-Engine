@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "Locus/Geometry/Vector3.h"
+#include "Locus/Math/Vectors.h"
 
 #include "Color.h"
 
@@ -19,7 +19,7 @@ namespace Locus
 
 struct Light
 {
-   Vector3 eyePosition;
+   FVector3 eyePosition;
    Color diffuseColor;
    Color ambientColor;
    Color specularColor;

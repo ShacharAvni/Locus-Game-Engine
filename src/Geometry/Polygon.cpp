@@ -31,7 +31,7 @@ Polygon<PointType>::Polygon()
 template <class PointType>
 bool Polygon<PointType>::IsWellDefined() const
 {
-   return ( (numPoints >= 3) && !normal.ApproximatelyEqualTo(Vector3::ZeroVector()) );
+   return ( (numPoints >= 3) && !ApproximatelyEqual(normal, Vec3D::ZeroVector()) );
 }
 
 template <class PointType>
@@ -71,7 +71,7 @@ PointType& Polygon<PointType>::operator[](std::size_t i)
 template <class PointType>
 PointType Polygon<PointType>::MidpointOfEdge(std::size_t i) const
 {
-   return points[i] + (points[(i + 1) % numPoints] - points[i])/2;
+   return points[i] + (points[(i + 1) % numPoints] - points[i])/2.0f;
 }
 
 template <class PointType>
@@ -95,15 +95,15 @@ PointType Polygon<PointType>::Centroid() const
 template <class PointType>
 void Polygon<PointType>::UpdateNormal()
 {
-   normal.set(0.0f, 0.0f, 0.0f);
+   normal.Set(0.0f, 0.0f, 0.0f);
 
    if (numPoints >= 3)
    {
       for (std::size_t pointIndex = 0; pointIndex < numPoints; ++pointIndex)
       {
-         normal = (points[(pointIndex + 1) % numPoints] - points[pointIndex]).cross(points[(pointIndex + 2) % numPoints] - points[(pointIndex + 1) % numPoints]);
+         normal = Cross(points[(pointIndex + 1) % numPoints] - points[pointIndex], points[(pointIndex + 2) % numPoints] - points[(pointIndex + 1) % numPoints]);
 
-         if (!normal.ApproximatelyEqualTo(Vector3::ZeroVector()))
+         if (!ApproximatelyEqual(normal, Vec3D::ZeroVector()))
          {
             break;
          }
@@ -112,7 +112,7 @@ void Polygon<PointType>::UpdateNormal()
 }
 
 template <class PointType>
-const Vector3& Polygon<PointType>::Normal() const
+const FVector3& Polygon<PointType>::Normal() const
 {
    return normal;
 }
@@ -120,7 +120,7 @@ const Vector3& Polygon<PointType>::Normal() const
 template <class PointType>
 Plane Polygon<PointType>::GetPlane() const
 {
-   PointType point = (numPoints > 0) ? points[0] : PointType::ZeroVector();
+   PointType point = (numPoints > 0) ? points[0] : PointType();
 
    return Plane(point, normal);
 }
@@ -150,17 +150,17 @@ bool Polygon<PointType>::PointIsOnPolygonCommonPath(const PointType& point, bool
       {
          if (rayLineSegmentIntersectionType == IntersectionType::Point)
          {
-            if (intersectionPoint1.ApproximatelyEqualTo(point, toleranceFactor))
+            if (ApproximatelyEqual(intersectionPoint1, point, toleranceFactor))
             {
                return allowPointOnEdges;
                //point is on the line segment
             }
 
-            if (intersectionPoint1.ApproximatelyEqualTo(lineSegmentOfEdge.P1, toleranceFactor))
+            if (ApproximatelyEqual(intersectionPoint1, lineSegmentOfEdge.P1, toleranceFactor))
             {
                //ray hit the line segment at the endpoint lineSegmentOfEdge.P1
 
-               if (ray.V.cross(lineSegmentOfEdge.P2 - ray.P).goesTheSameWayAs(normal))
+               if (GoTheSameWay(Cross(ray.V, lineSegmentOfEdge.P2 - ray.P), normal))
                {
                   //only count hits for a vertex if the other vertex is on a
                   //particular side of the ray (this side is determined
@@ -169,11 +169,11 @@ bool Polygon<PointType>::PointIsOnPolygonCommonPath(const PointType& point, bool
                   ++numHits;
                }
             }
-            else if (intersectionPoint1.ApproximatelyEqualTo(lineSegmentOfEdge.P2, toleranceFactor))
+            else if (ApproximatelyEqual(intersectionPoint1, lineSegmentOfEdge.P2, toleranceFactor))
             {
                //ray hit the line segment at the endpoint lineSegmentOfEdge.P2
 
-               if (ray.V.cross(lineSegmentOfEdge.P1 - ray.P).goesTheSameWayAs(normal))
+               if (GoTheSameWay(Cross(ray.V, lineSegmentOfEdge.P1 - ray.P), normal))
                {
                   //only count hits for a vertex if the other vertex is on a
                   //particular side of the ray (this side is determined
@@ -190,7 +190,7 @@ bool Polygon<PointType>::PointIsOnPolygonCommonPath(const PointType& point, bool
          }
          else //if (rayLineSegmentIntersectionType == IntersectionType::LineSegment)
          {
-            if ((intersectionPoint1.ApproximatelyEqualTo(point, toleranceFactor)) || (intersectionPoint2.ApproximatelyEqualTo(point, toleranceFactor)))
+            if (ApproximatelyEqual(intersectionPoint1, point, toleranceFactor) || ApproximatelyEqual(intersectionPoint2, point, toleranceFactor))
             {
                //point is on the line segment
                return allowPointOnEdges;
@@ -204,7 +204,7 @@ bool Polygon<PointType>::PointIsOnPolygonCommonPath(const PointType& point, bool
 }
 
 template <>
-bool Polygon<Vector3>::PointIsOnPolygon(const Vector3& point, bool allowPointOnEdges, float toleranceFactor) const
+bool Polygon<FVector3>::PointIsOnPolygon(const FVector3& point, bool allowPointOnEdges, float toleranceFactor) const
 {
    if (GetPlane().pointIsOnPlane(point))
    {
@@ -217,7 +217,7 @@ bool Polygon<Vector3>::PointIsOnPolygon(const Vector3& point, bool allowPointOnE
 }
 
 template <>
-bool Polygon<Vector2>::PointIsOnPolygon(const Vector2& point, bool allowPointOnEdges, float toleranceFactor) const
+bool Polygon<FVector2>::PointIsOnPolygon(const FVector2& point, bool allowPointOnEdges, float toleranceFactor) const
 {
    float minX = points[0].x;
    float maxX = minX;
@@ -290,26 +290,26 @@ void Polygon<PointType>::Reverse()
 }
 
 template <class PointType>
-Vector3 Polygon<PointType>::CrossAtVertex(std::size_t vertexIndex) const
+FVector3 Polygon<PointType>::CrossAtVertex(std::size_t vertexIndex) const
 {
-   Vector3 cross;
+   FVector3 cross;
 
    if (vertexIndex == 0)
    {
-      cross = (points[0] - points[numPoints - 1]).cross(points[1] - points[0]);
+      cross = Cross(points[0] - points[numPoints - 1], points[1] - points[0]);
    }
    else
    {
-      cross = (points[vertexIndex] - points[vertexIndex - 1]).cross(points[(vertexIndex + 1) % numPoints] - points[vertexIndex]);
+      cross = Cross(points[vertexIndex] - points[vertexIndex - 1], points[(vertexIndex + 1) % numPoints] - points[vertexIndex]);
    }
 
    return cross;
 }
 
 template <class PointType>
-PolygonWinding Polygon<PointType>::GetWinding(const Vector3& normalVector) const
+PolygonWinding Polygon<PointType>::GetWinding(const FVector3& normalVector) const
 {
-   if (!IsWellDefined() || !normalVector.cross(normal).ApproximatelyEqualTo(Vector3::ZeroVector()))
+   if (!IsWellDefined() || !ApproximatelyEqual(Cross(normalVector, normal), Vec3D::ZeroVector()))
    {
       return PolygonWinding::Undefined;
    }
@@ -326,7 +326,7 @@ PolygonWinding Polygon<PointType>::GetWinding(const Vector3& normalVector) const
       }
    }
 
-   Vector3 cross;
+   FVector3 cross;
 
    std::size_t indexOfCrossVertex = indexOfPointWithMaxX;
 
@@ -342,9 +342,9 @@ PolygonWinding Polygon<PointType>::GetWinding(const Vector3& normalVector) const
       {
          --indexOfCrossVertex;
       }
-   } while (cross.ApproximatelyEqualTo(Vector3::ZeroVector()));
+   } while (ApproximatelyEqual(cross, Vec3D::ZeroVector()));
 
-   if (cross.goesTheSameWayAs(normalVector))
+   if (GoTheSameWay(cross, normalVector))
    {
       return PolygonWinding::CounterClockwise;
    }
@@ -355,19 +355,19 @@ PolygonWinding Polygon<PointType>::GetWinding(const Vector3& normalVector) const
 }
 
 template <>
-PolygonWinding Polygon<Vector2>::GetWinding(const Vector3& normalVector) const
+PolygonWinding Polygon<FVector2>::GetWinding(const FVector3& normalVector) const
 {
-   if (!IsWellDefined() || !normalVector.cross(normal).ApproximatelyEqualTo(Vector3::ZeroVector()))
+   if (!IsWellDefined() || !ApproximatelyEqual(Cross(normalVector, normal), Vec3D::ZeroVector()))
    {
       return PolygonWinding::Undefined;
    }
 
    float sum = 0.0f;
-   Vector2 p = Vector2::ZeroVector();
+   FVector2 p = Vec2D::ZeroVector();
 
    for (std::size_t pointIndex = 0; pointIndex < numPoints; ++pointIndex)
    {
-      sum += ( (points[pointIndex] - p).cross(points[(pointIndex + 1) % numPoints] - points[pointIndex]) ).z;
+      sum += Cross(points[pointIndex] - p, points[(pointIndex + 1) % numPoints] - points[pointIndex]).z;
    }
 
    if (sum > 0.0f)
@@ -401,7 +401,7 @@ bool Polygon<PointType>::IsSelfIntersecting() const
          lineSegment1.P1 = points[segmentIndex];
          lineSegment1.P2 = points[(segmentIndex + 1) % numPoints];
 
-         if (lineSegment1.P1.PreciselyEqualTo(lineSegment1.P2))
+         if (lineSegment1.P1 == lineSegment1.P2)
          {
             continue;
          }
@@ -409,7 +409,7 @@ bool Polygon<PointType>::IsSelfIntersecting() const
          lineSegment2.P1 = points[segmentIndex2];
          lineSegment2.P2 = points[(segmentIndex2 + 1) % numPoints];
 
-         if (lineSegment2.P1.PreciselyEqualTo(lineSegment2.P2))
+         if (lineSegment2.P1 == lineSegment2.P2)
          {
             continue;
          }
@@ -420,8 +420,8 @@ bool Polygon<PointType>::IsSelfIntersecting() const
          {
             if (intersectionType == IntersectionType::Point)
             {
-               bool onSegment1EndPoint = (intersectionPoint1.ApproximatelyEqualTo(lineSegment1.P1) || intersectionPoint1.ApproximatelyEqualTo(lineSegment1.P2));
-               bool onSegment2EndPoint = (intersectionPoint1.ApproximatelyEqualTo(lineSegment2.P1) || intersectionPoint1.ApproximatelyEqualTo(lineSegment2.P2));
+               bool onSegment1EndPoint = (ApproximatelyEqual(intersectionPoint1, lineSegment1.P1) || ApproximatelyEqual(intersectionPoint1, lineSegment1.P2));
+               bool onSegment2EndPoint = (ApproximatelyEqual(intersectionPoint1, lineSegment2.P1) || ApproximatelyEqual(intersectionPoint1, lineSegment2.P2));
 
                if (!onSegment1EndPoint || !onSegment2EndPoint)
                {
@@ -478,7 +478,7 @@ bool Polygon<PointType>::Intersects(const Polygon<PointType>& other) const
    return false;
 }
 
-template class LOCUS_GEOMETRY_API_AT_DEFINITION Polygon<Vector3>;
-template class LOCUS_GEOMETRY_API_AT_DEFINITION Polygon<Vector2>;
+template class LOCUS_GEOMETRY_API_AT_DEFINITION Polygon<FVector3>;
+template class LOCUS_GEOMETRY_API_AT_DEFINITION Polygon<FVector2>;
 
 }

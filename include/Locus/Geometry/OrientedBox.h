@@ -12,8 +12,9 @@
 
 #include "LocusGeometryAPI.h"
 
+#include "Locus/Math/Vectors.h"
+
 #include "AxisAlignedBox.h"
-#include "Vector3.h"
 #include "Transformation.h"
 #include "TriangleFwd.h"
 #include "Plane.h"
@@ -30,8 +31,8 @@ class LOCUS_GEOMETRY_API OrientedBox : private AxisAlignedBox
 {
 public:
    OrientedBox();
-   OrientedBox(const Vector3& centroid, float xLength, float yLength, float zLength);
-   OrientedBox(const std::vector<Vector3>& points);
+   OrientedBox(const FVector3& centroid, float xLength, float yLength, float zLength);
+   OrientedBox(const std::vector<FVector3>& points);
    OrientedBox(const AxisAlignedBox& axisAlignedBox);
 
    void SetRotationInverse(const Transformation& rotationInverse);
@@ -51,13 +52,13 @@ public:
 
    bool Intersects(const Moveable& thisMoveable, const OrientedBox& other, const Moveable& otherMoveable) const;
 
-   void AxesAndRotation(std::array<Vector3, 3>& axes, Transformation& rotation) const;
+   void AxesAndRotation(std::array<FVector3, 3>& axes, Transformation& rotation) const;
 
    Plane MaxSplitPlane() const;
 
    float DiagonalLength() const;
 
-   Vector3 centroid;
+   FVector3 centroid;
 
 private:
    Transformation rotationInverse;

@@ -11,6 +11,8 @@
 #include "Locus/Rendering/Quad.h"
 #include "Locus/Rendering/RenderingState.h"
 
+#include "Locus/Geometry/Vector3Geometry.h"
+
 namespace Locus
 {
 
@@ -19,12 +21,12 @@ Quad::Quad()
 {
 }
 
-void Quad::Set(const Vector3& lowerLeftCorner, const Vector3& widthDirection, const Vector3& heightDirection, float width, float height, const Color& color)
+void Quad::Set(const FVector3& lowerLeftCorner, const FVector3& widthDirection, const FVector3& heightDirection, float width, float height, const Color& color)
 {
-   Vector3 v1 = Vector3::ZeroVector();
-   Vector3 v2 = width * widthDirection;
-   Vector3 v3 = v2 + height * heightDirection;
-   Vector3 v4 = v1 + height * heightDirection;
+   FVector3 v1 = Vec3D::ZeroVector();
+   FVector3 v2 = width * widthDirection;
+   FVector3 v3 = v2 + height * heightDirection;
+   FVector3 v4 = v1 + height * heightDirection;
 
    Mesh::Clear();
 
@@ -36,9 +38,9 @@ void Quad::Set(const Vector3& lowerLeftCorner, const Vector3& widthDirection, co
    Mesh::AddPosition(v4); Mesh::AddTextureCoordinate( TextureCoordinate(0.0, 1.0) );
 
    Mesh::AddQuad(MeshVertexIndexer(0, 0, 0, 0),
-                  MeshVertexIndexer(1, 1, 0, 0),
-                  MeshVertexIndexer(2, 2, 0, 0),
-                  MeshVertexIndexer(3, 3, 0, 0));
+                 MeshVertexIndexer(1, 1, 0, 0),
+                 MeshVertexIndexer(2, 2, 0, 0),
+                 MeshVertexIndexer(3, 3, 0, 0));
 
    Moveable::Reset(lowerLeftCorner);
 }

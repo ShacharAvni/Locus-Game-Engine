@@ -27,17 +27,17 @@ unsigned int Collidable::GetCollidableType() const
    return collidableType;
 }
 
-const Vector3& Collidable::GetBroadCollisionExtentMin() const
+const FVector3& Collidable::GetBroadCollisionExtentMin() const
 {
    return broadCollisionExtentMin;
 }
 
-const Vector3& Collidable::GetBroadCollisionExtentMax() const
+const FVector3& Collidable::GetBroadCollisionExtentMax() const
 {
    return broadCollisionExtentMax;
 }
 
-void Collidable::UpdateBroadCollisionExtent(const Vector3& centroid, float halfLength)
+void Collidable::UpdateBroadCollisionExtent(const FVector3& centroid, float halfLength)
 {
    broadCollisionExtentMin.x = centroid.x - halfLength;
    broadCollisionExtentMax.x = centroid.x + halfLength;

@@ -13,9 +13,9 @@
 #include "LocusGeometryAPI.h"
 
 #include "LineSegmentFwd.h"
-#include "Vector3.h"
-#include "Vector2.h"
 #include "IntersectionTypes.h"
+
+#include "Locus/Math/Vectors.h"
 
 #include <type_traits>
 
@@ -34,7 +34,7 @@ template <class PointType>
 class LOCUS_GEOMETRY_API Line
 {
 public:
-   static_assert(std::is_same<PointType, Vector2>::value || std::is_same<PointType, Vector3>::value, "PointType must be Vector3 or Vector2");
+   static_assert(std::is_same<PointType, FVector2>::value || std::is_same<PointType, FVector3>::value, "PointType must be FVector3 or FVector2");
 
    /// Initialized as the X axis.
    Line();
@@ -180,8 +180,8 @@ public:
 
 #ifdef LOCUS_GEOMETRY_SHARED_IMPORTS
 
-extern template class LOCUS_SHARED_IMPORTS Line<Vector3>;
-extern template class LOCUS_SHARED_IMPORTS Line<Vector2>;
+extern template class LOCUS_SHARED_IMPORTS Line<FVector3>;
+extern template class LOCUS_SHARED_IMPORTS Line<FVector2>;
 
 #endif
 

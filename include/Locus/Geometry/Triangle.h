@@ -14,10 +14,10 @@
 
 #include "Polygon.h"
 #include "LineFwd.h"
-#include "Vector2.h"
-#include "Vector3.h"
 #include "Plane.h"
 #include "LineSegmentFwd.h"
+
+#include "Locus/Math/Vectors.h"
 
 #include <vector>
 #include <type_traits>
@@ -29,7 +29,7 @@ template <class PointType>
 class LOCUS_GEOMETRY_API Triangle : public Polygon<PointType>
 {
 public:
-   static_assert(std::is_same<PointType, Vector2>::value || std::is_same<PointType, Vector3>::value, "PointType must be Vector3 or Vector2");
+   static_assert(std::is_same<PointType, FVector2>::value || std::is_same<PointType, FVector3>::value, "PointType must be FVector3 or FVector2");
 
    Triangle();
    Triangle(const PointType& p1, const PointType& p2, const PointType& p3);
@@ -39,7 +39,7 @@ public:
    virtual bool IsWellDefined() const override;
    virtual bool AddPoint(const PointType& point) override;
 
-   Vector3 ComputeBarycentricCoordinates(const PointType& targetPoint) const;
+   FVector3 ComputeBarycentricCoordinates(const PointType& targetPoint) const;
 
    static PointType ComputeCentroid(const Triangle<PointType>& triangle1, const Triangle<PointType>& triangle2);
 
@@ -63,8 +63,8 @@ protected:
 
 #ifdef LOCUS_GEOMETRY_SHARED_IMPORTS
 
-extern template class LOCUS_SHARED_IMPORTS Triangle<Vector3>;
-extern template class LOCUS_SHARED_IMPORTS Triangle<Vector2>;
+extern template class LOCUS_SHARED_IMPORTS Triangle<FVector3>;
+extern template class LOCUS_SHARED_IMPORTS Triangle<FVector2>;
 
 #endif
 

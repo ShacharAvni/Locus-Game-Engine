@@ -54,8 +54,8 @@ add_library(Locus_Geometry
             Transformation.cpp
             Triangle.cpp
             Triangulation.cpp
-            Vector2.cpp
-            Vector3.cpp
+            Vector2Geometry.cpp
+            Vector3Geometry.cpp
             ${LOCUS_GEOMETRY_INCLUDE}/AxisAlignedBox.h
             ${LOCUS_GEOMETRY_INCLUDE}/BoundingVolumeHierarchy.h
             ${LOCUS_GEOMETRY_INCLUDE}/Collidable.h
@@ -88,8 +88,8 @@ add_library(Locus_Geometry
             ${LOCUS_GEOMETRY_INCLUDE}/Triangle.h
             ${LOCUS_GEOMETRY_INCLUDE}/TriangleFwd.h
             ${LOCUS_GEOMETRY_INCLUDE}/Triangulation.h
-            ${LOCUS_GEOMETRY_INCLUDE}/Vector2.h
-            ${LOCUS_GEOMETRY_INCLUDE}/Vector3.h)
+            ${LOCUS_GEOMETRY_INCLUDE}/Vector2Geometry.h
+            ${LOCUS_GEOMETRY_INCLUDE}/Vector3Geometry.h)
 
 target_link_libraries(Locus_Geometry Locus_Common)
 target_link_libraries(Locus_Geometry Locus_Math)

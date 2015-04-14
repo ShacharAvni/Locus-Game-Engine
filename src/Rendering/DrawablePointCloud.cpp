@@ -23,13 +23,13 @@ DrawablePointCloud::DrawablePointCloud()
 {
 }
 
-DrawablePointCloud::DrawablePointCloud(const std::vector<Vector3>& pointCloudPositions, const std::vector<Color>& pointCloudColors)
+DrawablePointCloud::DrawablePointCloud(const std::vector<FVector3>& pointCloudPositions, const std::vector<Color>& pointCloudColors)
    : PointCloud(pointCloudPositions), colors(pointCloudColors)
 {
    Refit();
 }
 
-void DrawablePointCloud::Set(const std::vector<Vector3>& pointCloudPositions, const std::vector<Color>& pointCloudColors)
+void DrawablePointCloud::Set(const std::vector<FVector3>& pointCloudPositions, const std::vector<Color>& pointCloudColors)
 {
    positions = pointCloudPositions;
    colors = pointCloudColors;
@@ -37,7 +37,7 @@ void DrawablePointCloud::Set(const std::vector<Vector3>& pointCloudPositions, co
    Refit();
 }
 
-void DrawablePointCloud::AddPosition(const Vector3& v, const Color& color)
+void DrawablePointCloud::AddPosition(const FVector3& v, const Color& color)
 {
    PointCloud::AddPosition(v);
    colors.push_back(color);

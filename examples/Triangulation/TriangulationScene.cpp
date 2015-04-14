@@ -50,7 +50,7 @@ TriangulationScene::TriangulationScene(Locus::SceneManager& sceneManager, unsign
 {
    InitializeRenderingState();
 
-   viewpoint.TranslateBy( Locus::Vector3(0.0f, 0.0f, REAL_Z_VIEWER) );
+   viewpoint.TranslateBy( Locus::FVector3(0.0f, 0.0f, REAL_Z_VIEWER) );
 
    currentPolygonAsLineSegments.CreateGPUVertexData();
 }
@@ -91,7 +91,7 @@ void TriangulationScene::MouseMoved(int x, int y)
 {
    if (currentPolygonAsLineSegments.NumLineSegments() > 0)
    {
-      Locus::Vector3 worldCoordinate;
+      Locus::FVector3 worldCoordinate;
 
       if (Unproject(x, y, worldCoordinate))
       {
@@ -108,7 +108,7 @@ void TriangulationScene::MouseMoved(int x, int y)
 
 void TriangulationScene::MousePressed(MouseButton_t button)
 {
-   Locus::Vector3 worldCoordinate;
+   Locus::FVector3 worldCoordinate;
 
    if (Unproject(lastMouseX, lastMouseY, worldCoordinate))
    {
@@ -166,7 +166,7 @@ void TriangulationScene::Resized(int width, int height)
    resolutionY = height;
 }
 
-bool TriangulationScene::Unproject(int x, int y, Locus::Vector3& worldCoordinate) const
+bool TriangulationScene::Unproject(int x, int y, Locus::FVector3& worldCoordinate) const
 {
    const Locus::Transformation& modelView = viewpoint.GetTransformation().GetInverse();
    const Locus::Transformation& projection = renderingState->transformationStack.TopTransformation(Locus::TransformationStack::Projection);
@@ -191,7 +191,7 @@ Locus::Color TriangulationScene::CurrentColor() const
 
 void TriangulationScene::GetCompletedPolygonLineSegmentsAsPolygons(std::vector<Locus::Polygon2D_t>& polygons) const
 {
-   Locus::Vector2 point2D;
+   Locus::FVector2 point2D;
 
    for (const std::unique_ptr<Locus::LineSegmentCollection>& completedPolygon : completedPolygonsAsLineSegments)
    {
@@ -199,7 +199,7 @@ void TriangulationScene::GetCompletedPolygonLineSegmentsAsPolygons(std::vector<L
 
       for (size_t lineSegmentIndex = 0, numLineSegments = completedPolygon->NumLineSegments(); lineSegmentIndex < numLineSegments; ++lineSegmentIndex)
       {
-         const Locus::Vector3& point3D = (*completedPolygon)[lineSegmentIndex].segment.P1;
+         const Locus::FVector3& point3D = (*completedPolygon)[lineSegmentIndex].segment.P1;
 
          point2D.x = point3D.x;
          point2D.y = point3D.y;
@@ -223,10 +223,10 @@ bool TriangulationScene::CompletedPolygonsAreWellFormed(const std::vector<Locus:
       //determine if any line segments are degenerate
       for (std::size_t pointIndex = 0, numPoints = polygon.NumPoints(); pointIndex < numPoints; ++pointIndex)
       {
-         const Locus::Vector2& point1 = polygon[pointIndex];
-         const Locus::Vector2& point2 = polygon[(pointIndex + 1) % numPoints];
+         const Locus::FVector2& point1 = polygon[pointIndex];
+         const Locus::FVector2& point2 = polygon[(pointIndex + 1) % numPoints];
 
-         if (point1.PreciselyEqualTo(point2))
+         if (point1 == point2)
          {
             return false;
          }
@@ -270,7 +270,7 @@ void TriangulationScene::TriangulateCompletedPolygons()
 
       if (CompletedPolygonsAreWellFormed(polygonsToTriangulate))
       {
-         std::vector<const Vector2*> trianglePoints;
+         std::vector<const Locus::FVector2*> trianglePoints;
 
          Locus::Triangulate(polygonsToTriangulate, Locus::PolygonWinding::CounterClockwise, trianglePoints);
 

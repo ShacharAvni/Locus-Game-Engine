@@ -24,20 +24,20 @@ OrientedBox::OrientedBox()
 {
 }
 
-OrientedBox::OrientedBox(const Vector3& centroid, float xLength, float yLength, float zLength)
+OrientedBox::OrientedBox(const FVector3& centroid, float xLength, float yLength, float zLength)
    : centroid(centroid)
 {
-   min.set(-xLength / 2, -yLength / 2, -zLength / 2);
-   max.set(xLength / 2, yLength / 2, zLength / 2);
+   min.Set(-xLength / 2, -yLength / 2, -zLength / 2);
+   max.Set(xLength / 2, yLength / 2, zLength / 2);
 }
 
-OrientedBox::OrientedBox(const std::vector<Vector3>& points)
+OrientedBox::OrientedBox(const std::vector<FVector3>& points)
 {
    std::size_t numPoints = points.size();
 
    if (numPoints > 1)
    {
-      centroid.set(0.0f, 0.0f, 0.0f);
+      centroid.Set(0.0f, 0.0f, 0.0f);
 
       float xxExpectedValue = 0.0f;
       float yyExpectedValue = 0.0f;
@@ -46,7 +46,7 @@ OrientedBox::OrientedBox(const std::vector<Vector3>& points)
       float xzExpectedValue = 0.0f;
       float yzExpectedValue = 0.0f;
 
-      for (const Vector3& singlePoint : points)
+      for (const FVector3& singlePoint : points)
       {
          centroid += singlePoint;
 
@@ -82,22 +82,22 @@ OrientedBox::OrientedBox(const std::vector<Vector3>& points)
 
       if (covarianceMatrix.SolveEigenvectors(eigenvectors))
       {
-         Vector3 columnInRotationMatrix(eigenvectors[0][0], eigenvectors[0][1], eigenvectors[0][2]);
-         columnInRotationMatrix.normalize();
+         FVector3 columnInRotationMatrix(eigenvectors[0][0], eigenvectors[0][1], eigenvectors[0][2]);
+         Normalize(columnInRotationMatrix);
 
          rotation(0, 0) = columnInRotationMatrix.x;
          rotation(1, 0) = columnInRotationMatrix.y;
          rotation(2, 0) = columnInRotationMatrix.z;
 
-         columnInRotationMatrix.set(eigenvectors[1][0], eigenvectors[1][1], eigenvectors[1][2]);
-         columnInRotationMatrix.normalize();
+         columnInRotationMatrix.Set(eigenvectors[1][0], eigenvectors[1][1], eigenvectors[1][2]);
+         Normalize(columnInRotationMatrix);
 
          rotation(0, 1) = columnInRotationMatrix.x;
          rotation(1, 1) = columnInRotationMatrix.y;
          rotation(2, 1) = columnInRotationMatrix.z;
 
-         columnInRotationMatrix.set(eigenvectors[2][0], eigenvectors[2][1], eigenvectors[2][2]);
-         columnInRotationMatrix.normalize();
+         columnInRotationMatrix.Set(eigenvectors[2][0], eigenvectors[2][1], eigenvectors[2][2]);
+         Normalize(columnInRotationMatrix);
 
          rotation(0, 2) = columnInRotationMatrix.x;
          rotation(1, 2) = columnInRotationMatrix.y;
@@ -106,18 +106,18 @@ OrientedBox::OrientedBox(const std::vector<Vector3>& points)
 
       rotationInverse = rotation.TransposedMatrix();
 
-      Vector3 rotatedXAxis = rotation.MultVector(Vector3::XAxis());
-      Vector3 rotatedYAxis = rotation.MultVector(Vector3::YAxis());
-      Vector3 rotatedZAxis = rotation.MultVector(Vector3::ZAxis());
+      FVector3 rotatedXAxis = rotation.MultVector(Vec3D::XAxis());
+      FVector3 rotatedYAxis = rotation.MultVector(Vec3D::YAxis());
+      FVector3 rotatedZAxis = rotation.MultVector(Vec3D::ZAxis());
 
       float maxFloat = std::numeric_limits<float>::max();
 
-      Vector3 minProjections(maxFloat, maxFloat, maxFloat);
-      Vector3 maxProjections(-maxFloat, -maxFloat, -maxFloat);
+      FVector3 minProjections(maxFloat, maxFloat, maxFloat);
+      FVector3 maxProjections(-maxFloat, -maxFloat, -maxFloat);
 
-      for (const Vector3& singlePoint : points)
+      for (const FVector3& singlePoint : points)
       {
-         float projected = rotatedXAxis.dot(singlePoint - centroid);
+         float projected = Dot(rotatedXAxis, singlePoint - centroid);
 
          if (projected < minProjections.x)
          {
@@ -128,7 +128,7 @@ OrientedBox::OrientedBox(const std::vector<Vector3>& points)
             maxProjections.x = projected;
          }
 
-         projected = rotatedYAxis.dot(singlePoint - centroid);
+         projected = Dot(rotatedYAxis, singlePoint - centroid);
 
          if (projected < minProjections.y)
          {
@@ -139,7 +139,7 @@ OrientedBox::OrientedBox(const std::vector<Vector3>& points)
             maxProjections.y = projected;
          }
 
-         projected = rotatedZAxis.dot(singlePoint - centroid);
+         projected = Dot(rotatedZAxis, singlePoint - centroid);
 
          if (projected < minProjections.z)
          {
@@ -163,8 +163,8 @@ OrientedBox::OrientedBox(const AxisAlignedBox& axisAlignedBox)
 
    centroid = axisAlignedBox.Centroid();
 
-   min.set(-extents[Vector3::Coordinate_X] / 2, -extents[Vector3::Coordinate_Y] / 2, -extents[Vector3::Coordinate_Z] / 2);
-   max.set(extents[Vector3::Coordinate_X] / 2, extents[Vector3::Coordinate_Y] / 2, extents[Vector3::Coordinate_Z] / 2);
+   min.Set(-extents[0] / 2, -extents[1] / 2, -extents[2] / 2);
+   max.Set(extents[0] / 2, extents[1] / 2, extents[2] / 2);
 }
 
 void OrientedBox::SetRotationInverse(const Transformation& rotationInverse)
@@ -192,19 +192,19 @@ bool OrientedBox::Intersects(const Triangle3D_t& triangle) const
    return !IsOutside(triangle);
 }
 
-void OrientedBox::AxesAndRotation(std::array<Vector3, 3>& axes, Transformation& rotation) const
+void OrientedBox::AxesAndRotation(std::array<FVector3, 3>& axes, Transformation& rotation) const
 {
    rotation = rotationInverse;
    rotation.Transpose();
 
-   axes[Vector3::Coordinate_X] = rotation.MultVector(Vector3::XAxis());
-   axes[Vector3::Coordinate_Y] = rotation.MultVector(Vector3::YAxis());
-   axes[Vector3::Coordinate_Z] = rotation.MultVector(Vector3::ZAxis());
+   axes[0] = rotation.MultVector(Vec3D::XAxis());
+   axes[1] = rotation.MultVector(Vec3D::YAxis());
+   axes[2] = rotation.MultVector(Vec3D::ZAxis());
 }
 
 Plane OrientedBox::MaxSplitPlane() const
 {
-   std::array<Vector3, 3> axes;
+   std::array<FVector3, 3> axes;
    Transformation rotation;
 
    AxesAndRotation(axes, rotation);
@@ -213,10 +213,10 @@ Plane OrientedBox::MaxSplitPlane() const
 
    Extents(extents);
 
-   Vector3::Coordinate maxExtentsCoordinate = Vector3::Coordinate_X;
-   float maxExtent = extents[Vector3::Coordinate_X];
+   unsigned int maxExtentsCoordinate = 0;
+   float maxExtent = extents[0];
 
-   for (Vector3::Coordinate coordinate = Vector3::Coordinate_Y; coordinate <= Vector3::Coordinate_Z; coordinate = static_cast<Vector3::Coordinate>(coordinate + 1))
+   for (unsigned int coordinate = 1; coordinate < 3; ++coordinate)
    {
       float thisExtent = extents[coordinate];
 
@@ -252,11 +252,11 @@ bool OrientedBox::Intersects(const OrientedBox& box) const
    //http://www.gamasutra.com/view/feature/131790/simple_intersection_tests_for_games.php?page=5
 
    Transformation thisRotation;
-   std::array<Vector3, 3> thisAxes;
+   std::array<FVector3, 3> thisAxes;
    AxesAndRotation(thisAxes, thisRotation);
 
    Transformation thatRotation;
-   std::array<Vector3, 3> thatAxes;
+   std::array<FVector3, 3> thatAxes;
    box.AxesAndRotation(thatAxes, thatRotation);
 
    std::array<float, 3> thisExtents;
@@ -267,32 +267,32 @@ bool OrientedBox::Intersects(const OrientedBox& box) const
 
    float dotProducts[3][3];
 
-   for (Vector3::Coordinate thisCoordinate = Vector3::Coordinate_X; thisCoordinate <= Vector3::Coordinate_Z; thisCoordinate = static_cast<Vector3::Coordinate>(thisCoordinate + 1))
+   for (unsigned int thisCoordinate = 0; thisCoordinate < 3; ++thisCoordinate)
    {
-      for (Vector3::Coordinate thatCoordinate = Vector3::Coordinate_X; thatCoordinate <= Vector3::Coordinate_Z; thatCoordinate = static_cast<Vector3::Coordinate>(thatCoordinate + 1))
+      for (unsigned int thatCoordinate = 0; thatCoordinate < 3; ++thatCoordinate)
       {
-         dotProducts[thisCoordinate][thatCoordinate] = thisAxes[thisCoordinate].dot(thatAxes[thatCoordinate]);
+         dotProducts[thisCoordinate][thatCoordinate] = Dot(thisAxes[thisCoordinate], thatAxes[thatCoordinate]);
       }
    }
 
-   Vector3 parentFrameTranslation = box.centroid - centroid;
+   FVector3 parentFrameTranslation = box.centroid - centroid;
 
-   Vector3 thisFrameTranslation( parentFrameTranslation.dot(thisAxes[0]),
-                                    parentFrameTranslation.dot(thisAxes[1]),
-                                    parentFrameTranslation.dot(thisAxes[2]) );
+   FVector3 thisFrameTranslation( Dot(parentFrameTranslation, thisAxes[0]),
+                                  Dot(parentFrameTranslation, thisAxes[1]),
+                                  Dot(parentFrameTranslation, thisAxes[2]) );
 
    float thisRadiusProjection = 0.0f;
    float thatRadiusProjection = 0.0f;
    float projectionThreshold = 0.0f;
 
    //projections onto this axes
-   for (Vector3::Coordinate thisCoordinate = Vector3::Coordinate_X; thisCoordinate <= Vector3::Coordinate_Z; thisCoordinate = static_cast<Vector3::Coordinate>(thisCoordinate + 1))
+   for (unsigned int thisCoordinate = 0; thisCoordinate < 3; ++thisCoordinate)
    {
       thisRadiusProjection = thisExtents[thisCoordinate];
 
       thatRadiusProjection = (thatExtents[0] * fabs(dotProducts[thisCoordinate][0])) +
-                              (thatExtents[1] * fabs(dotProducts[thisCoordinate][1])) +
-                              (thatExtents[2] * fabs(dotProducts[thisCoordinate][2]));
+                             (thatExtents[1] * fabs(dotProducts[thisCoordinate][1])) +
+                             (thatExtents[2] * fabs(dotProducts[thisCoordinate][2]));
 
       projectionThreshold = fabs( thisFrameTranslation[thisCoordinate] );
 
@@ -303,11 +303,11 @@ bool OrientedBox::Intersects(const OrientedBox& box) const
    }
 
    //projections onto that axes
-   for (Vector3::Coordinate thatCoordinate = Vector3::Coordinate_X; thatCoordinate <= Vector3::Coordinate_Z; thatCoordinate = static_cast<Vector3::Coordinate>(thatCoordinate + 1))
+   for (unsigned int thatCoordinate = 0; thatCoordinate < 3; ++thatCoordinate)
    {
       thisRadiusProjection = (thisExtents[0] * fabs(dotProducts[0][thatCoordinate])) +
-                              (thisExtents[1] * fabs(dotProducts[1][thatCoordinate])) +
-                              (thisExtents[2] * fabs(dotProducts[2][thatCoordinate]));
+                             (thisExtents[1] * fabs(dotProducts[1][thatCoordinate])) +
+                             (thisExtents[2] * fabs(dotProducts[2][thatCoordinate]));
 
       thatRadiusProjection = thatExtents[thatCoordinate];
 
@@ -322,7 +322,7 @@ bool OrientedBox::Intersects(const OrientedBox& box) const
    //this_XAxis x that_XAxis
    thisRadiusProjection = thisExtents[1] * fabs(dotProducts[2][0]) + thisExtents[2] * fabs(dotProducts[1][0]);
    thatRadiusProjection = thatExtents[1] * fabs(dotProducts[0][2]) + thatExtents[2] * fabs(dotProducts[0][1]);
-   projectionThreshold = fabs( (thisFrameTranslation[Vector3::Coordinate_Z] * dotProducts[1][0]) - (thisFrameTranslation[Vector3::Coordinate_Y] * dotProducts[2][0]) );
+   projectionThreshold = fabs( (thisFrameTranslation[2] * dotProducts[1][0]) - (thisFrameTranslation[1] * dotProducts[2][0]) );
 
    if (projectionThreshold > (thisRadiusProjection + thatRadiusProjection))
    {
@@ -332,7 +332,7 @@ bool OrientedBox::Intersects(const OrientedBox& box) const
    //this_XAxis x that_YAxis
    thisRadiusProjection = thisExtents[1] * fabs(dotProducts[2][1]) + thisExtents[2] * fabs(dotProducts[1][1]);
    thatRadiusProjection = thatExtents[0] * fabs(dotProducts[0][2]) + thatExtents[2] * fabs(dotProducts[0][0]);
-   projectionThreshold = fabs( (thisFrameTranslation[Vector3::Coordinate_Z] * dotProducts[1][1]) - (thisFrameTranslation[Vector3::Coordinate_Y] * dotProducts[2][1]) );
+   projectionThreshold = fabs( (thisFrameTranslation[2] * dotProducts[1][1]) - (thisFrameTranslation[1] * dotProducts[2][1]) );
 
    if (projectionThreshold > (thisRadiusProjection + thatRadiusProjection))
    {
@@ -342,7 +342,7 @@ bool OrientedBox::Intersects(const OrientedBox& box) const
    //this_XAxis x that_ZAxis
    thisRadiusProjection = thisExtents[1] * fabs(dotProducts[2][2]) + thisExtents[2] * fabs(dotProducts[1][2]);
    thatRadiusProjection = thatExtents[0] * fabs(dotProducts[0][1]) + thatExtents[1] * fabs(dotProducts[0][0]);
-   projectionThreshold = fabs( thisFrameTranslation[Vector3::Coordinate_Z] * dotProducts[1][2] - thisFrameTranslation[Vector3::Coordinate_Y] * dotProducts[2][2] );
+   projectionThreshold = fabs( thisFrameTranslation[2] * dotProducts[1][2] - thisFrameTranslation[1] * dotProducts[2][2] );
 
    if (projectionThreshold > (thisRadiusProjection + thatRadiusProjection))
    {
@@ -352,7 +352,7 @@ bool OrientedBox::Intersects(const OrientedBox& box) const
    //this_YAxis x that_XAxis
    thisRadiusProjection = thisExtents[0] * fabs(dotProducts[2][0]) + thisExtents[2] * fabs(dotProducts[0][0]);
    thatRadiusProjection = thatExtents[1] * fabs(dotProducts[1][2]) + thatExtents[2] * fabs(dotProducts[1][1]);
-   projectionThreshold = fabs( thisFrameTranslation[Vector3::Coordinate_X] * dotProducts[2][0] - thisFrameTranslation[Vector3::Coordinate_Z]*dotProducts[0][0] );
+   projectionThreshold = fabs( thisFrameTranslation[0] * dotProducts[2][0] - thisFrameTranslation[2]*dotProducts[0][0] );
 
    if (projectionThreshold > (thisRadiusProjection + thatRadiusProjection))
    {
@@ -362,7 +362,7 @@ bool OrientedBox::Intersects(const OrientedBox& box) const
    //this_YAxis x that_YAxis
    thisRadiusProjection = thisExtents[0] * fabs(dotProducts[2][1]) + thisExtents[2] * fabs(dotProducts[0][1]);
    thatRadiusProjection = thatExtents[0] * fabs(dotProducts[1][2]) + thatExtents[2] * fabs(dotProducts[1][0]);
-   projectionThreshold = fabs( thisFrameTranslation[Vector3::Coordinate_X] * dotProducts[2][1] - thisFrameTranslation[Vector3::Coordinate_Z] * dotProducts[0][1] );
+   projectionThreshold = fabs( thisFrameTranslation[0] * dotProducts[2][1] - thisFrameTranslation[2] * dotProducts[0][1] );
 
    if (projectionThreshold > (thisRadiusProjection + thatRadiusProjection))
    {
@@ -372,7 +372,7 @@ bool OrientedBox::Intersects(const OrientedBox& box) const
    //this_YAxis x that_ZAxis
    thisRadiusProjection = thisExtents[0] * fabs(dotProducts[2][2]) + thisExtents[2] * fabs(dotProducts[0][2]);
    thatRadiusProjection = thatExtents[0] * fabs(dotProducts[1][1]) + thatExtents[1] * fabs(dotProducts[1][0]);
-   projectionThreshold = fabs( thisFrameTranslation[Vector3::Coordinate_X] * dotProducts[2][2] - thisFrameTranslation[Vector3::Coordinate_Z] * dotProducts[0][2] );
+   projectionThreshold = fabs( thisFrameTranslation[0] * dotProducts[2][2] - thisFrameTranslation[2] * dotProducts[0][2] );
 
    if (projectionThreshold > (thisRadiusProjection + thatRadiusProjection))
    {
@@ -382,7 +382,7 @@ bool OrientedBox::Intersects(const OrientedBox& box) const
    //this_ZAxis x that_XAxis
    thisRadiusProjection = thisExtents[0] * fabs(dotProducts[1][0]) + thisExtents[1] * fabs(dotProducts[0][0]);
    thatRadiusProjection = thatExtents[1] * fabs(dotProducts[2][2]) + thatExtents[2] * fabs(dotProducts[2][1]);
-   projectionThreshold = fabs( thisFrameTranslation[Vector3::Coordinate_Y] * dotProducts[0][0] - thisFrameTranslation[Vector3::Coordinate_X] * dotProducts[1][0] );
+   projectionThreshold = fabs( thisFrameTranslation[1] * dotProducts[0][0] - thisFrameTranslation[0] * dotProducts[1][0] );
 
    if (projectionThreshold > (thisRadiusProjection + thatRadiusProjection))
    {
@@ -392,7 +392,7 @@ bool OrientedBox::Intersects(const OrientedBox& box) const
    //this_ZAxis x that_YAxis
    thisRadiusProjection = thisExtents[0] * fabs(dotProducts[1][1]) + thisExtents[1] * fabs(dotProducts[0][1]);
    thatRadiusProjection = thatExtents[0] * fabs(dotProducts[2][2]) + thatExtents[2] * fabs(dotProducts[2][0]);
-   projectionThreshold = fabs( thisFrameTranslation[Vector3::Coordinate_Y] * dotProducts[0][1] - thisFrameTranslation[Vector3::Coordinate_X] * dotProducts[1][1] );
+   projectionThreshold = fabs( thisFrameTranslation[1] * dotProducts[0][1] - thisFrameTranslation[0] * dotProducts[1][1] );
 
    if (projectionThreshold > (thisRadiusProjection + thatRadiusProjection))
    {
@@ -402,7 +402,7 @@ bool OrientedBox::Intersects(const OrientedBox& box) const
    //this_ZAxis x that_ZAxis
    thisRadiusProjection = thisExtents[0] * fabs(dotProducts[1][2]) + thisExtents[1] * fabs(dotProducts[0][2]);
    thatRadiusProjection = thatExtents[0] * fabs(dotProducts[2][1]) + thatExtents[1] * fabs(dotProducts[2][0]);
-   projectionThreshold = fabs( thisFrameTranslation[Vector3::Coordinate_Y] * dotProducts[0][2] - thisFrameTranslation[Vector3::Coordinate_X] * dotProducts[1][2] );
+   projectionThreshold = fabs( thisFrameTranslation[1] * dotProducts[0][2] - thisFrameTranslation[0] * dotProducts[1][2] );
 
    if (projectionThreshold > (thisRadiusProjection + thatRadiusProjection))
    {

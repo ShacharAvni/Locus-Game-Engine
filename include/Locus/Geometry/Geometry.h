@@ -12,6 +12,8 @@
 
 #include "LocusGeometryAPI.h"
 
+#include "Locus/Math/VectorsFwd.h"
+
 namespace Locus
 {
 
@@ -22,7 +24,6 @@ LOCUS_GEOMETRY_API extern const float TO_RADIANS;
 LOCUS_GEOMETRY_API extern const float TO_DEGREES;
 
 class Sphere;
-class Vector3;
 struct MotionProperties;
 
 /*!
@@ -47,7 +48,7 @@ struct MotionProperties;
  *
  * \param[in,out] motionProperties2 The MotionProperties of the second object.
  */
-LOCUS_GEOMETRY_API void ResolveCollision(float coefficientOfRestitution, const Sphere& sphere1, const Sphere& sphere2, const Vector3& collisionPoint,
-                                         const Vector3& impulseDirection, MotionProperties& motionProperties1, MotionProperties& motionProperties2);
+LOCUS_GEOMETRY_API void ResolveCollision(float coefficientOfRestitution, const Sphere& sphere1, const Sphere& sphere2, const FVector3& collisionPoint,
+                                         const FVector3& impulseDirection, MotionProperties& motionProperties1, MotionProperties& motionProperties2);
  
 }

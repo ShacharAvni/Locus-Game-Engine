@@ -11,6 +11,7 @@
 #include "Locus/Geometry/Sphere.h"
 #include "Locus/Geometry/Moveable.h"
 #include "Locus/Geometry/Geometry.h"
+#include "Locus/Geometry/Vector3Geometry.h"
 
 #include "Locus/Common/Util.h"
 
@@ -27,21 +28,21 @@ Sphere::Sphere()
 {
 }
 
-Sphere::Sphere(const Vector3& center, float radius)
+Sphere::Sphere(const FVector3& center, float radius)
    : center(center), radius(radius)
 {
 }
 
-Sphere::Sphere(const std::vector<Vector3>& points)
+Sphere::Sphere(const std::vector<FVector3>& points)
    : radius(0.01f)
 {
    std::size_t numPoints = points.size();
 
    if (numPoints > 0)
    {
-      center = Vector3::ZeroVector();
+      center = Vec3D::ZeroVector();
 
-      for (const Vector3& singlePoint : points)
+      for (const FVector3& singlePoint : points)
       {
          center += singlePoint;
       }
@@ -50,9 +51,9 @@ Sphere::Sphere(const std::vector<Vector3>& points)
 
       radius = 0;
 
-      for (const Vector3& singlePoint : points)
+      for (const FVector3& singlePoint : points)
       {
-         radius = std::max(radius, (singlePoint - center).squaredNorm());
+         radius = std::max(radius, SquaredNorm(singlePoint - center));
       }
 
       radius = sqrt(radius);
@@ -63,7 +64,7 @@ bool Sphere::Intersects(const Moveable& thisMoveable, const Sphere& other, const
 {
    float radiiSum = (radius * thisMoveable.CurrentScale().x) + (other.radius * otherMoveable.CurrentScale().x);
 
-   return (otherMoveable.CurrentModelTransformation().MultVertex(other.center) - thisMoveable.CurrentModelTransformation().MultVertex(center)).squaredNorm() <= (radiiSum * radiiSum);
+   return (SquaredNorm(otherMoveable.CurrentModelTransformation().MultVertex(other.center) - thisMoveable.CurrentModelTransformation().MultVertex(center)) <= (radiiSum * radiiSum));
 }
 
 float Sphere::Volume() const

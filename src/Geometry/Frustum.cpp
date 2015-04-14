@@ -9,46 +9,47 @@
 \********************************************************************************************************/
 
 #include "Locus/Geometry/Frustum.h"
+#include "Locus/Geometry/Vector3Geometry.h"
 
 #include "Locus/Common/Float.h"
 
 namespace Locus
 {
 
-Frustum::Frustum(const Vector3& point, const Vector3& forward, const Vector3& up, float horizField, float vertField, float distNear, float distFar)
+Frustum::Frustum(const FVector3& point, const FVector3& forward, const FVector3& up, float horizField, float vertField, float distNear, float distFar)
    : viewPoint(point), forwardVector(forward), upVector(up), horizontalField(horizField), verticalField(vertField), nearDistance(distNear), farDistance(distFar)
 {
-   Vector3 forwardUnitVector = forwardVector.normVector();
-   Vector3 upUnitVector = upVector.normVector();
-   Vector3 rightUnitVector = forwardVector.cross(upVector).normVector();
+   FVector3 forwardUnitVector = NormVector(forwardVector);
+   FVector3 upUnitVector = NormVector(upVector);
+   FVector3 rightUnitVector = NormVector(Cross(forwardVector, upVector));
 
    planes[Frustum::Near].set(viewPoint + nearDistance*forwardUnitVector, forwardUnitVector);
    planes[Frustum::Far].set(viewPoint + farDistance*forwardUnitVector, -forwardUnitVector);
 
    //TODO: Fix fudging going on here
 
-   Vector3 pointLeft = viewPoint + nearDistance*forwardUnitVector - rightUnitVector*10;
-   Vector3 normalLeft = rightUnitVector;
-   normalLeft.rotate(horizontalField/2, upUnitVector);
+   FVector3 pointLeft = viewPoint + nearDistance*forwardUnitVector - rightUnitVector*10.0f;
+   FVector3 normalLeft = rightUnitVector;
+   RotateAroundDegrees(normalLeft, upUnitVector, horizontalField/2);
    planes[Frustum::Left].set(pointLeft, normalLeft);
 
-   Vector3 pointRight = viewPoint + nearDistance*forwardUnitVector + rightUnitVector*10;
-   Vector3 normalRight = -rightUnitVector;
-   normalRight.rotate(-horizontalField/2, upUnitVector);
+   FVector3 pointRight = viewPoint + nearDistance*forwardUnitVector + rightUnitVector*10.0f;
+   FVector3 normalRight = -rightUnitVector;
+   RotateAroundDegrees(normalRight, upUnitVector, -horizontalField/2);
    planes[Frustum::Right].set(pointRight, normalRight);
 
-   Vector3 pointBottom = viewPoint + nearDistance*forwardUnitVector - upUnitVector*10;
-   Vector3 normalBottom = upUnitVector;
-   normalBottom.rotate(-verticalField/2, rightUnitVector);
+   FVector3 pointBottom = viewPoint + nearDistance*forwardUnitVector - upUnitVector*10.0f;
+   FVector3 normalBottom = upUnitVector;
+   RotateAroundDegrees(normalBottom, rightUnitVector, -verticalField/2);
    planes[Frustum::Bottom].set(pointBottom, normalBottom);
 
-   Vector3 pointTop = viewPoint + nearDistance*forwardUnitVector + upUnitVector*10;
-   Vector3 normalTop = -upUnitVector;
-   normalTop.rotate(verticalField/2, rightUnitVector);
+   FVector3 pointTop = viewPoint + nearDistance*forwardUnitVector + upUnitVector*10.0f;
+   FVector3 normalTop = -upUnitVector;
+   RotateAroundDegrees(normalTop, rightUnitVector, verticalField/2);
    planes[Frustum::Top].set(pointTop, normalTop);
 }
 
-bool Frustum::Within(const Vector3& point) const
+bool Frustum::Within(const FVector3& point) const
 {
    for (const Plane& plane : planes)
    {
@@ -63,7 +64,7 @@ bool Frustum::Within(const Vector3& point) const
    return true;
 }
 
-bool Frustum::Within(const Vector3& centerOfSphere, float sphereRadius) const
+bool Frustum::Within(const FVector3& centerOfSphere, float sphereRadius) const
 {
    float radiusSquared = sphereRadius * sphereRadius;
 

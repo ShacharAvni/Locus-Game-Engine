@@ -9,9 +9,9 @@
 \********************************************************************************************************/
 
 #include "Locus/Geometry/Quaternion.h"
-#include "Locus/Geometry/Vector3.h"
+#include "Locus/Geometry/Vector3Geometry.h"
 
-#include <math.h>
+#include <cmath>
 
 namespace Locus
 {
@@ -21,13 +21,13 @@ Quaternion::Quaternion(float a, float b, float c, float d)
 {
 }
 
-Quaternion::Quaternion(const Vector3& rotationAxis, float angleRadians)
+Quaternion::Quaternion(const FVector3& rotationAxis, float angleRadians)
 {
-   Vector3 rotationAxisNormalized = rotationAxis.normVector();
+   FVector3 rotationAxisNormalized = NormVector(rotationAxis);
 
-   float halfSine = sin(angleRadians / 2);
+   float halfSine = std::sin(angleRadians / 2);
 
-   a = cos(angleRadians / 2);
+   a = std::cos(angleRadians / 2);
    b = halfSine * rotationAxisNormalized.x;
    c = halfSine * rotationAxisNormalized.y;
    d = halfSine * rotationAxisNormalized.z;
@@ -58,9 +58,9 @@ Transformation Quaternion::ToTransformation() const
    Quaternion n = NormalizedQuaternion();
 
    return Transformation(1.0f - 2.0f*n.c*n.c - 2.0f*n.d*n.d,            2.0f*n.b*n.c - 2.0f*n.d*n.a,            2.0f*n.b*n.d + 2.0f*n.c*n.a,       0.0f,
-                                 2.0f*n.b*n.c + 2.0f*n.d*n.a,     1.0f - 2.0f*n.b*n.b - 2.0f*n.d*n.d,            2.0f*n.c*n.d - 2.0f*n.b*n.a,       0.0f,
-                                 2.0f*n.b*n.d - 2.0f*n.c*n.a,            2.0f*n.c*n.d + 2.0f*n.b*n.a,     1.0f - 2.0f*n.b*n.b - 2.0f*n.c*n.c,       0.0f,
-                                                         0.0f,                                   0.0f,                                   0.0f,       1.0f);
+                                2.0f*n.b*n.c + 2.0f*n.d*n.a,     1.0f - 2.0f*n.b*n.b - 2.0f*n.d*n.d,            2.0f*n.c*n.d - 2.0f*n.b*n.a,       0.0f,
+                                2.0f*n.b*n.d - 2.0f*n.c*n.a,            2.0f*n.c*n.d + 2.0f*n.b*n.a,     1.0f - 2.0f*n.b*n.b - 2.0f*n.c*n.c,       0.0f,
+                                                       0.0f,                                   0.0f,                                   0.0f,       1.0f);
 }
 
 Quaternion Quaternion::Conjugate() const
@@ -70,7 +70,7 @@ Quaternion Quaternion::Conjugate() const
 
 float Quaternion::Norm() const
 {
-   return sqrt((a * a) + (b * b) + (c * c) + (d * d));
+   return std::sqrt((a * a) + (b * b) + (c * c) + (d * d));
 }
 
 Quaternion Quaternion::Reciprocal() const
@@ -110,9 +110,9 @@ Quaternion operator*(const Quaternion& q, float k)
 Quaternion operator*(const Quaternion& q1, const Quaternion& q2) //Hamilton product
 {
    return Quaternion( (q1.a * q2.a) - (q1.b * q2.b) - (q1.c * q2.c) - (q1.d * q2.d),
-                        (q1.a * q2.b) + (q1.b * q2.a) + (q1.c * q2.d) - (q1.d * q2.c),
-                        (q1.a * q2.c) - (q1.b * q2.d) + (q1.c * q2.a) + (q1.d * q2.b),
-                        (q1.a * q2.d) + (q1.b * q2.c) - (q1.c * q2.b) + (q1.d * q2.a) );
+                      (q1.a * q2.b) + (q1.b * q2.a) + (q1.c * q2.d) - (q1.d * q2.c),
+                      (q1.a * q2.c) - (q1.b * q2.d) + (q1.c * q2.a) + (q1.d * q2.b),
+                      (q1.a * q2.d) + (q1.b * q2.c) - (q1.c * q2.b) + (q1.d * q2.a) );
 }
 
 Quaternion operator/(const Quaternion& q, float k)

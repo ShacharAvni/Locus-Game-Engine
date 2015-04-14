@@ -13,7 +13,7 @@
 #include "Locus/Rendering/ShaderVariables.h"
 #include "Locus/Rendering/Texture.h"
 
-#include "Locus/Geometry/Vector3.h"
+#include "Locus/Math/Vectors.h"
 
 #include <Locus/Rendering/Locus_glew.h>
 
@@ -23,19 +23,19 @@ namespace Locus
 SkyBox::SkyBox(float radius)
    : frontTexture(nullptr), backTexture(nullptr), leftTexture(nullptr), rightTexture(nullptr), upTexture(nullptr), downTexture(nullptr), radius(radius)
 {
-   Vector3 v1(-radius, -radius, -radius);
-   Vector3 v2(radius, -radius, radius);
-   Vector3 v3(-radius, -radius, radius);
-   Vector3 v4(radius, -radius, -radius);
-   Vector3 v5(-radius, radius, -radius);
+   FVector3 v1(-radius, -radius, -radius);
+   FVector3 v2(radius, -radius, radius);
+   FVector3 v3(-radius, -radius, radius);
+   FVector3 v4(radius, -radius, -radius);
+   FVector3 v5(-radius, radius, -radius);
 
    float quadLength = 2 * radius;
 
-   Vector3 up(0.0, 1.0, 0.0);
-   Vector3 left(-1.0, 0.0, 0.0);
-   Vector3 right(1.0, 0.0, 0.0);
-   Vector3 back(0.0, 0.0, 1.0);
-   Vector3 forward(0.0, 0.0, -1.0);
+   FVector3 up(0.0, 1.0, 0.0);
+   FVector3 left(-1.0, 0.0, 0.0);
+   FVector3 right(1.0, 0.0, 0.0);
+   FVector3 back(0.0, 0.0, 1.0);
+   FVector3 forward(0.0, 0.0, -1.0);
 
    frontQuad.Set(v1, right, up, quadLength, quadLength, Color::White());
    backQuad.Set(v2, left, up, quadLength, quadLength, Color::White());

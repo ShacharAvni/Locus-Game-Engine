@@ -156,11 +156,11 @@ void Mesh::AssignNormals()
 
    std::vector<std::size_t> normalHitCounts(numPositions);
 
-   Vector3 faceNormal;
+   FVector3 faceNormal;
 
    for (face_t& face : faces)
    {
-      faceNormal = (positions[face[1].positionID] - positions[face[0].positionID]).cross(positions[face[2].positionID] - positions[face[1].positionID]);
+      faceNormal = Cross(positions[face[1].positionID] - positions[face[0].positionID], positions[face[2].positionID] - positions[face[1].positionID]);
 
       for (std::size_t vertexIndex = 0; vertexIndex < Triangle3D_t::NumPointsOnATriangle; ++vertexIndex)
       {

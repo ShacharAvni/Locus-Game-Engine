@@ -30,11 +30,11 @@ class LOCUS_RENDERING_API DrawablePointCloud : public PointCloud, public Default
 {
 public:
    DrawablePointCloud();
-   DrawablePointCloud(const std::vector<Vector3>& pointCloudPositions, const std::vector<Color>& pointCloudColors);
+   DrawablePointCloud(const std::vector<FVector3>& pointCloudPositions, const std::vector<Color>& pointCloudColors);
       
-   void Set(const std::vector<Vector3>& pointCloudPositions, const std::vector<Color>& pointCloudColors);
+   void Set(const std::vector<FVector3>& pointCloudPositions, const std::vector<Color>& pointCloudColors);
 
-   virtual void AddPosition(const Vector3& v, const Color& color);
+   virtual void AddPosition(const FVector3& v, const Color& color);
    virtual void Clear();
 
    virtual void UpdateGPUVertexData();

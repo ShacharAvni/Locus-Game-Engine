@@ -9,7 +9,8 @@
 \********************************************************************************************************/
 
 #include "Locus/Geometry/DualTransformation.h"
-#include "Locus/Geometry/Vector3.h"
+
+#include "Locus/Math/Vectors.h"
 
 namespace Locus
 {
@@ -20,19 +21,19 @@ void DualTransformation::SetToIdentity()
    inverse.SetToIdentity();
 }
 
-void DualTransformation::TranslateBy(const Vector3& t)
+void DualTransformation::TranslateBy(const FVector3& t)
 {
    transform.TranslateBy(t);
    inverse.InverseTranslateBy(t);
 }
 
-void DualTransformation::RotateBy(const Vector3& rotation)
+void DualTransformation::RotateBy(const FVector3& rotation)
 {
    transform.RotateBy(rotation);
    inverse.InverseRotateBy(rotation);
 }
 
-void DualTransformation::ScaleBy(const Vector3& scale)
+void DualTransformation::ScaleBy(const FVector3& scale)
 {
    transform.ScaleBy(scale);
    inverse.InverseScaleBy(scale);

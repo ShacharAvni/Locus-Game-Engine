@@ -12,10 +12,10 @@
 
 #include "LocusGeometryAPI.h"
 
+#include "Locus/Math/VectorsFwd.h"
+
 #include "PolygonFwd.h"
 #include "PolygonWinding.h"
-#include "Vector2.h"
-#include "Vector3.h"
 
 #include <vector>
 #include <list>
@@ -33,7 +33,7 @@ class LOCUS_GEOMETRY_API PolygonHierarchy
 public:
    static_assert(std::is_same<PolygonType, Polygon2D_t>::value || std::is_same<PolygonType, Polygon3D_t>::value, "PolygonType must be Polygon3D_t or Polygon2D_t");
 
-   PolygonHierarchy(std::vector<PolygonType*>& polygons, PolygonWinding winding, const Vector3& normal, float toleranceFactor);
+   PolygonHierarchy(std::vector<PolygonType*>& polygons, PolygonWinding winding, const FVector3& normal, float toleranceFactor);
 
    struct Node
    {
@@ -47,7 +47,7 @@ private:
    std::unique_ptr<Node> root;
 
    static void DetermineTopLevelPolygonsAndTheirChildren(std::vector<PolygonType*>& polygons, float toleranceFactor, std::list<PolygonType*>& topLevelPolygons, std::list< std::vector<PolygonType*> >& children);
-   static void FormHierarchyAtNode_R(std::unique_ptr<Node>& node, std::vector<PolygonType*>& polygons, PolygonWinding winding, const Vector3& normal, float toleranceFactor);
+   static void FormHierarchyAtNode_R(std::unique_ptr<Node>& node, std::vector<PolygonType*>& polygons, PolygonWinding winding, const FVector3& normal, float toleranceFactor);
 };
 
 #include "Locus/Preprocessor/EndSilenceDLLInterfaceWarnings"

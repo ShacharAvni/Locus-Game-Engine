@@ -13,8 +13,7 @@
 #include "LocusGeometryAPI.h"
 
 #include "Locus/Math/Matrix.h"
-
-#include "Vector3.h"
+#include "Locus/Math/Vectors.h"
 
 namespace Locus
 {
@@ -32,29 +31,29 @@ public:
 
    Transformation& operator=(const Matrix<float>& matrix);
 
-   static const Vector3& IdentityScale();
+   static const FVector3& IdentityScale();
 
    static const Transformation& Identity();
 
-   static Transformation Translation(const Vector3& t);
+   static Transformation Translation(const FVector3& t);
    static Transformation XRotation(float radians);
    static Transformation YRotation(float radians);
    static Transformation ZRotation(float radians);
-   static Transformation Scale(const Vector3& scale);
+   static Transformation Scale(const FVector3& scale);
    static Transformation Perspective(float fovy, float aspect, float zNear, float zFar);
    static Transformation Orthographic(float left, float right, float bottom, float top, float nearVal, float farVal);
 
-   Vector3 MultVector(const Vector3& v) const;
-   Vector3 MultVertex(const Vector3& v) const;
+   FVector3 MultVector(const FVector3& v) const;
+   FVector3 MultVertex(const FVector3& v) const;
 
-   void TranslateBy(const Vector3& t);
-   void InverseTranslateBy(const Vector3& t);
+   void TranslateBy(const FVector3& t);
+   void InverseTranslateBy(const FVector3& t);
 
-   void RotateBy(const Vector3& rotation);
-   void InverseRotateBy(const Vector3& rotation);
+   void RotateBy(const FVector3& rotation);
+   void InverseRotateBy(const FVector3& rotation);
 
-   void ScaleBy(const Vector3& scale);
-   void InverseScaleBy(const Vector3& scale);
+   void ScaleBy(const FVector3& scale);
+   void InverseScaleBy(const FVector3& scale);
 };
 
 #include "Locus/Preprocessor/EndSilenceDLLInterfaceWarnings"

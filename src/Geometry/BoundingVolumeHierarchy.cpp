@@ -63,9 +63,9 @@ static void DetermineOctants(Plane::IntersectionQuery intersectionQueryX, Plane:
    }
 }
 
-static std::vector<Vector3> GetUniquePointsFromTriangles(const std::vector<Triangle3D_t>& triangles)
+static std::vector<FVector3> GetUniquePointsFromTriangles(const std::vector<Triangle3D_t>& triangles)
 {
-   std::vector<Vector3> uniquePoints;
+   std::vector<FVector3> uniquePoints;
 
    std::size_t numTriangles = triangles.size();
 
@@ -82,9 +82,9 @@ static std::vector<Vector3> GetUniquePointsFromTriangles(const std::vector<Trian
 
       std::sort(uniquePoints.begin(), uniquePoints.end());
 
-      std::vector<Vector3>::iterator uniqueEnd = std::unique(uniquePoints.begin(), uniquePoints.end(), [](const Vector3& first, const Vector3& second)->bool
+      std::vector<FVector3>::iterator uniqueEnd = std::unique(uniquePoints.begin(), uniquePoints.end(), [](const FVector3& first, const FVector3& second)->bool
       {
-         return first.PreciselyEqualTo(second);
+         return (first == second);
       });
 
       uniquePoints.resize( std::distance(uniquePoints.begin(), uniqueEnd) );
@@ -93,7 +93,7 @@ static std::vector<Vector3> GetUniquePointsFromTriangles(const std::vector<Trian
    return uniquePoints;
 }
 
-static std::vector<Vector3> GetUniquePointsFromTriangles(const TriangleInputMap_t& triangles)
+static std::vector<FVector3> GetUniquePointsFromTriangles(const TriangleInputMap_t& triangles)
 {
    std::vector<Triangle3D_t> trianglesAsVector;
    trianglesAsVector.reserve(triangles.size());
@@ -120,29 +120,29 @@ static TriangleInputMap_t MakeTriangleInputMap(const std::vector<Triangle3D_t>& 
    return triangleInputMap;
 }
 
-static Vector3 GetCenterOfBoundingVolume(const Sphere& boundingVolume)
+static FVector3 GetCenterOfBoundingVolume(const Sphere& boundingVolume)
 {
    return boundingVolume.center;
 }
 
-static Vector3 GetCenterOfBoundingVolume(const AxisAlignedBox& boundingVolume)
+static FVector3 GetCenterOfBoundingVolume(const AxisAlignedBox& boundingVolume)
 {
    return boundingVolume.Centroid();
 }
 
-static Vector3 GetCenterOfBoundingVolume(const OrientedBox& boundingVolume)
+static FVector3 GetCenterOfBoundingVolume(const OrientedBox& boundingVolume)
 {
    return boundingVolume.centroid;
 }
 
 template <class BoundingVolume>
-static BoundingVolume InstantiateBoundingVolumeFromPoints(const std::vector<Vector3>& points)
+static BoundingVolume InstantiateBoundingVolumeFromPoints(const std::vector<FVector3>& points)
 {
    return BoundingVolume(points);
 }
 
 template <>
-AxisAlignedBox InstantiateBoundingVolumeFromPoints(const std::vector<Vector3>& points)
+AxisAlignedBox InstantiateBoundingVolumeFromPoints(const std::vector<FVector3>& points)
 {
    return AxisAlignedBox(points, false);
 }
@@ -170,9 +170,9 @@ BoundingVolumeHierarchy<BoundingVolume>::Node::Node(const TriangleInputMap_t& tr
 
          std::array<TriangleInputMap_t, 8> trianglesInOctants;
 
-         const Vector3 center = GetCenterOfBoundingVolume(boundingVolume);
+         const FVector3 center = GetCenterOfBoundingVolume(boundingVolume);
 
-         const std::array<Plane, 3> splitPlanes = { Plane(center, Vector3::XAxis()), Plane(center, Vector3::YAxis()), Plane(center, Vector3::ZAxis()) };
+         const std::array<Plane, 3> splitPlanes = { Plane(center, Vec3D::XAxis()), Plane(center, Vec3D::YAxis()), Plane(center, Vec3D::ZAxis()) };
          std::array<Plane::IntersectionQuery, 3> intersectionQueries;
 
          std::array<bool, NUM_TREE_CHILDREN> inOctants;
@@ -180,12 +180,12 @@ BoundingVolumeHierarchy<BoundingVolume>::Node::Node(const TriangleInputMap_t& tr
 
          for (const std::unordered_map<std::size_t, Triangle3D_t>::value_type& containedTriangle : triangles)
          {
-            for (Vector3::Coordinate coordinate = Vector3::Coordinate_X; coordinate <= Vector3::Coordinate_Z; coordinate = static_cast<Vector3::Coordinate>(coordinate + 1))
+            for (unsigned int coordinate = 0; coordinate < 3; ++coordinate)
             {
                intersectionQueries[coordinate] = splitPlanes[coordinate].triangleIntersectionTest(containedTriangle.second);
             }
 
-            DetermineOctants(intersectionQueries[Vector3::Coordinate_X], intersectionQueries[Vector3::Coordinate_Y], intersectionQueries[Vector3::Coordinate_Z], inOctants);
+            DetermineOctants(intersectionQueries[0], intersectionQueries[1], intersectionQueries[2], inOctants);
 
             for (std::size_t childIndex = 0; childIndex < NUM_TREE_CHILDREN; ++childIndex)
             {
@@ -237,7 +237,7 @@ template <class BoundingVolume>
 void BoundingVolumeHierarchy<BoundingVolume>::ConstructFromTriangles(const std::vector<Triangle3D_t>& triangles, std::size_t leafTriangles, std::size_t maxDepth)
 {
    TriangleInputMap_t triangleInputMap = MakeTriangleInputMap(triangles);
-   std::vector<Vector3> rootPoints = GetUniquePointsFromTriangles(triangles);
+   std::vector<FVector3> rootPoints = GetUniquePointsFromTriangles(triangles);
 
    root = std::make_unique<Node>(triangleInputMap, InstantiateBoundingVolumeFromPoints<BoundingVolume>(rootPoints), leafTriangles, 0, maxDepth);
 }

@@ -12,16 +12,15 @@
 
 #include "LocusGeometryAPI.h"
 
+#include "Locus/Math/VectorsFwd.h"
+
 namespace Locus
 {
 
 template <class PointType>
 class LOCUS_GEOMETRY_API Polygon;
 
-class Vector3;
-class Vector2;
-
-typedef Polygon<Vector3> Polygon3D_t;
-typedef Polygon<Vector2> Polygon2D_t;
+typedef Polygon<FVector3> Polygon3D_t;
+typedef Polygon<FVector2> Polygon2D_t;
 
 }

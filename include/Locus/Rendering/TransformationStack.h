@@ -12,6 +12,8 @@
 
 #include "LocusRenderingAPI.h"
 
+#include "Locus/Math/VectorsFwd.h"
+
 #include "Locus/Geometry/Transformation.h"
 
 #include <stack>
@@ -49,8 +51,8 @@ public:
 
    void Multiply(const Transformation& trans);
 
-   void Translate(const Vector3& t);
-   void Scale(const Vector3& scale);
+   void Translate(const FVector3& t);
+   void Scale(const FVector3& scale);
 
    const Transformation& TopTransformation(TransformationMode mode) const;
    Transformation& TopTransformation(TransformationMode mode);

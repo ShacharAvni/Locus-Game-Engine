@@ -17,6 +17,8 @@
 #include "Locus/Geometry/PolygonFwd.h"
 #include "Locus/Geometry/PolygonWinding.h"
 
+#include "Locus/Math/VectorsFwd.h"
+
 #include "Locus/Common/CircularList.h"
 
 #include <vector>
@@ -24,9 +26,6 @@
 
 namespace Locus
 {
-
-class Vector2;
-class Vector3;
 
 //{CodeReview:Triangulation}
 /// Internal class used by all overloads of Locus::Triangulate for triangulation via Ear Clipping.
@@ -60,7 +59,7 @@ public:
     * the result should be used before the input polygons go out
     * of scope.
     */ 
-   void Triangulate(std::vector<const Vector2*>& triangles);
+   void Triangulate(std::vector<const FVector2*>& triangles);
 
    static const float EXPERIMENTAL_TOLERANCE;
 
@@ -74,51 +73,51 @@ private:
 
    struct Vertex
    {
-      Vertex(const Vector2* point)
+      Vertex(const FVector2* point)
          : point(point),
            type(VertexType::Reflex)
       {
       }
 
-      const Vector2* point;
+      const FVector2* point;
       VertexType type;
-      std::list<const Vector2*> collinearPoints;
+      std::list<const FVector2*> collinearPoints;
    };
 
    typedef CircularList<Vertex> VertexList;
 
    typedef std::forward_list< VertexList::iterator > VertexListIteratorList;
 
-   void MakeSimple(const std::vector<const Polygon2D_t*>& innerPolygons, const Vector3& checkNormal);
+   void MakeSimple(const std::vector<const Polygon2D_t*>& innerPolygons, const FVector3& checkNormal);
    void StitchOuterAndInnerPolygons(const Polygon2D_t& hole, std::size_t maxInteriorPointIndex, VertexList::iterator mutuallyVisibleVertexIter);
 
-   VertexList::iterator FindMutuallyVisibleVertex(const Vector2& maxInteriorPoint);
+   VertexList::iterator FindMutuallyVisibleVertex(const FVector2& maxInteriorPoint);
    const Polygon2D_t* FindMaxInteriorPointInListAndRemovePolygonFromConsideration(std::forward_list<const Polygon2D_t*>& innerPolygons, std::size_t& maxInteriorPointIndex);
-   VertexList::iterator DetermineMutuallyVisibleVertexFromRayCastResult(const Vector2& maxInteriorPoint, const Vector2& intersectionPointOnEdge, VertexList::iterator pointOnEdgeWithMaximumXIter);
-   VertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(const Vector2& maxInteriorPoint, Vector2& intersectionPointOnEdge, VertexList::iterator& pointOnEdgeWithMaximumXIter);
+   VertexList::iterator DetermineMutuallyVisibleVertexFromRayCastResult(const FVector2& maxInteriorPoint, const FVector2& intersectionPointOnEdge, VertexList::iterator pointOnEdgeWithMaximumXIter);
+   VertexList::iterator RayCastFromMaxInteriorPointToOuterPolygon(const FVector2& maxInteriorPoint, FVector2& intersectionPointOnEdge, VertexList::iterator& pointOnEdgeWithMaximumXIter);
 
    void RemoveCollinearPointsFromConsideration();
    void AdjustForPossibleResultingCollinearity(VertexListIteratorList& ears, VertexList::iterator& beforeEar, VertexList::iterator& afterEar);
    void MigrateCollinearPoints(VertexList::iterator& to, const VertexList::iterator& from);
 
-   void GetPointsStraddlingVertex(VertexList::const_iterator vertexIterator, const Vector2*& pointBefore, const Vector2*& pointAtVertex, const Vector2*& pointAfter);
+   void GetPointsStraddlingVertex(VertexList::const_iterator vertexIterator, const FVector2*& pointBefore, const FVector2*& pointAtVertex, const FVector2*& pointAfter);
 
-   VertexType GetConvexOrReflexVertexType(const Vector2* pointBefore, const Vector2* pointOfInterest, const Vector2* pointAfter);
+   VertexType GetConvexOrReflexVertexType(const FVector2* pointBefore, const FVector2* pointOfInterest, const FVector2* pointAfter);
    VertexType GetConvexOrReflexVertexType(VertexList::const_iterator vertexIterator);
    void CheckForEarAndUpdateVertexType(VertexList::iterator vertexIterator);
 
-   void RemoveEar(const Vector2* point, VertexListIteratorList& ears);
+   void RemoveEar(const FVector2* point, VertexListIteratorList& ears);
    void ReclassifyVertex(VertexList::iterator vertexIterator, VertexListIteratorList& ears);
 
-   void Triangulate_R(VertexListIteratorList& ears, std::vector<const Vector2*>& triangles);
+   void Triangulate_R(VertexListIteratorList& ears, std::vector<const FVector2*>& triangles);
 
-   void AddTriangle(std::vector<const Vector2*>& triangles, const VertexList::iterator& ear, bool last);
-   void AddRemainingTriangles(std::vector<const Vector2*>& triangles);
+   void AddTriangle(std::vector<const FVector2*>& triangles, const VertexList::iterator& ear, bool last);
+   void AddRemainingTriangles(std::vector<const FVector2*>& triangles);
 
-   static void AddTriangle_R(std::vector<const Vector2*>& triangles,
-                             const Vector2* trianglePoint1, std::list<const Vector2*>& collinearPoints1, 
-                             const Vector2* trianglePoint2, std::list<const Vector2*>& collinearPoints2,
-                             const Vector2* trianglePoint3, std::list<const Vector2*>& collinearPoints3);
+   static void AddTriangle_R(std::vector<const FVector2*>& triangles,
+                             const FVector2* trianglePoint1, std::list<const FVector2*>& collinearPoints1, 
+                             const FVector2* trianglePoint2, std::list<const FVector2*>& collinearPoints2,
+                             const FVector2* trianglePoint3, std::list<const FVector2*>& collinearPoints3);
 
    VertexList vertices;
    PolygonWinding polygonWinding;

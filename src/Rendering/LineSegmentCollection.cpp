@@ -92,7 +92,7 @@ void LineSegmentCollection::UpdateGPUVertexData()
          {
             for (std::size_t linePointIndex = 0; linePointIndex < 2; ++linePointIndex)
             {
-               const Vector3& point = (linePointIndex == 0) ? lineSegments[lineSegmentIndex].segment.P1 : lineSegments[lineSegmentIndex].segment.P2;
+               const FVector3& point = (linePointIndex == 0) ? lineSegments[lineSegmentIndex].segment.P1 : lineSegments[lineSegmentIndex].segment.P2;
 
                vertData[vertDataIndex].position[0] = static_cast<float>( point.x );
                vertData[vertDataIndex].position[1] = static_cast<float>( point.y );

@@ -12,7 +12,7 @@
 
 #include "LocusGeometryAPI.h"
 
-#include "Vector3.h"
+#include "Locus/Math/Vectors.h"
 
 namespace Locus
 {
@@ -23,14 +23,14 @@ class LOCUS_GEOMETRY_API Sphere
 {
 public:
    Sphere();
-   Sphere(const Vector3& center, float radius);
-   Sphere(const std::vector<Vector3>& points);
+   Sphere(const FVector3& center, float radius);
+   Sphere(const std::vector<FVector3>& points);
 
    bool Intersects(const Moveable& thisMoveable, const Sphere& other, const Moveable& otherMoveable) const;
 
    float Volume() const;
 
-   Vector3 center;
+   FVector3 center;
    float radius;
 };
 

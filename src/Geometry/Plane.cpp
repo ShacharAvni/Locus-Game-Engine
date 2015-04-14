@@ -19,27 +19,27 @@ namespace Locus
 
 Plane::Plane()
 {
-   setNormal( Vector3(0.0, 0.0, 1.0) );
+   setNormal( FVector3(0.0, 0.0, 1.0) );
 }
 
-Plane::Plane(const Vector3& p, const Vector3& n)
+Plane::Plane(const FVector3& p, const FVector3& n)
    : P(p)
 {
    setNormal(n);
 }
 
-Plane::Plane(const Vector3& p, const Vector3& v1, const Vector3& v2)
+Plane::Plane(const FVector3& p, const FVector3& v1, const FVector3& v2)
    : P(p)
 {
-   setNormal(v1.cross(v2));
+   setNormal(Cross(v1, v2));
 }
 
-Vector3 Plane::getNormal() const
+FVector3 Plane::getNormal() const
 {
    return N;
 }
 
-void Plane::setNormal(const Vector3& n)
+void Plane::setNormal(const FVector3& n)
 {
    N = n;
 
@@ -49,7 +49,7 @@ void Plane::setNormal(const Vector3& n)
    //}
 }
 
-void Plane::set(const Vector3& p, const Vector3& n)
+void Plane::set(const FVector3& p, const FVector3& n)
 {
    P = p;
    setNormal(n);
@@ -57,43 +57,43 @@ void Plane::set(const Vector3& p, const Vector3& n)
 
 //////////////////////////////////////Plane Logic Functions//////////////////////////////////////////
 
-float Plane::signedDistanceTo(const Vector3& v) const
+float Plane::signedDistanceTo(const FVector3& v) const
 {
    //computes signed distance to a particular Vector3 (with the Vector3
    //assumed to be in the same coordinate system as the plane's point P)
-   return N.dot(v - P);
+   return Dot(N, v - P);
 }
 
-float Plane::signedDistanceTo(const Vector3& v, const Vector3& offset) const
+float Plane::signedDistanceTo(const FVector3& v, const FVector3& offset) const
 {
    //computes signed distance to a particular Vector3. The offset value
    //places the plane in the same coordinate system as the Vector3, v
-   return N.dot(v - (P + offset));
+   return Dot(N, v - (P + offset));
 }
 
-float Plane::distanceTo(const Vector3& v) const
+float Plane::distanceTo(const FVector3& v) const
 {
-   return signedDistanceTo(v) / N.norm();
+   return signedDistanceTo(v) / Norm(N);
 }
 
-bool Plane::pointIsOnPlane(const Vector3& p) const
+bool Plane::pointIsOnPlane(const FVector3& p) const
 {
    return FIsZero<float>( signedDistanceTo(p) );
 }
 
-Vector3 Plane::getProjection(const Vector3& p) const
+FVector3 Plane::getProjection(const FVector3& p) const
 {
-   Vector3 projection = p - (signedDistanceTo(p) * N);
+   FVector3 projection = p - (signedDistanceTo(p) * N);
    return projection;
 }
 
 bool Plane::intersectsLineAtOnePoint(const Line3D_t& line, float& s) const
 {
-   float denominator = N.dot(line.V);
+   float denominator = Dot(N, line.V);
 
    if (FNotZero<float>(denominator))
    {
-      s = N.dot(P - line.P)/denominator;
+      s = Dot(N, P - line.P)/denominator;
 
       if (line.isRay)
       {
@@ -112,7 +112,7 @@ bool Plane::intersectsLineAtOnePoint(const Line3D_t& line, float& s) const
 
 bool Plane::isParallelTo(const Plane& otherPlane) const
 {
-   return N.cross(otherPlane.N).ApproximatelyEqualTo(Vector3::ZeroVector());
+   return ApproximatelyEqual(Cross(N, otherPlane.N), Vec3D::ZeroVector());
 }
 
 bool Plane::isCoplanarTo(const Plane& otherPlane) const
@@ -120,7 +120,7 @@ bool Plane::isCoplanarTo(const Plane& otherPlane) const
    return isParallelTo(otherPlane) && pointIsOnPlane(otherPlane.P);
 }
 
-Plane::IntersectionQuery Plane::getLineSegmentIntersection(const LineSegment3D_t& lineSegment, Vector3& intersectionPoint) const
+Plane::IntersectionQuery Plane::getLineSegmentIntersection(const LineSegment3D_t& lineSegment, FVector3& intersectionPoint) const
 {
    float s = 0.0f;
 
@@ -142,7 +142,7 @@ Plane::IntersectionQuery Plane::getLineSegmentIntersection(const LineSegment3D_t
    return IntersectionQuery::None;
 }
 
-Plane::IntersectionQuery Plane::getLineIntersection(const Line3D_t& line, Vector3& intersectionPoint) const
+Plane::IntersectionQuery Plane::getLineIntersection(const Line3D_t& line, FVector3& intersectionPoint) const
 {
    float s = 0.0f;
 
@@ -208,7 +208,7 @@ Plane::IntersectionQuery Plane::triangleIntersectionTest(const Triangle3D_t& tri
    }
 }
 
-IntersectionType Plane::getPlaneIntersection(const Plane& otherPlane, Vector3& pointOnLine, Vector3& lineVector) const
+IntersectionType Plane::getPlaneIntersection(const Plane& otherPlane, FVector3& pointOnLine, FVector3& lineVector) const
 {
    if (isParallelTo(otherPlane))
    {
@@ -223,12 +223,12 @@ IntersectionType Plane::getPlaneIntersection(const Plane& otherPlane, Vector3& p
    }
    else
    {
-      lineVector = N.cross(otherPlane.N);
+      lineVector = Cross(N, otherPlane.N);
 
       //Find D1 in the equation a1x + b1y + c1z - D1 = 0
       //where (a1, b1, c1) = (N.x, N.y, N.z)
 
-      Vector3 origin;
+      FVector3 origin;
 
       float D1 = distanceTo(origin);
 
@@ -345,7 +345,7 @@ IntersectionType Plane::getPlaneIntersection(const Plane& otherPlane) const
    }
 }
 
-IntersectionType Plane::TriangleIntersection(const Triangle3D_t& triangle, Vector3& p1, Vector3& p2) const
+IntersectionType Plane::TriangleIntersection(const Triangle3D_t& triangle, FVector3& p1, FVector3& p2) const
 {
    IntersectionType planeIntersectionType = getPlaneIntersection(triangle.GetPlane());
 
@@ -359,14 +359,14 @@ IntersectionType Plane::TriangleIntersection(const Triangle3D_t& triangle, Vecto
       bool hasIntersection = false;
       bool p1Set = false;
 
-      p1 = Vector3::ZeroVector();
-      p2 = Vector3::ZeroVector();
+      p1 = Vec3D::ZeroVector();
+      p2 = Vec3D::ZeroVector();
 
       for (std::size_t triangleEdgeIndex = 0; triangleEdgeIndex < Triangle3D_t::NumPointsOnATriangle; ++triangleEdgeIndex)
       {
          LineSegment3D_t triangleEdge = triangle.GetEdge(triangleEdgeIndex);
 
-         Vector3 intersectionPoint;
+         FVector3 intersectionPoint;
          Plane::IntersectionQuery intersectionQuery = getLineSegmentIntersection(triangleEdge, intersectionPoint);
 
          if (intersectionQuery == Plane::IntersectionQuery::Intersects)
@@ -377,7 +377,7 @@ IntersectionType Plane::TriangleIntersection(const Triangle3D_t& triangle, Vecto
             {
                p2 = intersectionPoint;
 
-               if (!p2.ApproximatelyEqualTo(p1))
+               if (!ApproximatelyEqual(p2, p1))
                {
                   break;
                }
@@ -401,7 +401,7 @@ IntersectionType Plane::TriangleIntersection(const Triangle3D_t& triangle, Vecto
 
       if (hasIntersection)
       {
-         if (p1.ApproximatelyEqualTo(p2))
+         if (ApproximatelyEqual(p1, p2))
          {
             return IntersectionType::Point;
          }

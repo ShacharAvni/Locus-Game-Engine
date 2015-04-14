@@ -22,21 +22,21 @@ Moveable::~Moveable()
 {
 }
 
-void Moveable::Translate(const Vector3& translation)
+void Moveable::Translate(const FVector3& translation)
 {
    modelTranslation += translation;
 
    UpdateTransformations();
 }
 
-void Moveable::Rotate(const Vector3& rotation)
+void Moveable::Rotate(const FVector3& rotation)
 {
    modelRotation.RotateBy(rotation);
 
    UpdateTransformations();
 }
 
-void Moveable::Scale(const Vector3& scale)
+void Moveable::Scale(const FVector3& scale)
 {
    modelScale.x *= scale.x;
    modelScale.y *= scale.y;
@@ -54,12 +54,12 @@ void Moveable::UpdateTransformations()
    modelTransformation.MultMatrix( Transformation::Scale(modelScale) );
 }
 
-Vector3 Moveable::Position() const
+FVector3 Moveable::Position() const
 {
    return modelTranslation;
 }
 
-const Vector3& Moveable::CurrentTranslation() const
+const FVector3& Moveable::CurrentTranslation() const
 {
    return modelTranslation;
 }
@@ -69,7 +69,7 @@ const Transformation& Moveable::CurrentRotation() const
    return modelRotation;
 }
 
-void Moveable::Reset(const Vector3& position, const Transformation& rotationTransformation, const Vector3& scale)
+void Moveable::Reset(const FVector3& position, const Transformation& rotationTransformation, const FVector3& scale)
 {
    modelRotation = rotationTransformation;
    modelTranslation = position;
@@ -78,7 +78,7 @@ void Moveable::Reset(const Vector3& position, const Transformation& rotationTran
    UpdateTransformations();
 }
 
-const Vector3& Moveable::CurrentScale() const
+const FVector3& Moveable::CurrentScale() const
 {
    return modelScale;
 }

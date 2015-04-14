@@ -12,13 +12,15 @@
 
 #include "LocusRenderingAPI.h"
 
+#include "Locus/Math/Vectors.h"
+
 #include "Locus/Geometry/Model.h"
-#include "Locus/Geometry/Vector3.h"
 
 #include "DefaultSingleDrawable.h"
 #include "TextureCoordinate.h"
 #include "Color.h"
 #include "GPUVertexDataStorage.h"
+#include "GPUVertexData.h"
 
 #include <cstddef>
 
@@ -78,7 +80,7 @@ struct MeshVertex : public ModelVertex
    {
    }
 
-   void Interpolate(const Vector3& interpolatePosition, const MeshVertex& faceVertex1, const MeshVertex& faceVertex2, const MeshVertex& faceVertex3, const Vector3& barycentricCoordinates)
+   void Interpolate(const FVector3& interpolatePosition, const MeshVertex& faceVertex1, const MeshVertex& faceVertex2, const MeshVertex& faceVertex3, const FVector3& barycentricCoordinates)
    {
       ModelVertex::Interpolate(interpolatePosition, faceVertex1, faceVertex2, faceVertex3, barycentricCoordinates);
 
@@ -121,7 +123,7 @@ protected:
    virtual void Construct(const std::vector<std::vector<MeshVertex>>& faceTriangles, std::vector<std::size_t>* degenerateFaceIndices = nullptr) override;
 
 private:
-   std::vector<Vector3> normals;
+   std::vector<FVector3> normals;
    std::vector<TextureCoordinate> textureCoordinates;
    std::vector<Color> colors;
 };

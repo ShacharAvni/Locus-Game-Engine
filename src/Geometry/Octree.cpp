@@ -72,16 +72,16 @@ Octree::Octree(const std::vector<Triangle3D_t>& triangles, std::size_t leafTrian
       const float reallyBigNumber = std::numeric_limits<float>::max();
       const float reallySmallNumber = -reallyBigNumber;
 
-      Vector3 min(reallyBigNumber, reallyBigNumber, reallyBigNumber);
-      Vector3 max(reallySmallNumber, reallySmallNumber, reallySmallNumber);
+      FVector3 min(reallyBigNumber, reallyBigNumber, reallyBigNumber);
+      FVector3 max(reallySmallNumber, reallySmallNumber, reallySmallNumber);
 
       for (std::size_t triangleIndex = 0; triangleIndex < numTriangles; ++triangleIndex)
       {
          for (std::size_t vertexIndex = 0; vertexIndex < Triangle3D_t::NumPointsOnATriangle; ++vertexIndex)
          {
-            Vector3 checkVertex = triangles[triangleIndex][vertexIndex];
+            FVector3 checkVertex = triangles[triangleIndex][vertexIndex];
 
-            for (Vector3::Coordinate coordinate = Vector3::Coordinate_X; coordinate <= Vector3::Coordinate_Z; coordinate = static_cast<Vector3::Coordinate>(coordinate + 1))
+            for (unsigned int coordinate = 0; coordinate < 3; ++coordinate)
             {
                min[coordinate] = std::min(min[coordinate], checkVertex[coordinate]);
                max[coordinate] = std::max(max[coordinate], checkVertex[coordinate]);
@@ -92,10 +92,10 @@ Octree::Octree(const std::vector<Triangle3D_t>& triangles, std::size_t leafTrian
       //turn extents into a cube
 
       //find biggest extent
-      Vector3::Coordinate biggestCoordinate = Vector3::Coordinate_X;
-      float biggestExtent = max[Vector3::Coordinate_X] - min[Vector3::Coordinate_X];
+      unsigned int biggestCoordinate = 0;
+      float biggestExtent = max[biggestCoordinate] - min[biggestCoordinate];
 
-      for (Vector3::Coordinate coordinate = Vector3::Coordinate_Y; coordinate <= Vector3::Coordinate_Z; coordinate = static_cast<Vector3::Coordinate>(coordinate + 1))
+      for (unsigned int coordinate = 1; coordinate < 3; ++coordinate)
       {
          float extent = max[coordinate] - min[coordinate];
 
@@ -107,7 +107,7 @@ Octree::Octree(const std::vector<Triangle3D_t>& triangles, std::size_t leafTrian
       }
 
       //stretch the other two extents
-      for (Vector3::Coordinate coordinate = Vector3::Coordinate_X; coordinate <= Vector3::Coordinate_Z; coordinate = static_cast<Vector3::Coordinate>(coordinate + 1))
+      for (unsigned int coordinate = 0; coordinate < 3; ++coordinate)
       {
          if (coordinate != biggestCoordinate)
          {

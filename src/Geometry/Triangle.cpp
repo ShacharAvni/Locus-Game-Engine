@@ -34,7 +34,7 @@ Triangle<PointType>::Triangle(const PointType& p1, const PointType& p2, const Po
 
    this->numPoints = 3;
 
-   this->normal = (p2 - p1).cross(p3 - p2);
+   this->normal = Cross(p2 - p1, p3 - p2);
 }
 
 template <class PointType>
@@ -50,22 +50,22 @@ bool Triangle<PointType>::AddPoint(const PointType& /*point*/)
 }
 
 template <class PointType>
-Vector3 Triangle<PointType>::ComputeBarycentricCoordinates(const PointType& targetPoint) const
+FVector3 Triangle<PointType>::ComputeBarycentricCoordinates(const PointType& targetPoint) const
 {
-   Vector3 barycentric;
+   FVector3 barycentric;
 
-   Vector3 u = this->points[1] - this->points[0];
-   Vector3 v = this->points[2] - this->points[0];
-   Vector3 w = targetPoint - this->points[0];
+   FVector3 u = this->points[1] - this->points[0];
+   FVector3 v = this->points[2] - this->points[0];
+   FVector3 w = targetPoint - this->points[0];
 
-   Vector3 vCrossW = v.cross(w);
+   FVector3 vCrossW = Cross(v, w);
  
-   Vector3 uCrossW = u.cross(w);
-   Vector3 uCrossV = u.cross(v);
+   FVector3 uCrossW = Cross(u, w);
+   FVector3 uCrossV = Cross(u, v);
  
-   float denom = uCrossV.norm();
-   barycentric.y = vCrossW.norm() / denom;
-   barycentric.z = uCrossW.norm() / denom;
+   float denom = Norm(uCrossV);
+   barycentric.y = Norm(vCrossW) / denom;
+   barycentric.z = Norm(uCrossW) / denom;
 
    barycentric.x = 1 - barycentric.y - barycentric.z;
 
@@ -91,13 +91,13 @@ PointType Triangle<PointType>::ComputeCentroid(const Triangle<PointType>& triang
 template <class PointType>
 bool Triangle<PointType>::IsValidTriangle(const PointType& point1, const PointType& point2, const PointType& point3, float toleranceFactor)
 {
-   return Triangle<Vector3>::IsValidTriangle(point1, point2, point3, toleranceFactor);
+   return Triangle<FVector3>::IsValidTriangle(point1, point2, point3, toleranceFactor);
 }
 
 template <>
-bool Triangle<Vector3>::IsValidTriangle(const Vector3& point1, const Vector3& point2, const Vector3& point3, float toleranceFactor)
+bool Triangle<FVector3>::IsValidTriangle(const FVector3& point1, const FVector3& point2, const FVector3& point3, float toleranceFactor)
 {
-   return !( (point2 - point1).cross(point3 - point2).ApproximatelyEqualTo(Vector3::ZeroVector(), toleranceFactor) );
+   return !( ApproximatelyEqual(Cross(point2 - point1, point3 - point2), Vec3D::ZeroVector(), toleranceFactor) );
 }
 
 template <class PointType>
@@ -107,14 +107,14 @@ bool Triangle<PointType>::PointIsOnPolygonCommonPath(const PointType& point, boo
    //between the edge vectors and the vector from the
    //edge to the point "go the same way"
 
-   Vector3 checkCross;
+   FVector3 checkCross;
    bool crossSet = false;
 
    for (std::size_t i = 0; i < this->numPoints; ++i)
    {
-      Vector3 edgeCross = (this->points[(i + 1) % this->numPoints] - this->points[i]).cross(point - this->points[(i + 1) % this->numPoints]);
+      FVector3 edgeCross = Cross(this->points[(i + 1) % this->numPoints] - this->points[i], point - this->points[(i + 1) % this->numPoints]);
 
-      if (!edgeCross.ApproximatelyEqualTo(Vector3::ZeroVector(), toleranceFactor))
+      if (!ApproximatelyEqual(edgeCross, Vec3D::ZeroVector(), toleranceFactor))
       {
          if (!crossSet)
          {
@@ -123,7 +123,7 @@ bool Triangle<PointType>::PointIsOnPolygonCommonPath(const PointType& point, boo
          }
          else
          {
-            if (!checkCross.goesTheSameWayAs(edgeCross))
+            if (!GoTheSameWay(checkCross, edgeCross))
             {
                return false;
             }
@@ -206,10 +206,10 @@ IntersectionType Triangle<PointType>::CoplanarTriangleIntersection(const Triangl
          std::vector<PointType> uniqueIntersectionPoints;
          std::vector<std::size_t> uniqueIndices;
 
-         GetUniqueItems<PointType>(possibleIntersectionPoints, uniqueIntersectionPoints, [](const PointType& first, const PointType& second)->bool{ return first.ApproximatelyEqualTo(second); }, uniqueIndices);
+         GetUniqueItems<PointType>(possibleIntersectionPoints, uniqueIntersectionPoints, [](const PointType& first, const PointType& second)->bool{ return ApproximatelyEqual(first, second); }, uniqueIndices);
 
          ReorderCoplanarVertices<PointType>(uniqueIntersectionPoints, this->Normal(), PolygonWinding::CounterClockwise,
-            [](const PointType& v)->Vector3
+            [](const PointType& v)->FVector3
             {
                return v;
             });
@@ -290,21 +290,21 @@ bool Triangle<PointType>::CoplanarTriangleIntersection(const Triangle<PointType>
 }
 
 template <>
-IntersectionType Triangle<Vector3>::TriangleIntersection(const Triangle<Vector3>& otherTriangle, std::vector<Vector3>& intersectionPoints) const
+IntersectionType Triangle<FVector3>::TriangleIntersection(const Triangle<FVector3>& otherTriangle, std::vector<FVector3>& intersectionPoints) const
 {
    //p1 and p2 describe the line segment on the otherTriangle that intersects the plane of this triangle if such
    //an intersection occurs. Otherwise, if the plane of this triangle intersects the other triangle at one point,
    //then p1 stores this point. If there is no intersection with the plane of this triangle and the other triangle
    //or if the intersection is the other triangle itself, then p1 and p2 are undefined.
 
-   Vector3 p1;
-   Vector3 p2;
+   FVector3 p1;
+   FVector3 p2;
 
    IntersectionType thisPlaneWithOtherTriangleIntersectionType = GetPlane().TriangleIntersection(otherTriangle, p1, p2);
 
    if (thisPlaneWithOtherTriangleIntersectionType == IntersectionType::LineSegment)
    {
-      LineSegment<Vector3> lineSegmentThisPlaneWithOtherTriangle(p1, p2);
+      LineSegment<FVector3> lineSegmentThisPlaneWithOtherTriangle(p1, p2);
 
       //p3 and p4 describe the line segment on this triangle that intersects the plane of the other triangle if such
       //an intersection occurs. Otherwise, if the plane of the other triangle intersects this triangle at one point,
@@ -315,17 +315,17 @@ IntersectionType Triangle<Vector3>::TriangleIntersection(const Triangle<Vector3>
       //imply that the previous intersection test (this plane with other triangle) would
       //have been an "Area" intersection as well.
 
-      Vector3 p3;
-      Vector3 p4;
+      FVector3 p3;
+      FVector3 p4;
 
       IntersectionType otherPlaneWithThisTriangleIntersectionType = otherTriangle.GetPlane().TriangleIntersection(*this, p3, p4);
 
       if (otherPlaneWithThisTriangleIntersectionType == IntersectionType::LineSegment)
       {
-         LineSegment<Vector3> lineSegmentOtherPlaneWithThisTriangle(p3, p4);
+         LineSegment<FVector3> lineSegmentOtherPlaneWithThisTriangle(p3, p4);
 
-         Vector3 pIntersection1;
-         Vector3 pIntersection2;
+         FVector3 pIntersection1;
+         FVector3 pIntersection2;
 
          IntersectionType lineSegmentsIntersectionType = lineSegmentThisPlaneWithOtherTriangle.GetLineSegmentIntersection(lineSegmentOtherPlaneWithThisTriangle, pIntersection1, pIntersection2);
 
@@ -393,20 +393,20 @@ IntersectionType Triangle<Vector3>::TriangleIntersection(const Triangle<Vector3>
 }
 
 template <>
-IntersectionType Triangle<Vector2>::TriangleIntersection(const Triangle<Vector2>& otherTriangle, std::vector<Vector2>& intersectionPoints) const
+IntersectionType Triangle<FVector2>::TriangleIntersection(const Triangle<FVector2>& otherTriangle, std::vector<FVector2>& intersectionPoints) const
 {
    return CoplanarTriangleIntersection(otherTriangle, intersectionPoints);
 }
 
 template <>
-bool Triangle<Vector3>::TriangleIntersection(const Triangle<Vector3>& otherTriangle) const
+bool Triangle<FVector3>::TriangleIntersection(const Triangle<FVector3>& otherTriangle) const
 {
    Plane otherPlane = otherTriangle.GetPlane();
    IntersectionType planeIntersection = GetPlane().getPlaneIntersection(otherPlane);
 
    if (planeIntersection == IntersectionType::Line)
    {
-      Vector3 lineSegmentIntersectionPoint;
+      FVector3 lineSegmentIntersectionPoint;
       for (int lineSegmentIndex = 0; lineSegmentIndex < 3; ++lineSegmentIndex)
       {
          if (otherPlane.getLineSegmentIntersection(GetEdge(lineSegmentIndex), lineSegmentIntersectionPoint) == Plane::IntersectionQuery::Intersects)
@@ -431,7 +431,7 @@ bool Triangle<Vector3>::TriangleIntersection(const Triangle<Vector3>& otherTrian
 }
 
 template <>
-bool Triangle<Vector2>::TriangleIntersection(const Triangle<Vector2>& otherTriangle) const
+bool Triangle<FVector2>::TriangleIntersection(const Triangle<FVector2>& otherTriangle) const
 {
    return CoplanarTriangleIntersection(otherTriangle);
 }
@@ -456,7 +456,7 @@ IntersectionType Triangle<PointType>::CoplanarLineIntersection(const Line<PointT
       {
          if (hasIntersection)
          {
-            if (!lineLineSegmentIntersectionPoint1.ApproximatelyEqualTo(p1))
+            if (!ApproximatelyEqual(lineLineSegmentIntersectionPoint1, p1))
             {
                p2 = lineLineSegmentIntersectionPoint1;
 
@@ -505,9 +505,9 @@ IntersectionType Triangle<PointType>::CoplanarLineIntersection(const Line<PointT
 }
 
 template <>
-IntersectionType Triangle<Vector3>::LineIntersection(const Line<Vector3>& line, std::vector<Vector3>& intersectionPoints) const
+IntersectionType Triangle<FVector3>::LineIntersection(const Line<FVector3>& line, std::vector<FVector3>& intersectionPoints) const
 {
-   Vector3 intersectionPoint;
+   FVector3 intersectionPoint;
    Plane::IntersectionQuery planeIntersectionQuery = GetPlane().getLineIntersection(line, intersectionPoint);
 
    if (planeIntersectionQuery == Plane::IntersectionQuery::Infinite)
@@ -535,7 +535,7 @@ IntersectionType Triangle<Vector3>::LineIntersection(const Line<Vector3>& line, 
 }
 
 template <>
-IntersectionType Triangle<Vector2>::LineIntersection(const Line<Vector2>& line, std::vector<Vector2>& intersectionPoints) const
+IntersectionType Triangle<FVector2>::LineIntersection(const Line<FVector2>& line, std::vector<FVector2>& intersectionPoints) const
 {
    return CoplanarLineIntersection(line, intersectionPoints);
 }
@@ -560,7 +560,7 @@ IntersectionType Triangle<PointType>::CoplanarLineSegmentIntersection(const Line
       {
          if (hasIntersection)
          {
-            if (!lineSegmentLineSegmentIntersectionPoint1.ApproximatelyEqualTo(p1))
+            if (!ApproximatelyEqual(lineSegmentLineSegmentIntersectionPoint1, p1))
             {
                p2 = lineSegmentLineSegmentIntersectionPoint1;
 
@@ -609,9 +609,9 @@ IntersectionType Triangle<PointType>::CoplanarLineSegmentIntersection(const Line
 }
 
 template <>
-IntersectionType Triangle<Vector3>::LineSegmentIntersection(const LineSegment<Vector3>& lineSegment, std::vector<Vector3>& intersectionPoints) const
+IntersectionType Triangle<FVector3>::LineSegmentIntersection(const LineSegment<FVector3>& lineSegment, std::vector<FVector3>& intersectionPoints) const
 {
-   Vector3 intersectionPoint;
+   FVector3 intersectionPoint;
    Plane::IntersectionQuery planeIntersectionQuery = GetPlane().getLineSegmentIntersection(lineSegment, intersectionPoint);
 
    if (planeIntersectionQuery == Plane::IntersectionQuery::Intersects)
@@ -633,12 +633,12 @@ IntersectionType Triangle<Vector3>::LineSegmentIntersection(const LineSegment<Ve
 }
 
 template <>
-IntersectionType Triangle<Vector2>::LineSegmentIntersection(const LineSegment<Vector2>& lineSegment, std::vector<Vector2>& intersectionPoints) const
+IntersectionType Triangle<FVector2>::LineSegmentIntersection(const LineSegment<FVector2>& lineSegment, std::vector<FVector2>& intersectionPoints) const
 {
    return CoplanarLineSegmentIntersection(lineSegment, intersectionPoints);
 }
 
-template class LOCUS_GEOMETRY_API_AT_DEFINITION Triangle<Vector3>;
-template class LOCUS_GEOMETRY_API_AT_DEFINITION Triangle<Vector2>;
+template class LOCUS_GEOMETRY_API_AT_DEFINITION Triangle<FVector3>;
+template class LOCUS_GEOMETRY_API_AT_DEFINITION Triangle<FVector2>;
 
 }

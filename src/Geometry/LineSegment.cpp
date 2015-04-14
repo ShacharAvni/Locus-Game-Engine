@@ -9,6 +9,8 @@
 \********************************************************************************************************/
 
 #include "Locus/Geometry/LineSegment.h"
+#include "Locus/Geometry/Vector3Geometry.h"
+#include "Locus/Geometry/Vector2Geometry.h"
 
 #include "Locus/Common/Float.h"
 
@@ -18,13 +20,13 @@ namespace Locus
 {
 
 template <>
-LineSegment<Vector3>::LineSegment()
+LineSegment<FVector3>::LineSegment()
    : P1(0, 0, 0), P2(1, 0, 0) //avoiding degenerate case
 {
 }
 
 template <>
-LineSegment<Vector2>::LineSegment()
+LineSegment<FVector2>::LineSegment()
    : P1(0, 0), P2(1, 0) //avoiding degenerate case
 {
 }
@@ -38,7 +40,7 @@ LineSegment<PointType>::LineSegment(const PointType& P1, const PointType& P2)
 template <class PointType>
 bool LineSegment<PointType>::IsDegenerate() const
 {
-   return P1.ApproximatelyEqualTo(P2);
+   return ApproximatelyEqual(P1, P2);
 }
 
 template <class PointType>
@@ -56,17 +58,17 @@ PointType LineSegment<PointType>::Vector() const
 template <class PointType>
 bool LineSegment<PointType>::PointIsOnLineSegment(const PointType& checkPoint, float toleranceFactor) const
 {
-   Vector3 checkVector = checkPoint - P1;
-   Vector3 segmentVector = Vector();
+   FVector3 checkVector = checkPoint - P1;
+   FVector3 segmentVector = Vector();
 
-   Vector3 checkCross = segmentVector.cross(checkVector);
+   FVector3 checkCross = Cross(segmentVector, checkVector);
 
-   if (checkCross.ApproximatelyEqualTo(Vector3::ZeroVector(), toleranceFactor))
+   if (ApproximatelyEqual(checkCross, Vec3D::ZeroVector(), toleranceFactor))
    {
-      float norm = segmentVector.norm();
+      float norm = Norm(segmentVector);
       segmentVector /= norm;
 
-      float dot = checkVector.dot(segmentVector);
+      float dot = Dot(checkVector, segmentVector);
 
       return ( FGreaterOrEqual<float>(dot, 0.0f, toleranceFactor) && FLessOrEqual<float>(dot, norm, toleranceFactor) );
    }
@@ -84,14 +86,14 @@ IntersectionType LineSegment<PointType>::GetCollinearLineSegmentIntersection(con
    //overlap.
 
    PointType lineSegmentVector = Vector();
-   PointType normVector = lineSegmentVector.normVector();
+   PointType normVector = NormVector(lineSegmentVector);
 
    float projP1Line1 = 0.0f;
-   float projP2Line1 = lineSegmentVector.dot(normVector);
+   float projP2Line1 = Dot(lineSegmentVector, normVector);
 
    float line2Projections[2];
-   line2Projections[0] = (otherLineSegment.P1 - P1).dot(normVector);
-   line2Projections[1] = (otherLineSegment.P2 - P1).dot(normVector);
+   line2Projections[0] = Dot(otherLineSegment.P1 - P1, normVector);
+   line2Projections[1] = Dot(otherLineSegment.P2 - P1, normVector);
 
    PointType lineSegment2Points[2] = {otherLineSegment.P1, otherLineSegment.P2};
 
@@ -136,7 +138,7 @@ IntersectionType LineSegment<PointType>::GetCollinearLineSegmentIntersection(con
          }
       }
 
-      if (pIntersection1.ApproximatelyEqualTo(pIntersection2))
+      if (ApproximatelyEqual(pIntersection1, pIntersection2))
       {
          return IntersectionType::Point;
       }
@@ -155,12 +157,12 @@ bool LineSegment<PointType>::GetCollinearLineSegmentIntersection(const LineSegme
    //overlap.
 
    PointType lineSegmentVector = Vector();
-   PointType normVector = lineSegmentVector.normVector();
+   PointType normVector = NormVector(lineSegmentVector);
 
-   float projP2Line1 = lineSegmentVector.dot(normVector);
+   float projP2Line1 = Dot(lineSegmentVector, normVector);
 
-   float projP1Line2 = (otherLineSegment.P1 - P1).dot(normVector);
-   float projP2Line2 = (otherLineSegment.P2 - P1).dot(normVector);
+   float projP1Line2 = Dot(otherLineSegment.P1 - P1, normVector);
+   float projP2Line2 = Dot(otherLineSegment.P2 - P1, normVector);
 
    return ( (FGreaterOrEqual<float>(projP1Line2, 0.0f) && FLessOrEqual<float>(projP1Line2, projP2Line1)) ||
             (FGreaterOrEqual<float>(projP2Line2, 0.0f) && FLessOrEqual<float>(projP2Line2, projP2Line1)) );
@@ -227,7 +229,7 @@ bool LineSegment<PointType>::GetLineSegmentIntersection(const LineSegment<PointT
    }
 }
 
-template class LOCUS_GEOMETRY_API_AT_DEFINITION LineSegment<Vector3>;
-template class LOCUS_GEOMETRY_API_AT_DEFINITION LineSegment<Vector2>;
+template class LOCUS_GEOMETRY_API_AT_DEFINITION LineSegment<FVector3>;
+template class LOCUS_GEOMETRY_API_AT_DEFINITION LineSegment<FVector2>;
 
 }

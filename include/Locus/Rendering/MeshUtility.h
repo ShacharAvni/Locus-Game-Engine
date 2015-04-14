@@ -12,6 +12,8 @@
 
 #include "LocusRenderingAPI.h"
 
+#include "Locus/Math/VectorsFwd.h"
+
 #include "Mesh.h"
 #include "TextureCoordinate.h"
 
@@ -22,8 +24,6 @@
 namespace Locus
 {
 
-class Vector3;
-
 class LOCUS_RENDERING_API MeshUtility
 {
 public:
@@ -32,7 +32,7 @@ public:
    static std::unique_ptr<Mesh> MakeSphere(float radius, unsigned int subdivisions);
    static std::unique_ptr<Mesh> MakeCube(float lengthOfOneSide);
 
-   static TextureCoordinate SphericalUVMapping(const Vector3& pointOnSphere);
+   static TextureCoordinate SphericalUVMapping(const FVector3& pointOnSphere);
 
 private:
    static void AddFaceToMesh(Mesh& mesh, std::size_t p1Index, std::size_t p2Index, std::size_t p3Index);

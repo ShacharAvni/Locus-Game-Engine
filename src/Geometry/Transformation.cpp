@@ -9,11 +9,11 @@
 \********************************************************************************************************/
 
 #include "Locus/Geometry/Transformation.h"
-#include "Locus/Geometry/Vector3.h"
 #include "Locus/Geometry/Geometry.h"
 
 #include "Locus/Common/Float.h"
 
+#include <cmath>
 #include <cassert>
 
 namespace Locus
@@ -45,9 +45,9 @@ Transformation& Transformation::operator=(const Matrix<float>& matrix)
    return *this;
 }
 
-const Vector3& Transformation::IdentityScale()
+const FVector3& Transformation::IdentityScale()
 {
-   static Vector3 identityScale(1.0f, 1.0f, 1.0f);
+   static FVector3 identityScale(1.0f, 1.0f, 1.0f);
    return identityScale;
 }
 
@@ -61,7 +61,7 @@ const Transformation& Transformation::Identity()
    return identity;
 }
 
-Transformation Transformation::Translation(const Vector3& t)
+Transformation Transformation::Translation(const FVector3& t)
 {
    return Transformation(1,  0,  0,  t.x,
                          0,  1,  0,  t.y,
@@ -71,34 +71,34 @@ Transformation Transformation::Translation(const Vector3& t)
 
 Transformation Transformation::XRotation(float radians)
 {
-   return Transformation(1,            0,             0,     0,
-                         0, cos(radians), -sin(radians),     0,
-                         0, sin(radians),  cos(radians),     0,
-                         0,            0,             0,     1);
+   return Transformation(1,                   0,                  0,     0,
+                         0,   std::cos(radians), -std::sin(radians),     0,
+                         0,   std::sin(radians),  std::cos(radians),     0,
+                         0,                   0,                  0,     1);
 }
 
 Transformation Transformation::YRotation(float radians)
 {
-   return Transformation(cos(radians),    0,  sin(radians),   0,
-                                    0,    1,             0,   0,
-                        -sin(radians),    0,  cos(radians),   0,
-                                    0,    0,             0,   1);
+   return Transformation(std::cos(radians),    0,  std::sin(radians),   0,
+                                         0,    1,                  0,   0,
+                        -std::sin(radians),    0,  std::cos(radians),   0,
+                                         0,    0,                  0,   1);
 }
 
 Transformation Transformation::ZRotation(float radians)
 {
-   return Transformation(cos(radians), -sin(radians),   0,   0,
-                         sin(radians),  cos(radians),   0,   0,
-                                    0,             0,   1,   0,
-                                    0,             0,   0,   1);
+   return Transformation(std::cos(radians), -std::sin(radians),   0,   0,
+                         std::sin(radians),  std::cos(radians),   0,   0,
+                                         0,                  0,   1,   0,
+                                         0,                  0,   0,   1);
 }
 
-Transformation Transformation::Scale(const Vector3& scale)
+Transformation Transformation::Scale(const FVector3& scale)
 {
    //scale vectors can't have zeroes
-   Vector3 properScale(FIsZero<float>(scale.x) ? 1.0f : scale.x,
-                       FIsZero<float>(scale.y) ? 1.0f : scale.y,
-                       FIsZero<float>(scale.z) ? 1.0f : scale.z);
+   FVector3 properScale(FIsZero<float>(scale.x) ? 1.0f : scale.x,
+                        FIsZero<float>(scale.y) ? 1.0f : scale.y,
+                        FIsZero<float>(scale.z) ? 1.0f : scale.z);
 
    return Transformation(properScale.x,               0,               0,        0,
                                      0,   properScale.y,               0,        0,
@@ -129,30 +129,30 @@ Transformation Transformation::Orthographic(float left, float right, float botto
 
 }
 
-Vector3 Transformation::MultVector(const Vector3& v) const
+FVector3 Transformation::MultVector(const FVector3& v) const
 {
    const std::vector<float>& columnMajorValues = GetElements();
 
-   return Vector3(columnMajorValues[0] * v.x + columnMajorValues[4] * v.y + columnMajorValues[8]  * v.z,
-                  columnMajorValues[1] * v.x + columnMajorValues[5] * v.y + columnMajorValues[9]  * v.z,
-                  columnMajorValues[2] * v.x + columnMajorValues[6] * v.y + columnMajorValues[10] * v.z);
+   return FVector3(columnMajorValues[0] * v.x + columnMajorValues[4] * v.y + columnMajorValues[8]  * v.z,
+                   columnMajorValues[1] * v.x + columnMajorValues[5] * v.y + columnMajorValues[9]  * v.z,
+                   columnMajorValues[2] * v.x + columnMajorValues[6] * v.y + columnMajorValues[10] * v.z);
 }
 
-Vector3 Transformation::MultVertex(const Vector3& v) const
+FVector3 Transformation::MultVertex(const FVector3& v) const
 {
    const std::vector<float>& columnMajorValues = GetElements();
 
-   return Vector3(columnMajorValues[0] * v.x + columnMajorValues[4] * v.y + columnMajorValues[8]  * v.z + columnMajorValues[12],
-                  columnMajorValues[1] * v.x + columnMajorValues[5] * v.y + columnMajorValues[9]  * v.z + columnMajorValues[13],
-                  columnMajorValues[2] * v.x + columnMajorValues[6] * v.y + columnMajorValues[10] * v.z + columnMajorValues[14]);
+   return FVector3(columnMajorValues[0] * v.x + columnMajorValues[4] * v.y + columnMajorValues[8]  * v.z + columnMajorValues[12],
+                   columnMajorValues[1] * v.x + columnMajorValues[5] * v.y + columnMajorValues[9]  * v.z + columnMajorValues[13],
+                   columnMajorValues[2] * v.x + columnMajorValues[6] * v.y + columnMajorValues[10] * v.z + columnMajorValues[14]);
 }
 
-void Transformation::TranslateBy(const Vector3& t)
+void Transformation::TranslateBy(const FVector3& t)
 {
    MultMatrix( Transformation::Translation(t) );
 }
 
-void Transformation::InverseTranslateBy(const Vector3& t)
+void Transformation::InverseTranslateBy(const FVector3& t)
 {
    Transformation translationInverseResult = Transformation::Translation(-t);
    translationInverseResult.MultMatrix(*this);
@@ -160,7 +160,7 @@ void Transformation::InverseTranslateBy(const Vector3& t)
    *this = translationInverseResult;
 }
 
-void Transformation::RotateBy(const Vector3& rotation)
+void Transformation::RotateBy(const FVector3& rotation)
 {
    if (FNotZero<float>(rotation.y))
    {
@@ -178,7 +178,7 @@ void Transformation::RotateBy(const Vector3& rotation)
    }
 }
 
-void Transformation::InverseRotateBy(const Vector3& rotation)
+void Transformation::InverseRotateBy(const FVector3& rotation)
 {
    Transformation rotationInverseResult;
 
@@ -202,16 +202,16 @@ void Transformation::InverseRotateBy(const Vector3& rotation)
    *this = rotationInverseResult;
 }
 
-void Transformation::ScaleBy(const Vector3& scale)
+void Transformation::ScaleBy(const FVector3& scale)
 {
    MultMatrix( Transformation::Scale(scale) );
 }
 
-void Transformation::InverseScaleBy(const Vector3& scale)
+void Transformation::InverseScaleBy(const FVector3& scale)
 {
-   Transformation scaleInverseResult = Transformation::Scale( Vector3(FIsZero<float>(scale.x) ? 1.0f : 1/scale.x,
-                                                                      FIsZero<float>(scale.y) ? 1.0f : 1/scale.y,
-                                                                      FIsZero<float>(scale.z) ? 1.0f : 1/scale.z) );
+   Transformation scaleInverseResult = Transformation::Scale( FVector3(FIsZero<float>(scale.x) ? 1.0f : 1/scale.x,
+                                                                       FIsZero<float>(scale.y) ? 1.0f : 1/scale.y,
+                                                                       FIsZero<float>(scale.z) ? 1.0f : 1/scale.z) );
 
    scaleInverseResult.MultMatrix(*this);
 

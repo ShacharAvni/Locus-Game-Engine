@@ -12,7 +12,8 @@
 
 #include "LocusRenderingAPI.h"
 
-#include "Locus/Geometry/Vector3.h"
+#include "Locus/Math/Vectors.h"
+
 #include "Locus/Geometry/DualTransformation.h"
 #include "Locus/Geometry/Transformation.h"
 
@@ -26,17 +27,17 @@ class LOCUS_RENDERING_API Viewpoint
 public:
    Viewpoint();
 
-   const Vector3& GetPosition() const;
-   const Vector3& GetRight() const;
-   const Vector3& GetUp() const;
-   const Vector3& GetForward() const;
+   const FVector3& GetPosition() const;
+   const FVector3& GetRight() const;
+   const FVector3& GetUp() const;
+   const FVector3& GetForward() const;
    const Transformation& GetRotation() const;
    const DualTransformation& GetTransformation() const;
 
-   Vector3 ToEyePosition(const Vector3& worldPosition) const;
+   FVector3 ToEyePosition(const FVector3& worldPosition) const;
 
-   void TranslateBy(const Vector3& translation);
-   void RotateBy(const Vector3& rotation);
+   void TranslateBy(const FVector3& translation);
+   void RotateBy(const FVector3& rotation);
 
    void Activate(TransformationStack& transformationStack) const;
    void Deactivate(TransformationStack& transformationStack) const;
@@ -45,11 +46,11 @@ private:
    DualTransformation transformation;
    Transformation rotations;
 
-   Vector3 position;
+   FVector3 position;
 
-   Vector3 forward;
-   Vector3 up;
-   Vector3 right;
+   FVector3 forward;
+   FVector3 up;
+   FVector3 right;
 };
 
 }

@@ -12,7 +12,8 @@
 #include "Locus/Rendering/RenderingState.h"
 
 #include "Locus/Geometry/Transformation.h"
-#include "Locus/Geometry/Vector3.h"
+
+#include "Locus/Math/Vectors.h"
 
 #include <Locus/Rendering/Locus_glew.h>
 
@@ -52,7 +53,7 @@ bool DrawUtility::Unproject(
    const Transformation& projection,
    int resolutionX,
    int resolutionY,
-   Vector3& worldCoordinate)
+   FVector3& worldCoordinate)
 {
    Locus::Matrix<float> modelViewProjectionInverted = projection * modelView;
 

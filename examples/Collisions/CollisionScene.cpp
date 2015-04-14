@@ -179,8 +179,8 @@ void CollisionScene::InitializeCollidableMeshes()
       float yDirection = static_cast<float>(random.RandomDouble(-1, 1));
       float zDirection = static_cast<float>(random.RandomDouble(-1, 1));
 
-      collidableMeshes[i].motionProperties.direction.set(xDirection, yDirection, zDirection);
-      collidableMeshes[i].motionProperties.direction.normalize();
+      collidableMeshes[i].motionProperties.direction.Set(xDirection, yDirection, zDirection);
+      Normalize(collidableMeshes[i].motionProperties.direction);
 
       //randomize speed
       collidableMeshes[i].motionProperties.speed = static_cast<float>(random.RandomDouble(MIN_MESH_SPEED, MAX_MESH_SPEED));
@@ -190,7 +190,7 @@ void CollisionScene::InitializeCollidableMeshes()
       yDirection = static_cast<float>(random.RandomDouble(-1, 1));
       zDirection = static_cast<float>(random.RandomDouble(-1, 1));
 
-      collidableMeshes[i].motionProperties.rotation.set(xDirection, yDirection, zDirection);
+      collidableMeshes[i].motionProperties.rotation.Set(xDirection, yDirection, zDirection);
 
       //randomize rotation speed
       collidableMeshes[i].motionProperties.angularSpeed = static_cast<float>(random.RandomDouble(MIN_MESH_ROTATION_SPEED, MAX_MESH_ROTATION_SPEED));
@@ -198,10 +198,10 @@ void CollisionScene::InitializeCollidableMeshes()
       //randomize size
       float scale = static_cast<float>(random.RandomDouble(MIN_MESH_SCALE, MAX_MESH_SCALE));
 
-      collidableMeshes[i].Scale( Locus::Vector3(scale, scale, scale) );
+      collidableMeshes[i].Scale( Locus::FVector3(scale, scale, scale) );
 
       //randomize position (centroid)
-      Locus::Vector3 position;
+      Locus::FVector3 position;
 
       position.x = static_cast<float>(random.RandomDouble(-maxDistance, maxDistance));
       position.y = static_cast<float>(random.RandomDouble(-maxDistance, maxDistance));
@@ -229,7 +229,7 @@ void CollisionScene::InitializeCollidableMeshes()
 
 void CollisionScene::InitializeBoundary()
 {
-   const Vector3 boundaryPoints[8] =
+   const Locus::FVector3 boundaryPoints[8] =
    {
       {-BOUNDARY_SIZE, -BOUNDARY_SIZE, -BOUNDARY_SIZE},
       { BOUNDARY_SIZE, -BOUNDARY_SIZE, -BOUNDARY_SIZE},
@@ -351,9 +351,9 @@ void CollisionScene::MouseMoved(int x, int y)
    int diffX = x - lastMouseX;
    int diffY = y - lastMouseY;
 
-   Locus::Vector3 difference(static_cast<float>(diffX), static_cast<float>(diffY), 0.0f);
+   Locus::FVector3 difference(static_cast<float>(diffX), static_cast<float>(diffY), 0.0f);
 
-   Locus::Vector3 rotation((-difference.y/resolutionY) * FIELD_OF_VIEW * Locus::TO_RADIANS, (-difference.x/resolutionX)* FIELD_OF_VIEW * Locus::TO_RADIANS, 0.0f);
+   Locus::FVector3 rotation((-difference.y/resolutionY) * FIELD_OF_VIEW * Locus::TO_RADIANS, (-difference.x/resolutionX)* FIELD_OF_VIEW * Locus::TO_RADIANS, 0.0f);
 
    viewpoint.RotateBy(rotation);
 
@@ -410,7 +410,7 @@ void CollisionScene::TickCollidableMeshes(double DT)
 
    for (CollidableMesh& collidableMesh : collidableMeshes)
    {
-      Locus::Vector3 nextPosition = collidableMesh.Position() + ((collidableMesh.motionProperties.speed * collidableMesh.motionProperties.direction) * static_cast<float>(DT));
+      Locus::FVector3 nextPosition = collidableMesh.Position() + ((collidableMesh.motionProperties.speed * collidableMesh.motionProperties.direction) * static_cast<float>(DT));
 
       if (std::fabs(nextPosition.x) >= BOUNDARY_SIZE)
       {
@@ -440,7 +440,7 @@ void CollisionScene::TickViewer(double DT)
    //rotation is done directly when the game responds to the
    //user's mouse movements
 
-   Locus::Vector3 translation
+   Locus::FVector3 translation
    ( 
       (moveViewerLeft  ? -VIEWER_SPEED : 0.0f) + (moveViewerRight ?  VIEWER_SPEED : 0.0f),
       (moveViewerDown  ? -VIEWER_SPEED : 0.0f) + (moveViewerUp    ?  VIEWER_SPEED : 0.0f),
@@ -449,10 +449,10 @@ void CollisionScene::TickViewer(double DT)
 
    bool move = false;
 
-   Locus::Vector3 originalPosition = viewpoint.GetPosition();
-   Locus::Vector3 newPosition;
+   Locus::FVector3 originalPosition = viewpoint.GetPosition();
+   Locus::FVector3 newPosition;
 
-   if (!translation.ApproximatelyEqualTo(Locus::Vector3::ZeroVector()))
+   if (!ApproximatelyEqual(translation, Locus::Vec3D::ZeroVector()))
    {
       translation *= static_cast<float>(DT);
 
