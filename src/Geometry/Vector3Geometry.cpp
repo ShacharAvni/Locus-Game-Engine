@@ -186,19 +186,4 @@ bool GoExactlyTheSameWay(const FVector3& v1, const FVector3& v2)
    return ( ApproximatelyEqual(Cross(v1, v2), Vec3D::ZeroVector()) && GoTheSameWay(v1, v2) );
 }
 
-bool operator <(const FVector3& v1, const FVector3& v2)
-{
-   if (v1.x != v2.x)
-   {
-      return v1.x < v2.x;
-   }
-
-   if (v1.y != v2.y)
-   {
-      return v1.y < v2.y;
-   }
-
-   return v1.z < v2.z;
-}
-
 }

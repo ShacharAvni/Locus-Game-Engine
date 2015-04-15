@@ -49,9 +49,6 @@ LOCUS_GEOMETRY_API void RotateAroundDegrees(FVector3& v, const FVector3& axis, f
 LOCUS_GEOMETRY_API bool GoTheSameWay(const FVector3& v1, const FVector3& v2);
 LOCUS_GEOMETRY_API bool GoExactlyTheSameWay(const FVector3& v1, const FVector3& v2);
 
-//for sorting within the Model class
-LOCUS_GEOMETRY_API bool operator <(const FVector3& v1, const FVector3& v2);
-
 }
 
 namespace std

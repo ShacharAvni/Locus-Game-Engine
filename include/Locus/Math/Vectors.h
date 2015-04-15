@@ -92,10 +92,16 @@ template <typename ElementType>
 bool operator!=(const Vector2<ElementType>& v1, const Vector2<ElementType>& v2);
 
 template <typename ElementType>
+bool operator<(const Vector2<ElementType>& v1, const Vector2<ElementType>& v2);
+
+template <typename ElementType>
 bool ApproximatelyEqual(const Vector2<ElementType>& v1, const Vector2<ElementType>& v2, ElementType toleranceFactor = 1);
 
 template <>
 bool ApproximatelyEqual(const Vector2<int>& v1, const Vector2<int>& v2, int toleranceFactor);
+
+template <typename ElementType>
+void Serialize(const Vector2<ElementType>& v, ElementType* destination);
 
 template <typename ElementType>
 struct LOCUS_MATH_API Vector3
@@ -173,10 +179,16 @@ template <typename ElementType>
 bool operator!=(const Vector3<ElementType>& v1, const Vector3<ElementType>& v2);
 
 template <typename ElementType>
+bool operator<(const Vector3<ElementType>& v1, const Vector3<ElementType>& v2);
+
+template <typename ElementType>
 bool ApproximatelyEqual(const Vector3<ElementType>& v1, const Vector3<ElementType>& v2, ElementType toleranceFactor = 1);
 
 template <>
 bool ApproximatelyEqual(const Vector3<int>& v1, const Vector3<int>& v2, int toleranceFactor);
+
+template <typename ElementType>
+void Serialize(const Vector3<ElementType>& v, ElementType* destination);
 
 template <typename ElementType>
 struct LOCUS_MATH_API Vector4
@@ -258,10 +270,16 @@ template <typename ElementType>
 bool operator!=(const Vector4<ElementType>& v1, const Vector4<ElementType>& v2);
 
 template <typename ElementType>
+bool operator<(const Vector4<ElementType>& v1, const Vector4<ElementType>& v2);
+
+template <typename ElementType>
 bool ApproximatelyEqual(const Vector4<ElementType>& v1, const Vector4<ElementType>& v2, ElementType toleranceFactor = 1);
 
 template <>
 bool ApproximatelyEqual(const Vector4<int>& v1, const Vector4<int>& v2, int toleranceFactor);
+
+template <typename ElementType>
+void Serialize(const Vector4<ElementType>& v, ElementType* destination);
 
 #define LOCUS_VECTORS_EXTERN_TEMPLATE_PER_ELEMENT_TYPE(VectorType, ElementType) \
    extern template struct LOCUS_SHARED_IMPORTS VectorType<ElementType>;\
@@ -277,7 +295,9 @@ bool ApproximatelyEqual(const Vector4<int>& v1, const Vector4<int>& v2, int tole
    extern template LOCUS_SHARED_IMPORTS VectorType<ElementType>& operator/=(VectorType<ElementType>& v, ElementType d);\
    extern template LOCUS_SHARED_IMPORTS bool operator==(const VectorType<ElementType>& v1, const VectorType<ElementType>& v2);\
    extern template LOCUS_SHARED_IMPORTS bool operator!=(const VectorType<ElementType>& v1, const VectorType<ElementType>& v2);\
-   extern template LOCUS_SHARED_IMPORTS bool ApproximatelyEqual(const VectorType<ElementType>& v1, const VectorType<ElementType>& v2, ElementType toleranceFactor);
+   extern template LOCUS_SHARED_IMPORTS bool operator<(const VectorType<ElementType>& v1, const VectorType<ElementType>& v2);\
+   extern template LOCUS_SHARED_IMPORTS bool ApproximatelyEqual(const VectorType<ElementType>& v1, const VectorType<ElementType>& v2, ElementType toleranceFactor);\
+   extern template LOCUS_SHARED_IMPORTS void Serialize(const VectorType<ElementType>& v, ElementType* destination);
 
 #define LOCUS_VECTORS_EXTERN_TEMPLATE(VectorType) \
    LOCUS_VECTORS_EXTERN_TEMPLATE_PER_ELEMENT_TYPE(VectorType, float)\

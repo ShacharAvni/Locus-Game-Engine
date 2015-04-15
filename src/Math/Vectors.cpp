@@ -136,6 +136,17 @@ bool operator!=(const Vector2<ElementType>& v1, const Vector2<ElementType>& v2)
 }
 
 template <typename ElementType>
+bool operator<(const Vector2<ElementType>& v1, const Vector2<ElementType>& v2)
+{
+   if (v1.x != v2.x)
+   {
+      return (v1.x < v2.x);
+   }
+
+   return (v1.y < v2.y);
+}
+
+template <typename ElementType>
 bool ApproximatelyEqual(const Vector2<ElementType>& v1, const Vector2<ElementType>& v2, ElementType toleranceFactor)
 {
    return (FEqual<ElementType>(v1.x, v2.x, toleranceFactor) && FEqual<ElementType>(v1.y, v2.y, toleranceFactor));
@@ -145,6 +156,15 @@ template <>
 bool ApproximatelyEqual(const Vector2<int>& v1, const Vector2<int>& v2, int /*toleranceFactor*/)
 {
    return (v1 == v2);
+}
+
+template <typename ElementType>
+void Serialize(const Vector2<ElementType>& v, ElementType* destination)
+{
+   assert(destination != nullptr);
+
+   destination[0] = v.x;
+   destination[1] = v.y;
 }
 
 ///////////////////////////////////////////////// Vector3 /////////////////////////////////////////////////
@@ -278,6 +298,22 @@ bool operator!=(const Vector3<ElementType>& v1, const Vector3<ElementType>& v2)
 }
 
 template <typename ElementType>
+bool operator<(const Vector3<ElementType>& v1, const Vector3<ElementType>& v2)
+{
+   if (v1.x != v2.x)
+   {
+      return (v1.x < v2.x);
+   }
+
+   if (v1.y != v2.y)
+   {
+      return (v1.y < v2.y);
+   }
+
+   return (v1.z < v2.z);
+}
+
+template <typename ElementType>
 bool ApproximatelyEqual(const Vector3<ElementType>& v1, const Vector3<ElementType>& v2, ElementType toleranceFactor)
 {
    return (FEqual<ElementType>(v1.x, v2.x, toleranceFactor) && FEqual<ElementType>(v1.y, v2.y, toleranceFactor) && FEqual<ElementType>(v1.z, v2.z, toleranceFactor));
@@ -287,6 +323,16 @@ template <>
 bool ApproximatelyEqual(const Vector3<int>& v1, const Vector3<int>& v2, int /*toleranceFactor*/)
 {
    return (v1 == v2);
+}
+
+template <typename ElementType>
+void Serialize(const Vector3<ElementType>& v, ElementType* destination)
+{
+   assert(destination != nullptr);
+
+   destination[0] = v.x;
+   destination[1] = v.y;
+   destination[2] = v.z;
 }
 
 ///////////////////////////////////////////////// Vector4 /////////////////////////////////////////////////
@@ -426,6 +472,27 @@ bool operator!=(const Vector4<ElementType>& v1, const Vector4<ElementType>& v2)
 }
 
 template <typename ElementType>
+bool operator<(const Vector4<ElementType>& v1, const Vector4<ElementType>& v2)
+{
+   if (v1.x != v2.x)
+   {
+      return (v1.x < v2.x);
+   }
+
+   if (v1.y != v2.y)
+   {
+      return (v1.y < v2.y);
+   }
+
+   if (v1.z != v2.z)
+   {
+      return (v1.z < v2.z);
+   }
+
+   return (v1.w < v2.w);
+}
+
+template <typename ElementType>
 bool ApproximatelyEqual(const Vector4<ElementType>& v1, const Vector4<ElementType>& v2, ElementType toleranceFactor)
 {
    return (FEqual<ElementType>(v1.x, v2.x, toleranceFactor) && FEqual<ElementType>(v1.y, v2.y, toleranceFactor) &&
@@ -436,6 +503,17 @@ template <>
 bool ApproximatelyEqual(const Vector4<int>& v1, const Vector4<int>& v2, int /*toleranceFactor*/)
 {
    return (v1 == v2);
+}
+
+template <typename ElementType>
+void Serialize(const Vector4<ElementType>& v, ElementType* destination)
+{
+   assert(destination != nullptr);
+
+   destination[0] = v.x;
+   destination[1] = v.y;
+   destination[2] = v.z;
+   destination[3] = v.w;
 }
 
 #define LOCUS_VECTORS_TEMPLATE_INSTANTIATION_PER_ELEMENT_TYPE(VectorType, ElementType) \
@@ -452,7 +530,9 @@ bool ApproximatelyEqual(const Vector4<int>& v1, const Vector4<int>& v2, int /*to
    template LOCUS_MATH_API VectorType<ElementType>& operator/=(VectorType<ElementType>& v, ElementType d);\
    template LOCUS_MATH_API bool operator==(const VectorType<ElementType>& v1, const VectorType<ElementType>& v2);\
    template LOCUS_MATH_API bool operator!=(const VectorType<ElementType>& v1, const VectorType<ElementType>& v2);\
-   template LOCUS_MATH_API bool ApproximatelyEqual(const VectorType<ElementType>& v1, const VectorType<ElementType>& v2, ElementType toleranceFactor);
+   template LOCUS_MATH_API bool operator<(const VectorType<ElementType>& v1, const VectorType<ElementType>& v2);\
+   template LOCUS_MATH_API bool ApproximatelyEqual(const VectorType<ElementType>& v1, const VectorType<ElementType>& v2, ElementType toleranceFactor);\
+   template LOCUS_MATH_API void Serialize(const VectorType<ElementType>& v, ElementType* destination);
 
 #define LOCUS_VECTORS_TEMPLATE_INSTANTIATION(VectorType) \
    LOCUS_VECTORS_TEMPLATE_INSTANTIATION_PER_ELEMENT_TYPE(VectorType, float)\
