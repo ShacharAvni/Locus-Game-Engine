@@ -62,6 +62,7 @@ add_library(Locus_Rendering
             MeshUtility.cpp
             OffscreenBuffer.cpp
             Quad.cpp
+            Rasterization.cpp
             RenderingState.cpp
             Shader.cpp
             ShaderController.cpp
@@ -96,6 +97,7 @@ add_library(Locus_Rendering
             ${LOCUS_RENDERING_INCLUDE}/MeshUtility.h
             ${LOCUS_RENDERING_INCLUDE}/OffscreenBuffer.h
             ${LOCUS_RENDERING_INCLUDE}/Quad.h
+            ${LOCUS_RENDERING_INCLUDE}/Rasterization.h
             ${LOCUS_RENDERING_INCLUDE}/RenderingState.h
             ${LOCUS_RENDERING_INCLUDE}/Shader.h
             ${LOCUS_RENDERING_INCLUDE}/ShaderController.h

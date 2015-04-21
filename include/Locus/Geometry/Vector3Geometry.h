@@ -40,7 +40,7 @@ LOCUS_GEOMETRY_API float AngleBetweenDegrees(const FVector3& v1, const FVector3&
 LOCUS_GEOMETRY_API float Norm(const FVector3& v);
 LOCUS_GEOMETRY_API float SquaredNorm(const FVector3& v);
 LOCUS_GEOMETRY_API FVector3 NormVector(const FVector3& v);
-LOCUS_GEOMETRY_API void Normalize(FVector3& v);
+LOCUS_GEOMETRY_API float Normalize(FVector3& v);
 LOCUS_GEOMETRY_API float Dot(const FVector3& v1, const FVector3& v2);
 LOCUS_GEOMETRY_API bool OrthogonalVectors(const FVector3& v1, const FVector3& v2);
 LOCUS_GEOMETRY_API FVector3 Cross(const FVector3& v1, const FVector3& v2);

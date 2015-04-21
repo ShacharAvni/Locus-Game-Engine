@@ -13,6 +13,7 @@
 #include "LocusGeometryAPI.h"
 
 #include "LineSegmentFwd.h"
+#include "LineFwd.h"
 #include "IntersectionTypes.h"
 
 #include "Locus/Math/Vectors.h"
@@ -25,9 +26,9 @@ namespace Locus
 /*!
  * \brief A line or ray.
  *
- * \note Supported template parameters are Vector2
- * and Vector3. If Vector2 is passed then this is
- * a 2D line (or ray). If Vector3 is passed then this
+ * \note Supported template parameters are FVector2
+ * and FVector3. If FVector2 is passed then this is
+ * a 2D line (or ray). If FVector3 is passed then this
  * is a 3D line (or ray).
  */
 template <class PointType>

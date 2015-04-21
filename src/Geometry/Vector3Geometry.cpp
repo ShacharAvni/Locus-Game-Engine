@@ -129,7 +129,7 @@ FVector3 NormVector(const FVector3& v)
    return v;
 }
 
-void Normalize(FVector3& v)
+float Normalize(FVector3& v)
 {
    float length = Norm(v);
 
@@ -139,6 +139,8 @@ void Normalize(FVector3& v)
       v.y /= length;
       v.z /= length;
    }
+
+   return length;
 }
 
 float Dot(const FVector3& v1, const FVector3& v2)

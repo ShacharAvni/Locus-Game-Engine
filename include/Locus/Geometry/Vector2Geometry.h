@@ -35,7 +35,7 @@ LOCUS_GEOMETRY_API float AngleWithXAxisRadians(const FVector2& v);
 LOCUS_GEOMETRY_API float Norm(const FVector2& v);
 LOCUS_GEOMETRY_API float SquaredNorm(const FVector2& v);
 LOCUS_GEOMETRY_API FVector2 NormVector(const FVector2& v);
-LOCUS_GEOMETRY_API void Normalize(FVector2& v);
+LOCUS_GEOMETRY_API float Normalize(FVector2& v);
 LOCUS_GEOMETRY_API float Dot(const FVector2& v1, const FVector2& v2);
 LOCUS_GEOMETRY_API bool OrthogonalVectors(const FVector2& v1, const FVector2& v2);
 LOCUS_GEOMETRY_API FVector3 Cross(const FVector2& v1, const FVector3& v2);
