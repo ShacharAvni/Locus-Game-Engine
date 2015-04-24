@@ -142,18 +142,18 @@ void Texture::GenerateMipmaps(const Image& image, MipmapGeneration mipmapGenerat
       return;
    }
 
-   GLInfo::Vendor vendor = glInfo.GetVendor();
-
-   if ((vendor == GLInfo::Vendor::Microsoft) || (vendor == GLInfo::Vendor::Unknown))
-   {
-      GenerateMipmapsLegacy(image, mipmapGeneration);
-      return;
-   }
-
-   bool vendorIsATI = (vendor == GLInfo::Vendor::ATI);
-
    if (mipmapGeneration == MipmapGeneration::GLGenerateMipMap)
    {
+      GLInfo::Vendor vendor = glInfo.GetVendor();
+
+      if ((vendor == GLInfo::Vendor::Microsoft) || (vendor == GLInfo::Vendor::Unknown))
+      {
+         GenerateMipmapsLegacy(image, MipmapGeneration::GLGenerateMipMapLegacyLinear);
+         return;
+      }
+
+      bool vendorIsATI = (vendor == GLInfo::Vendor::ATI);
+
       if (GLEW_VERSION_3_0)
       {
          Texture::SendTextureData(image, 0);
@@ -181,6 +181,12 @@ void Texture::GenerateMipmaps(const Image& image, MipmapGeneration mipmapGenerat
       }
    }
 
+   if ((mipmapGeneration == MipmapGeneration::NoMipMapLinear) || (mipmapGeneration == MipmapGeneration::NoMipMapNearest))
+   {
+      SendTextureDataWithoutMipmaps(image, mipmapGeneration);
+      return;
+   }
+
    GenerateMipmapsLegacy(image, mipmapGeneration);
 }
 
@@ -204,6 +210,19 @@ void Texture::GenerateMipmapsLegacy(const Image& image, MipmapGeneration mipmapG
    {
       GenerateManualMipmaps(image);
    }
+}
+
+void Texture::SendTextureDataWithoutMipmaps(const Image& image, MipmapGeneration mipmapGeneration) const
+{
+   bool nearest = (mipmapGeneration == MipmapGeneration::NoMipMapNearest);
+
+   GLint minFilterParam = nearest ? GL_NEAREST : GL_LINEAR;
+   GLint magFilterParam = nearest ? GL_NEAREST : GL_LINEAR;
+
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilterParam);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilterParam);
+
+   Texture::SendTextureData(image, 0);
 }
 
 unsigned int Texture::ClosestPowerOf2(unsigned int num)

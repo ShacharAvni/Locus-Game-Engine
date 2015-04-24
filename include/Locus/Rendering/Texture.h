@@ -28,6 +28,8 @@ public:
       GLGenerateMipMap,
       GLGenerateMipMapLegacyLinear,
       GLGenerateMipMapLegacyNearest,
+      NoMipMapLinear,
+      NoMipMapNearest,
       Manual
    };
 
@@ -56,6 +58,7 @@ private:
 
    void GenerateMipmaps(const Image& image, MipmapGeneration mipmapGeneration, const GLInfo& glInfo) const;
    void GenerateMipmapsLegacy(const Image& image, MipmapGeneration mipmapGeneration) const;
+   void SendTextureDataWithoutMipmaps(const Image& image, MipmapGeneration mipmapGeneration) const;
    void GenerateManualMipmaps(const Image& image) const;
    static void GenerateManualMipmapsUsingPowerOf2Image(Image& image);
 };
