@@ -84,12 +84,12 @@ std::size_t File::CurrentPosition() const
       throw Exception(std::string("Could not obtain current position of file ") + mountedFilePath.path + "\n" + PHYSFS_getLastError());
    }
 
-   return LossyCast<PHYSFS_sint64, std::size_t>(position);
+   return LossyCast<std::size_t, PHYSFS_sint64>(position);
 }
 
 std::size_t File::SizeInBytes() const
 {
-   return LossyCast<PHYSFS_sint64, std::size_t>( PHYSFS_fileLength(impl->physfsFileHandle) );
+   return LossyCast<std::size_t, PHYSFS_sint64>( PHYSFS_fileLength(impl->physfsFileHandle) );
 }
 
 void File::ReadWholeFile(std::vector<char>& bytes)
@@ -127,14 +127,14 @@ void File::ReadWholeFile(std::vector<char>& bytes)
 
 std::size_t File::Read(char* bytes, std::size_t numBytesToRead)
 {
-   PHYSFS_sint64 bytesRead = PHYSFS_read(impl->physfsFileHandle, bytes, 1, LossyCast<std::size_t, PHYSFS_uint32>(numBytesToRead));
+   PHYSFS_sint64 bytesRead = PHYSFS_read(impl->physfsFileHandle, bytes, 1, LossyCast<PHYSFS_uint32, std::size_t>(numBytesToRead));
 
    if (bytesRead == -1)
    {
       return 0;
    }
 
-   return LossyCast<PHYSFS_sint64, std::size_t>(bytesRead);
+   return LossyCast<std::size_t, PHYSFS_sint64>(bytesRead);
 }
 
 bool File::Seek(std::size_t offset, DataStream::SeekType seekType)

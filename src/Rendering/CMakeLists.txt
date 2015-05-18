@@ -110,6 +110,7 @@ add_library(Locus_Rendering
             ${LOCUS_RENDERING_INCLUDE}/Texture.h
             ${LOCUS_RENDERING_INCLUDE}/TextureArray.h
             ${LOCUS_RENDERING_INCLUDE}/TextureCoordinate.h
+            ${LOCUS_RENDERING_INCLUDE}/TextureFiltering.h
             ${LOCUS_RENDERING_INCLUDE}/TextureManager.h
             ${LOCUS_RENDERING_INCLUDE}/TransformationStack.h
             ${LOCUS_RENDERING_INCLUDE}/Viewpoint.h

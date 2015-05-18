@@ -10,32 +10,13 @@
 
 #pragma once
 
-#include "LocusRenderingAPI.h"
-
-#include "GLCommonTypes.h"
-#include "Image.h"
-#include "TextureFiltering.h"
-
-#include <vector>
-
 namespace Locus
 {
 
-class LOCUS_RENDERING_API TextureArray
+enum class TextureFiltering
 {
-public:
-   TextureArray(const std::vector<Image>& images, bool mipmaps, TextureFiltering filtering, bool clamp);
-   ~TextureArray();
-
-   TextureArray(const TextureArray&) = delete;
-   TextureArray& operator=(const TextureArray&) = delete;
-
-   void Bind() const;
-
-private:
-   GLuint id;
-
-   static bool ImagesAreWellFormed(const std::vector<Image>& images);
+   Nearest,
+   Linear
 };
 
 }

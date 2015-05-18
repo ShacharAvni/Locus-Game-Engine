@@ -83,7 +83,7 @@ bool FileOnDisk::IsEndOfStream() const
 
 std::size_t FileOnDisk::CurrentPosition() const
 {
-   return LossyCast<long int, std::size_t>( ftell(impl->fileHandle) );
+   return LossyCast<std::size_t, long int>( ftell(impl->fileHandle) );
 }
 
 std::size_t FileOnDisk::SizeInBytes() const
@@ -100,7 +100,7 @@ std::size_t FileOnDisk::SizeInBytes() const
          {
             if (fsetpos(impl->fileHandle, &position) == 0)
             {
-               return LossyCast<long int, std::size_t>(fileSize);
+               return LossyCast<std::size_t, long int>(fileSize);
             }
          }
       }
@@ -170,7 +170,7 @@ bool FileOnDisk::Seek(std::size_t offset, DataStream::SeekType seekType)
       return false;
    }
 
-   return (fseek(impl->fileHandle, LossyCast<std::size_t, long int>(offset), origin) == 0);
+   return (fseek(impl->fileHandle, LossyCast<long int, std::size_t>(offset), origin) == 0);
 }
 
 }

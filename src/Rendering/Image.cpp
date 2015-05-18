@@ -63,7 +63,7 @@ Image::Image(const MountedFilePath& mountedFilePath)
 
       const stbi_uc* bytesInMemory = reinterpret_cast<const stbi_uc*>(bytes.data());
 
-      pixels = stbi_load_from_memory(bytesInMemory, LossyCast<std::size_t, int>(bytes.size()), &numPixelsX, &numPixelsY, &numPixelComponentsAsInt, 0);
+      pixels = stbi_load_from_memory(bytesInMemory, LossyCast<int, std::size_t>(bytes.size()), &numPixelsX, &numPixelsY, &numPixelComponentsAsInt, 0);
    }
 
    if (pixels == nullptr)

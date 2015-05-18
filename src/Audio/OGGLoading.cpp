@@ -64,7 +64,7 @@ bool LoadOGG(DataStream& oggDataStream, SoundData& soundData)
       {
          DataStream* dataStream = reinterpret_cast<DataStream*>(datasource);
 
-         std::size_t offsetAsSizeT = LossyCast<ogg_int64_t, std::size_t>(offset);
+         std::size_t offsetAsSizeT = LossyCast<std::size_t, ogg_int64_t>(offset);
 
          bool seekSuccessful = false;
 
@@ -95,7 +95,7 @@ bool LoadOGG(DataStream& oggDataStream, SoundData& soundData)
       {
          DataStream* dataStream = reinterpret_cast<DataStream*>(datasource);
 
-         return LossyCast<std::size_t, long>(dataStream->CurrentPosition());
+         return LossyCast<long, std::size_t>(dataStream->CurrentPosition());
       }
    };
 
@@ -108,7 +108,7 @@ bool LoadOGG(DataStream& oggDataStream, SoundData& soundData)
 
    vorbis_info* info = ov_info(&oggFile, -1);
 
-   int dataLength = LossyCast<ogg_int64_t, int>( ov_pcm_total(&oggFile, -1) ) * info->channels * 2;    // always 16 bit data
+   int dataLength = LossyCast<int, ogg_int64_t>( ov_pcm_total(&oggFile, -1) ) * info->channels * 2;    // always 16 bit data
 
    if (dataLength <= 0)
    {

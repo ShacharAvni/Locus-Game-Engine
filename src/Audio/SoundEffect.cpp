@@ -195,7 +195,7 @@ void SoundEffect::BufferData()
 {
    const SoundData& soundData = soundEffectInternal->data;
 
-   soundEffectInternal->size = LossyCast<std::size_t, int>(soundData.rawData.size());
+   soundEffectInternal->size = LossyCast<int, std::size_t>(soundData.rawData.size());
 
    alBufferData(soundEffectInternal->bufferID, soundData.format, soundData.rawData.data(), soundEffectInternal->size, soundData.sampleRate);
    alSourcei(soundEffectInternal->sourceID, AL_BUFFER, soundEffectInternal->bufferID);

@@ -21,7 +21,7 @@
 namespace Locus
 {
 
-TextureArray::TextureArray(const std::vector<Image>& images, bool minMagFilterLinear, bool clamp)
+TextureArray::TextureArray(const std::vector<Image>& images, bool mipmaps, TextureFiltering filtering, bool clamp)
 {
    assert(TextureArray::ImagesAreWellFormed(images));
 
@@ -33,18 +33,34 @@ TextureArray::TextureArray(const std::vector<Image>& images, bool minMagFilterLi
    glGenTextures(1, &id);
    glBindTexture(GL_TEXTURE_2D_ARRAY, id);
 
-   GLsizei width = LossyCast<unsigned int, GLsizei>(images[0].Width());
-   GLsizei height = LossyCast<unsigned int, GLsizei>(images[0].Height());
+   GLsizei width = LossyCast<GLsizei, unsigned int>(images[0].Width());
+   GLsizei height = LossyCast<GLsizei, unsigned int>(images[0].Height());
    unsigned int numPixelComponents = images[0].NumPixelComponents();
 
-   GLsizei numImages = LossyCast<std::size_t, GLsizei>(images.size());
+   GLsizei numImages = LossyCast<GLsizei, std::size_t>(images.size());
 
    Texture::SetUnpackAlignmentForPixelComponents(numPixelComponents);
 
-   GLint minMagFilterParam = minMagFilterLinear ? GL_LINEAR : GL_NEAREST;
+   bool linearFiltering = (filtering == TextureFiltering::Linear);
 
-   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, minMagFilterParam);
-   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, minMagFilterParam);
+   GLint magFilterParam = linearFiltering ? GL_LINEAR : GL_NEAREST;
+
+   GLint minFilterParam;
+
+   if (mipmaps)
+   {
+      minFilterParam = linearFiltering ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_LINEAR;
+   }
+   else
+   {
+      minFilterParam = linearFiltering ? GL_LINEAR : GL_NEAREST;
+   }
+
+   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, minFilterParam);
+   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, magFilterParam);
+
+   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
 
    GLint format = Texture::GLFormat(numPixelComponents);
 
@@ -55,8 +71,10 @@ TextureArray::TextureArray(const std::vector<Image>& images, bool minMagFilterLi
       glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, imageIndex, width, height, 1, format, GL_UNSIGNED_BYTE, images[imageIndex].PixelData());
    }
 
-   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+   if (mipmaps)
+   {
+      glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+   }
 }
 
 TextureArray::~TextureArray()
