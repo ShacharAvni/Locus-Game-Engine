@@ -13,6 +13,7 @@
 #include "LocusRenderingAPI.h"
 
 #include "GLCommonTypes.h"
+#include "TextureFiltering.h"
 
 namespace Locus
 {
@@ -26,15 +27,12 @@ public:
    enum class MipmapGeneration
    {
       GLGenerateMipMap,
-      GLGenerateMipMapLegacyLinear,
-      GLGenerateMipMapLegacyNearest,
-      NoMipMapLinear,
-      NoMipMapNearest,
-      Manual
+      GLGenerateMipMapLegacy,
+      Manual,
+      None
    };
 
-   Texture(const Image& image, bool clamp, const GLInfo& glInfo);
-   Texture(const Image& image, MipmapGeneration mipmapGeneration, bool clamp, const GLInfo& glInfo);
+   Texture(const Image& image, MipmapGeneration mipmapGeneration, TextureFiltering filtering, bool clamp, const GLInfo& glInfo);
    ~Texture();
 
    Texture(const Texture&) = delete;
@@ -51,14 +49,10 @@ public:
 private:
    GLuint id;
 
-   //TODO: Get rid of this after delegating constructors are supported
-   void Construct(const Image& image, MipmapGeneration mipmapGeneration, bool clamp, const GLInfo& glInfo);
-
    static unsigned int ClosestPowerOf2(unsigned int num);
 
    void GenerateMipmaps(const Image& image, MipmapGeneration mipmapGeneration, const GLInfo& glInfo) const;
-   void GenerateMipmapsLegacy(const Image& image, MipmapGeneration mipmapGeneration) const;
-   void SendTextureDataWithoutMipmaps(const Image& image, MipmapGeneration mipmapGeneration) const;
+   void GenerateMipmapsLegacy(const Image& image) const;
    void GenerateManualMipmaps(const Image& image) const;
    static void GenerateManualMipmapsUsingPowerOf2Image(Image& image);
 };

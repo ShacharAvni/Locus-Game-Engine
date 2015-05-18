@@ -13,6 +13,7 @@
 #include "LocusRenderingAPI.h"
 
 #include "GLCommonTypes.h"
+#include "Texture.h"
 
 #include <string>
 #include <unordered_map>
@@ -36,8 +37,8 @@ public:
    TextureManager(const TextureManager&) = delete;
    TextureManager& operator=(const TextureManager&) = delete;
 
-   void Load(const std::string& textureName, const std::string& textureLocation, bool clamp);
-   void Load(const std::string& textureName, const MountedFilePath& textureLocation, bool clamp);
+   void Load(const std::string& textureName, const std::string& textureLocation, Texture::MipmapGeneration mipmapGeneration, TextureFiltering filtering, bool clamp);
+   void Load(const std::string& textureName, const MountedFilePath& textureLocation, Texture::MipmapGeneration mipmapGeneration, TextureFiltering filtering, bool clamp);
 
    Texture* GetTexture(const std::string& textureName) const;
 
@@ -49,7 +50,7 @@ private:
    const GLInfo& glInfo;
 
    template <class FilePathType>
-   void Load(const std::string& textureName, const FilePathType& textureFilePath, bool clamp);
+   void Load(const std::string& textureName, const FilePathType& textureFilePath, Texture::MipmapGeneration mipmapGeneration, TextureFiltering filtering, bool clamp);
 };
 
 #include "Locus/Preprocessor/EndSilenceDLLInterfaceWarnings"

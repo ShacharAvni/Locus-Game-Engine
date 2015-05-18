@@ -10,7 +10,6 @@
 
 #include "Locus/Rendering/TextureManager.h"
 #include "Locus/Rendering/GLInfo.h"
-#include "Locus/Rendering/Texture.h"
 #include "Locus/Rendering/Image.h"
 
 namespace Locus
@@ -27,22 +26,22 @@ TextureManager::~TextureManager()
 }
 
 template <class FilePathType>
-void TextureManager::Load(const std::string& textureName, const FilePathType& textureFilePath, bool clamp)
+void TextureManager::Load(const std::string& textureName, const FilePathType& textureFilePath, Texture::MipmapGeneration mipmapGeneration, TextureFiltering filtering, bool clamp)
 {
    if (textures.find(textureName) == textures.end())
    {
-      textures[textureName] = std::make_unique<Texture>(Image(textureFilePath), clamp, glInfo);
+      textures[textureName] = std::make_unique<Texture>(Image(textureFilePath), mipmapGeneration, filtering, clamp, glInfo);
    }
 }
 
-void TextureManager::Load(const std::string& textureName, const std::string& textureLocation, bool clamp)
+void TextureManager::Load(const std::string& textureName, const std::string& textureLocation, Texture::MipmapGeneration mipmapGeneration, TextureFiltering filtering, bool clamp)
 {
-   Load<std::string>(textureName, textureLocation, clamp);
+   Load<std::string>(textureName, textureLocation, mipmapGeneration, filtering, clamp);
 }
 
-void TextureManager::Load(const std::string& textureName, const MountedFilePath& textureLocation, bool clamp)
+void TextureManager::Load(const std::string& textureName, const MountedFilePath& textureLocation, Texture::MipmapGeneration mipmapGeneration, TextureFiltering filtering, bool clamp)
 {
-   Load<MountedFilePath>(textureName, textureLocation, clamp);
+   Load<MountedFilePath>(textureName, textureLocation, mipmapGeneration, filtering, clamp);
 }
 
 Texture* TextureManager::GetTexture(const std::string& textureName) const

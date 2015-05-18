@@ -22,21 +22,29 @@
 namespace Locus
 {
 
-Texture::Texture(const Image& image, bool clamp, const GLInfo& glInfo)
-{
-   Construct(image, MipmapGeneration::GLGenerateMipMap, clamp, glInfo);
-}
-
-Texture::Texture(const Image& image, MipmapGeneration mipmapGeneration, bool clamp, const GLInfo& glInfo)
-{
-   Construct(image, mipmapGeneration, clamp, glInfo);
-}
-
-void Texture::Construct(const Image& image, MipmapGeneration mipmapGeneration, bool clamp, const GLInfo& glInfo)
+Texture::Texture(const Image& image, MipmapGeneration mipmapGeneration, TextureFiltering filtering, bool clamp, const GLInfo& glInfo)
 {
    glGenTextures(1, &id);
 
    Bind();
+
+   bool linearFiltering = (filtering == TextureFiltering::Linear);
+
+   GLint minFilterParam;
+
+   if (mipmapGeneration == MipmapGeneration::None)
+   {
+      minFilterParam = linearFiltering ? GL_LINEAR : GL_NEAREST;
+   }
+   else
+   {
+      minFilterParam = linearFiltering ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_LINEAR;
+   }
+
+   GLint magFilterParam = linearFiltering ? GL_LINEAR : GL_NEAREST;
+
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilterParam);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilterParam);
 
    GenerateMipmaps(image, mipmapGeneration, glInfo);
 
@@ -136,6 +144,8 @@ void Texture::GenerateMipmaps(const Image& image, MipmapGeneration mipmapGenerat
 {
    Texture::SetUnpackAlignmentForPixelComponents(image.NumPixelComponents());
 
+   Texture::SendTextureData(image, 0);
+
    if (mipmapGeneration == MipmapGeneration::Manual)
    {
       GenerateManualMipmaps(image);
@@ -148,7 +158,7 @@ void Texture::GenerateMipmaps(const Image& image, MipmapGeneration mipmapGenerat
 
       if ((vendor == GLInfo::Vendor::Microsoft) || (vendor == GLInfo::Vendor::Unknown))
       {
-         GenerateMipmapsLegacy(image, MipmapGeneration::GLGenerateMipMapLegacyLinear);
+         GenerateMipmapsLegacy(image);
          return;
       }
 
@@ -156,8 +166,6 @@ void Texture::GenerateMipmaps(const Image& image, MipmapGeneration mipmapGenerat
 
       if (GLEW_VERSION_3_0)
       {
-         Texture::SendTextureData(image, 0);
-
          if (vendorIsATI)
          {
             glEnable(GL_TEXTURE_2D);
@@ -169,8 +177,6 @@ void Texture::GenerateMipmaps(const Image& image, MipmapGeneration mipmapGenerat
 
       if (GLEW_VERSION_2_1 && glewIsExtensionSupported("GL_EXT_framebuffer_object"))
       {
-         Texture::SendTextureData(image, 0);
-
          if (vendorIsATI)
          {
             glEnable(GL_TEXTURE_2D);
@@ -181,48 +187,24 @@ void Texture::GenerateMipmaps(const Image& image, MipmapGeneration mipmapGenerat
       }
    }
 
-   if ((mipmapGeneration == MipmapGeneration::NoMipMapLinear) || (mipmapGeneration == MipmapGeneration::NoMipMapNearest))
+   if (mipmapGeneration == MipmapGeneration::None)
    {
-      SendTextureDataWithoutMipmaps(image, mipmapGeneration);
       return;
    }
 
-   GenerateMipmapsLegacy(image, mipmapGeneration);
+   GenerateMipmapsLegacy(image);
 }
 
-void Texture::GenerateMipmapsLegacy(const Image& image, MipmapGeneration mipmapGeneration) const
+void Texture::GenerateMipmapsLegacy(const Image& image) const
 {
    if (GLEW_VERSION_1_4)
    {
-      bool mipMapNearest = (mipmapGeneration == MipmapGeneration::GLGenerateMipMapLegacyNearest);
-
-      GLint minFilterParam = mipMapNearest ? GL_NEAREST_MIPMAP_LINEAR : GL_LINEAR_MIPMAP_LINEAR;
-      GLint magFilterParam = mipMapNearest ? GL_NEAREST : GL_LINEAR;
-
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilterParam);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilterParam);
-
       glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-
-      Texture::SendTextureData(image, 0);
    }
    else
    {
       GenerateManualMipmaps(image);
    }
-}
-
-void Texture::SendTextureDataWithoutMipmaps(const Image& image, MipmapGeneration mipmapGeneration) const
-{
-   bool nearest = (mipmapGeneration == MipmapGeneration::NoMipMapNearest);
-
-   GLint minFilterParam = nearest ? GL_NEAREST : GL_LINEAR;
-   GLint magFilterParam = nearest ? GL_NEAREST : GL_LINEAR;
-
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilterParam);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilterParam);
-
-   Texture::SendTextureData(image, 0);
 }
 
 unsigned int Texture::ClosestPowerOf2(unsigned int num)
@@ -279,8 +261,6 @@ void Texture::GenerateManualMipmapsUsingPowerOf2Image(Image& image)
 
    int numLevels = std::max(divisionsX, divisionsY);
    numLevels = std::min(numLevels, maxLevels);
-
-   Texture::SendTextureData(image, 0);
 
    for (int level = 1; level < numLevels; ++level)
    {
