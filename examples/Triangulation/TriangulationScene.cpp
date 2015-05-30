@@ -89,7 +89,7 @@ void TriangulationScene::KeyPressed(Locus::Key_t key)
 
 void TriangulationScene::MouseMoved(int x, int y)
 {
-   if (currentPolygonAsLineSegments.NumLineSegments() > 0)
+   if (!currentPolygonAsLineSegments.lineSegments.empty())
    {
       Locus::FVector3 worldCoordinate;
 
@@ -97,7 +97,7 @@ void TriangulationScene::MouseMoved(int x, int y)
       {
          worldCoordinate.z = REAL_Z_SCENE;
 
-         currentPolygonAsLineSegments[currentPolygonAsLineSegments.NumLineSegments() - 1].segment.P2 = worldCoordinate;
+         currentPolygonAsLineSegments.lineSegments.back().segment.P2 = worldCoordinate;
          currentPolygonAsLineSegments.UpdateGPUVertexData();
       }
    }
@@ -120,38 +120,38 @@ void TriangulationScene::MousePressed(MouseButton_t button)
 
       if (button == Locus::Mouse_Button_Left)
       {
-         if (currentPolygonAsLineSegments.NumLineSegments() == 0)
+         if (currentPolygonAsLineSegments.lineSegments.empty())
          {
             coloredLineSegment.segment.P1 = worldCoordinate;
          }
          else
          {
-            coloredLineSegment.segment.P1 = currentPolygonAsLineSegments[currentPolygonAsLineSegments.NumLineSegments() - 1].segment.P2;
+            coloredLineSegment.segment.P1 = currentPolygonAsLineSegments.lineSegments.back().segment.P2;
          }
 
          coloredLineSegment.segment.P2 = worldCoordinate;
 
-         currentPolygonAsLineSegments.AddLineSegment(coloredLineSegment);
+         currentPolygonAsLineSegments.lineSegments.push_back(coloredLineSegment);
          currentPolygonAsLineSegments.UpdateGPUVertexData();
       }
       else
       {
          //a right or middle mouse button click is an attempt
          //to close the polygon
-         if (currentPolygonAsLineSegments.NumLineSegments() >= 2)
+         if (currentPolygonAsLineSegments.lineSegments.size() >= 2)
          {
             coloredLineSegment.segment.P1 = worldCoordinate;
-            coloredLineSegment.segment.P2 = currentPolygonAsLineSegments[0].segment.P1;
+            coloredLineSegment.segment.P2 = currentPolygonAsLineSegments.lineSegments[0].segment.P1;
 
-            currentPolygonAsLineSegments.AddLineSegment(coloredLineSegment);
+            currentPolygonAsLineSegments.lineSegments.push_back(coloredLineSegment);
 
             completedPolygonsAsLineSegments.emplace_back( std::make_unique<Locus::LineSegmentCollection>() );
 
-            completedPolygonsAsLineSegments.back()->CopyFrom(currentPolygonAsLineSegments);
+            completedPolygonsAsLineSegments.back()->lineSegments = currentPolygonAsLineSegments.lineSegments;
             completedPolygonsAsLineSegments.back()->CreateGPUVertexData();
             completedPolygonsAsLineSegments.back()->UpdateGPUVertexData();
 
-            currentPolygonAsLineSegments.Clear();
+            currentPolygonAsLineSegments.lineSegments.clear();
             currentPolygonAsLineSegments.UpdateGPUVertexData();
          }
       }
@@ -197,9 +197,9 @@ void TriangulationScene::GetCompletedPolygonLineSegmentsAsPolygons(std::vector<L
    {
       Locus::Polygon2D_t polygon;
 
-      for (size_t lineSegmentIndex = 0, numLineSegments = completedPolygon->NumLineSegments(); lineSegmentIndex < numLineSegments; ++lineSegmentIndex)
+      for (const Locus::LineSegmentCollection::ColoredLineSegment& coloredLineSegment : completedPolygon->lineSegments)
       {
-         const Locus::FVector3& point3D = (*completedPolygon)[lineSegmentIndex].segment.P1;
+         const Locus::FVector3& point3D = coloredLineSegment.segment.P1;
 
          point2D.x = point3D.x;
          point2D.y = point3D.y;
@@ -262,7 +262,7 @@ bool TriangulationScene::CompletedPolygonsAreWellFormed(const std::vector<Locus:
 
 void TriangulationScene::TriangulateCompletedPolygons()
 {
-   if (completedPolygonsAsLineSegments.size() > 0)
+   if (!completedPolygonsAsLineSegments.empty())
    {
       std::vector<Locus::Polygon2D_t> polygonsToTriangulate;
 
@@ -312,7 +312,7 @@ void TriangulationScene::TriangulateCompletedPolygons()
          }
       }
 
-      currentPolygonAsLineSegments.Clear();
+      currentPolygonAsLineSegments.lineSegments.clear();
       currentPolygonAsLineSegments.UpdateGPUVertexData();
 
       completedPolygonsAsLineSegments.clear();

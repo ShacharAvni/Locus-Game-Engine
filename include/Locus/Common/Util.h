@@ -113,6 +113,34 @@ void GetUniqueItems(const std::vector<T>& items, std::vector<T>& uniqueItems, st
 }
 
 /*!
+ * \brief The items are sorted (using the default comparator) and then consecutive
+ * duplicates are removed using the given equality comparison. If two consecutive
+ * elements after the sort are considered equal, then the first element is kept.
+ */
+template <class T, class EqualityCompare>
+void SortAndRemoveDuplicates(std::vector<T>& items, const EqualityCompare& equalityCompare)
+{
+   std::sort(items.begin(), items.end());
+
+   auto uniqueResult = std::unique(items.begin(), items.end(), equalityCompare);
+
+   items.resize( std::distance(items.begin(), uniqueResult) );
+}
+
+/*!
+ * \brief The other overload of SortAndRemoveDuplicates is called given operator==
+ * as the equality comparison.
+ *
+ * \sa template <class T, class EqualityCompare>
+ *     void SortAndRemoveDuplicates(std::vector<T>& items, const EqualityCompare& equalityCompare)
+ */
+template <class T>
+void SortAndRemoveDuplicates(std::vector<T>& items)
+{
+   SortAndRemoveDuplicates(items, [](const T& first, const T& second)->bool{ return first == second; });
+}
+
+/*!
  * \brief Sorts the input vector using Insertion Sort.
  *
  * \param[in,out] sortedInterval The vector to sort.
@@ -127,7 +155,7 @@ void InsertionSort(std::vector<T>& sortedInterval, Compare comp)
    {
       if (!comp(sortedInterval[i - 1], sortedInterval[i]))
       {
-         typename std::vector<T>::iterator whereToPlace = std::lower_bound(sortedInterval.begin(), sortedInterval.begin() + i - 1, sortedInterval[i], comp);
+         auto whereToPlace = std::lower_bound(sortedInterval.begin(), sortedInterval.begin() + i - 1, sortedInterval[i], comp);
          std::size_t whereToPlaceIndex = whereToPlace - sortedInterval.begin();
 
          for (std::size_t swapIndex = whereToPlaceIndex; swapIndex < i; ++swapIndex)
@@ -156,6 +184,7 @@ void ClearStack(std::stack<T>& stack)
    }
 }
 
+/// Clamps the value to between min and max exclusively.
 template <class T>
 T Clamp(T value, T min, T max)
 {
@@ -171,4 +200,21 @@ T Clamp(T value, T min, T max)
  */
 LOCUS_COMMON_API int CaseInsensitiveCompare(const std::string& first, const std::string& second);
 
+namespace ArrayLengthHelper
+{
+
+template <std::size_t N>
+struct TypeOfSize
+{
+      typedef char type[N];
+};
+
+template <typename T, std::size_t Size>
+typename TypeOfSize<Size>::type& GetSize(T(&)[Size]);
+
+}
+
 } // namespace Locus
+
+//courtesy of: http://stackoverflow.com/questions/3368883/how-does-this-size-of-array-template-function-work
+#define LOCUS_ARRAY_LENGTH(anArray) sizeof(Locus::ArrayLengthHelper::GetSize(anArray))

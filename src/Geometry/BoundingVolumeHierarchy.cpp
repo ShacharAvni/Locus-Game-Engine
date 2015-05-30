@@ -80,14 +80,7 @@ static std::vector<FVector3> GetUniquePointsFromTriangles(const std::vector<Tria
          uniquePoints.push_back(triangle[2]);
       }
 
-      std::sort(uniquePoints.begin(), uniquePoints.end());
-
-      std::vector<FVector3>::iterator uniqueEnd = std::unique(uniquePoints.begin(), uniquePoints.end(), [](const FVector3& first, const FVector3& second)->bool
-      {
-         return (first == second);
-      });
-
-      uniquePoints.resize( std::distance(uniquePoints.begin(), uniqueEnd) );
+      SortAndRemoveDuplicates(uniquePoints);
    }
 
    return uniquePoints;

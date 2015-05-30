@@ -47,8 +47,8 @@ public:
    static const Color& Yellow();
 };
 
-//for sorting within the Mesh class
 LOCUS_RENDERING_API bool operator==(const Color& color1, const Color& color2);
+LOCUS_RENDERING_API bool operator!=(const Color& color1, const Color& color2);
 LOCUS_RENDERING_API bool operator <(const Color& color1, const Color& color2);
 
 }

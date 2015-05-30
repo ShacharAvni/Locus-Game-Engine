@@ -39,24 +39,14 @@ public:
    LineSegmentCollection(const std::vector<ColoredLineSegment>& lineSegments);
    LineSegmentCollection(std::vector<ColoredLineSegment>&& lineSegments);
 
-   void CopyFrom(const LineSegmentCollection& lineSegmentCollection);
-
-   std::size_t NumLineSegments() const;
-
-   void Clear();
-
-   ColoredLineSegment& operator[](std::size_t index);
-   const ColoredLineSegment& operator[](std::size_t index) const;
-
-   void AddLineSegment(const ColoredLineSegment& lineSegment);
-
-   void InsertLineSegment(std::size_t index, const ColoredLineSegment& lineSegment);
-
    virtual void UpdateGPUVertexData() override;
 
-private:
    std::vector<ColoredLineSegment> lineSegments;
 };
+
+LOCUS_RENDERING_API bool operator==(const LineSegmentCollection::ColoredLineSegment& first, const LineSegmentCollection::ColoredLineSegment& second);
+LOCUS_RENDERING_API bool operator!=(const LineSegmentCollection::ColoredLineSegment& first, const LineSegmentCollection::ColoredLineSegment& second);
+LOCUS_RENDERING_API bool operator<(const LineSegmentCollection::ColoredLineSegment& first, const LineSegmentCollection::ColoredLineSegment& second);
 
 #include "Locus/Preprocessor/EndSilenceDLLInterfaceWarnings"
 

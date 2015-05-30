@@ -32,47 +32,6 @@ LineSegmentCollection::LineSegmentCollection(std::vector<LineSegmentCollection::
 {
 }
 
-void LineSegmentCollection::CopyFrom(const LineSegmentCollection& lineSegmentCollection)
-{
-   lineSegments = lineSegmentCollection.lineSegments;
-}
-
-std::size_t LineSegmentCollection::NumLineSegments() const
-{
-   return lineSegments.size();
-}
-
-void LineSegmentCollection::Clear()
-{
-   lineSegments.clear();
-}
-
-LineSegmentCollection::ColoredLineSegment& LineSegmentCollection::operator[](std::size_t index)
-{
-   assert(index < NumLineSegments());
-
-   return lineSegments[index];
-}
-
-const LineSegmentCollection::ColoredLineSegment& LineSegmentCollection::operator[](std::size_t index) const
-{
-   assert(index < NumLineSegments());
-
-   return lineSegments[index];
-}
-
-void LineSegmentCollection::AddLineSegment(const LineSegmentCollection::ColoredLineSegment& lineSegment)
-{
-   lineSegments.push_back(lineSegment);
-}
-
-void LineSegmentCollection::InsertLineSegment(std::size_t index, const LineSegmentCollection::ColoredLineSegment& lineSegment)
-{
-   assert(index < NumLineSegments());
-
-   lineSegments.insert(lineSegments.begin() + index, lineSegment);
-}
-
 void LineSegmentCollection::UpdateGPUVertexData()
 {
    if (defaultGPUVertexData != nullptr)
@@ -119,6 +78,31 @@ void LineSegmentCollection::UpdateGPUVertexData()
 
       defaultGPUVertexData->drawMode = GL_LINES;
    }
+}
+
+bool operator==(const LineSegmentCollection::ColoredLineSegment& first, const LineSegmentCollection::ColoredLineSegment& second)
+{
+   return ((first.color == second.color) && (first.segment.P1 == second.segment.P1) && (first.segment.P2 == second.segment.P2));
+}
+
+bool operator!=(const LineSegmentCollection::ColoredLineSegment& first, const LineSegmentCollection::ColoredLineSegment& second)
+{
+   return !(first == second);
+}
+
+bool operator<(const LineSegmentCollection::ColoredLineSegment& first, const LineSegmentCollection::ColoredLineSegment& second)
+{
+   if (first.segment.P1 != second.segment.P1)
+   {
+      return (first.segment.P1 < second.segment.P1);
+   }
+
+   if (first.segment.P2 != second.segment.P2)
+   {
+      return (first.segment.P2 < second.segment.P2);
+   }
+
+   return (first.color < second.color);
 }
 
 }

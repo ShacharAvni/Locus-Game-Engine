@@ -264,6 +264,8 @@ void CollisionScene::InitializeBoundary()
 
    Locus::LineSegmentCollection::ColoredLineSegment coloredLineSegment;
 
+   boundary.lineSegments.reserve( LOCUS_ARRAY_LENGTH(linePointIndices) );
+
    for (const std::pair<int, int>& linePointIndexPair : linePointIndices)
    {
       coloredLineSegment.segment.P1 = boundaryPoints[ linePointIndexPair.first ];
@@ -271,7 +273,7 @@ void CollisionScene::InitializeBoundary()
 
       coloredLineSegment.color = Locus::Color::Green();
 
-      boundary.AddLineSegment(coloredLineSegment);
+      boundary.lineSegments.push_back(coloredLineSegment);
    }
 
    boundary.CreateGPUVertexData();
