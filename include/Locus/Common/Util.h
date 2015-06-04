@@ -184,7 +184,7 @@ void ClearStack(std::stack<T>& stack)
    }
 }
 
-/// Clamps the value to between min and max exclusively.
+/// Clamps the value to between min and max inclusively.
 template <class T>
 T Clamp(T value, T min, T max)
 {
