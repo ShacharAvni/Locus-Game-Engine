@@ -13,6 +13,8 @@
 
 #include <Locus/Rendering/Locus_glew.h>
 
+#include "Locus/Common/Util.h"
+
 #include <cassert>
 
 namespace Locus
@@ -30,6 +32,19 @@ LineSegmentCollection::LineSegmentCollection(const std::vector<LineSegmentCollec
 LineSegmentCollection::LineSegmentCollection(std::vector<LineSegmentCollection::ColoredLineSegment>&& lineSegments)
    : lineSegments(lineSegments)
 {
+}
+
+void LineSegmentCollection::SortAndRemoveDuplicateLineSegments()
+{
+   for (ColoredLineSegment& coloredLineSegment : lineSegments)
+   {
+      if (!(coloredLineSegment.segment.P1 < coloredLineSegment.segment.P2))
+      {
+         std::swap(coloredLineSegment.segment.P1, coloredLineSegment.segment.P2);
+      }
+   }
+
+   SortAndRemoveDuplicates(lineSegments);
 }
 
 void LineSegmentCollection::UpdateGPUVertexData()

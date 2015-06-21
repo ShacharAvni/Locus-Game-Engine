@@ -39,6 +39,8 @@ public:
    LineSegmentCollection(const std::vector<ColoredLineSegment>& lineSegments);
    LineSegmentCollection(std::vector<ColoredLineSegment>&& lineSegments);
 
+   void SortAndRemoveDuplicateLineSegments();
+
    virtual void UpdateGPUVertexData() override;
 
    std::vector<ColoredLineSegment> lineSegments;

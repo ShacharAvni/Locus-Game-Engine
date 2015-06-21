@@ -40,6 +40,7 @@ add_library(Locus_Common
             ScopeFinalizer.cpp
             SequentialIDGenerator.cpp
             Util.cpp
+            ${LOCUS_COMMON_INCLUDE}/Array3D.h
             ${LOCUS_COMMON_INCLUDE}/Casts.h
             ${LOCUS_COMMON_INCLUDE}/CircularList.h
             ${LOCUS_COMMON_INCLUDE}/Exception.h
