@@ -85,7 +85,6 @@ CollisionScene::CollisionScene(Locus::SceneManager& sceneManager, unsigned int r
 
 CollisionScene::~CollisionScene()
 {
-   DestroyRenderingState();
 }
 
 void CollisionScene::InitializeRenderingState()
@@ -108,18 +107,6 @@ void CollisionScene::InitializeRenderingState()
    renderingState->transformationStack.LoadIdentity();
 
    renderingState->shaderController.UseProgram(shaderProgramID);
-}
-
-void CollisionScene::DestroyRenderingState()
-{
-   renderingState.reset();
-
-   for (CollidableMesh& collidableMesh : collidableMeshes)
-   {
-      collidableMesh.DeleteGPUVertexData();
-   }
-
-   boundary.DeleteGPUVertexData();
 }
 
 void CollisionScene::InitializeCollidableMeshes()

@@ -81,8 +81,6 @@ private:
    void InitializeCollidableMeshes();
    void InitializeBoundary();
 
-   void DestroyRenderingState();
-
    void UpdateLastMousePosition();
 
    void TickCollidableMeshes(double DT);
