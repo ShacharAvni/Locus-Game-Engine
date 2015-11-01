@@ -71,4 +71,14 @@ void WindowContext::GetPrimaryMonitorWindowSize(int& width, int &height) const
    height = primaryMonitorVideoMode->height;
 }
 
+GLFWwindow* WindowContext::GetSharedWindow() const
+{
+   return sharedWindow;
+}
+
+GLFWmonitor* WindowContext::GetPrimaryMonitor() const
+{
+   return primaryMonitor;
+}
+
 }

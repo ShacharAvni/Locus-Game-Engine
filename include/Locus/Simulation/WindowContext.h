@@ -32,6 +32,10 @@ public:
 
    void GetPrimaryMonitorWindowSize(int& width, int &height) const;
 
+   GLFWwindow* GetSharedWindow() const;
+   GLFWmonitor* GetPrimaryMonitor() const;
+
+private:
    GLFWwindow* sharedWindow;
    GLFWmonitor* primaryMonitor;
    const GLFWvidmode* primaryMonitorVideoMode;

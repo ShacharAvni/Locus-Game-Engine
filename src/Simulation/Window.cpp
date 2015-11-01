@@ -83,10 +83,10 @@ void Window::MakeWindow(int width, int height)
 #ifdef _DEBUG
    GLFWmonitor* monitor = nullptr;
 #else
-   GLFWmonitor* monitor = fullScreen ? windowContext.primaryMonitor : nullptr;
+   GLFWmonitor* monitor = fullScreen ? windowContext.GetPrimaryMonitor() : nullptr;
 #endif
 
-   glfwWindow = glfwCreateWindow(width, height, name.c_str(), monitor, windowContext.sharedWindow);
+   glfwWindow = glfwCreateWindow(width, height, name.c_str(), monitor, windowContext.GetSharedWindow());
 
    if (glfwWindow == nullptr)
    {
